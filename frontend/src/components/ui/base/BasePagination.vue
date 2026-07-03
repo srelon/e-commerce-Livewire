@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useQueryPatch } from '@/composables/useQueryPatch'
 
 const props = defineProps<{
     current_page: number
@@ -43,8 +43,7 @@ const emit = defineEmits<{
     'page-change': [page: number]
 }>()
 
-const route = useRoute()
-const router = useRouter()
+const { patch_query } = useQueryPatch()
 const container = ref<HTMLElement | null>(null)
 
 const pages = computed(() => {
@@ -60,10 +59,12 @@ const last_visible = computed(() => pages.value[pages.value.length - 1] ?? 0)
 
 function change_page(page: number) {
     if (page < 1 || page > props.last_page || page === props.current_page) return
-    router.replace({ query: { ...route.query, page: page > 1 ? page : undefined } })
+    patch_query({ page: page > 1 ? page : undefined }, { reset_page: false })
     emit('page-change', page)
-    if (container.value) {
-        window.scrollTo({ top: container.value.offsetTop - 200, behavior: 'smooth' })
+
+    const content = container.value?.closest('section')
+    if (content instanceof HTMLElement) {
+        window.scrollTo({ top: content.offsetTop - 120, behavior: 'smooth' })
     }
 }
 </script>

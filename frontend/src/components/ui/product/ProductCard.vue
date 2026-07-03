@@ -49,6 +49,7 @@ import { useRoute, useRouter } from 'vue-router'
 import QuickView from '@/components/ui/product/QuickView.vue'
 import BaseButton from '@/components/ui/base/BaseButton.vue'
 import { useShopStore } from '@/stores/shop'
+import { useQueryPatch } from '@/composables/useQueryPatch'
 
 interface Props {
     id: string
@@ -68,6 +69,7 @@ const props = withDefaults(defineProps<Props>(), {
 const store = useShopStore()
 const route = useRoute()
 const router = useRouter()
+const { patch_query } = useQueryPatch()
 
 const is_in_cart = computed(() => store.in_cart(props.id))
 
@@ -84,7 +86,7 @@ function handle_add_to_cart() {
 
 function go_to_category() {
     if (route.path === '/products') {
-        router.replace({ query: { ...route.query, category: props.category } })
+        patch_query({ category: props.category })
     } else {
         router.push({ path: '/products', query: { category: props.category } })
     }

@@ -22,3 +22,23 @@ export interface BlogPostSummary {
     image: string | null
     category: string | null
 }
+
+export interface FilterGroupItem {
+    name: string
+    count?: number
+}
+
+export interface FilterGroup {
+    title: string
+    type: 'price' | 'checkbox' | 'rating'
+    query_key: string
+    items?: FilterGroupItem[]
+    min?: number
+    max?: number
+}
+
+export interface ProductListMeta {
+    current_page: number
+    last_page: number
+    total: number
+}

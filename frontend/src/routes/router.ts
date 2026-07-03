@@ -15,7 +15,7 @@ import NewsPage from '@/views/Pages/News/NewsPage.vue'
 import { useShopStore } from '@/stores/shop'
 import middlewarePipeline from './middlewarePipeline'
 
-const APP_NAME = 'BookStore'
+const APP_NAME = import.meta.env.VITE_APP_NAME ?? 'BookStore'
 
 const routes: RouteRecordRaw[] = [
     {

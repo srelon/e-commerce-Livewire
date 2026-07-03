@@ -20,7 +20,7 @@ interface Props {
     modelValue?: number | null
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     modelValue: null,
 })
 
@@ -31,7 +31,7 @@ const emit = defineEmits<{
 const hovered = ref<number | null>(null)
 
 function on_click(i: number) {
-    emit('update:modelValue', i)
+    emit('update:modelValue', props.modelValue === i ? null : i)
 }
 </script>
 
