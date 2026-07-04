@@ -2,20 +2,20 @@
     <section class="hero">
         <div class="container">
             <div class="hero__top">
-                <h1 class="hero__title">Where Quiet Moments Meet Great Books</h1>
-                <p class="hero__desc">Discover new releases, bestsellers, and hidden gems on our virtual shelves. Enjoy smooth navigation and secure checkout for a seamless book-buying experience.</p>
+                <h1 class="hero__title">{{ title }}</h1>
+                <p class="hero__desc">{{ description }}</p>
             </div>
 
             <div class="hero__bottom">
                 <div class="hero__col hero__col--left">
                     <div class="hero__buttons">
-                        <router-link to="/products" class="hero__btn hero__btn--primary">
+                        <router-link :to="{ name: 'products' }" class="hero__btn hero__btn--primary">
                             Shop Now
                             <svg viewBox="0 0 15 15" aria-hidden="true">
                                 <path d="M1 15a1 1 0 0 1-.707-1.707L11.586 2H1.52a1 1 0 0 1 0-2h12.483q.202.002.379.075a1 1 0 0 1 .542.543 1 1 0 0 1 .076.38V13.48a1 1 0 1 1-2 0V3.414L1.707 14.707A1 1 0 0 1 1 15"/>
                             </svg>
                         </router-link>
-                        <router-link to="/products" class="hero__btn hero__btn--outline">
+                        <router-link :to="{ name: 'products' }" class="hero__btn hero__btn--outline">
                             View Categories
                             <svg viewBox="0 0 15 15" aria-hidden="true">
                                 <path d="M1 15a1 1 0 0 1-.707-1.707L11.586 2H1.52a1 1 0 0 1 0-2h12.483q.202.002.379.075a1 1 0 0 1 .542.543 1 1 0 0 1 .076.38V13.48a1 1 0 1 1-2 0V3.414L1.707 14.707A1 1 0 0 1 1 15"/>
@@ -23,9 +23,12 @@
                         </router-link>
                     </div>
 
+                    <div v-if="!layout_store.loaded" class="hero__card hero__card--stretch">
+                        <BaseSkeleton radius="0" />
+                    </div>
                     <router-link
-                        v-if="hero_categories[0]"
-                        :to="{ path: '/products', query: { category: hero_categories[0].name } }"
+                        v-else-if="hero_categories[0]"
+                        :to="{ name: 'products', query: { category: hero_categories[0].name } }"
                         class="hero__card hero__card--stretch"
                     >
                         <img :src="to_storage_url(hero_categories[0].image)" :alt="hero_categories[0].name" class="hero__card-img">
@@ -49,9 +52,12 @@
                 </div>
 
                 <div class="hero__col hero__col--mid">
+                    <div v-if="!layout_store.loaded" class="hero__card hero__card--stretch">
+                        <BaseSkeleton radius="0" />
+                    </div>
                     <router-link
-                        v-if="hero_categories[1]"
-                        :to="{ path: '/products', query: { category: hero_categories[1].name } }"
+                        v-else-if="hero_categories[1]"
+                        :to="{ name: 'products', query: { category: hero_categories[1].name } }"
                         class="hero__card hero__card--stretch"
                     >
                         <img :src="to_storage_url(hero_categories[1].image)" :alt="hero_categories[1].name" class="hero__card-img">
@@ -80,9 +86,12 @@
                 </div>
 
                 <div class="hero__col hero__col--right">
+                    <div v-if="!layout_store.loaded" class="hero__card hero__card--stretch">
+                        <BaseSkeleton radius="0" />
+                    </div>
                     <router-link
-                        v-if="hero_categories[2]"
-                        :to="{ path: '/products', query: { category: hero_categories[2].name } }"
+                        v-else-if="hero_categories[2]"
+                        :to="{ name: 'products', query: { category: hero_categories[2].name } }"
                         class="hero__card hero__card--stretch"
                     >
                         <img :src="to_storage_url(hero_categories[2].image)" :alt="hero_categories[2].name" class="hero__card-img">
@@ -113,6 +122,17 @@
 import { computed } from 'vue'
 import { useLayoutStore, to_storage_url } from '@/stores/layout'
 import NewsletterForm from '@/components/ui/forms/NewsletterForm.vue'
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
+
+interface Props {
+    title?: string
+    description?: string
+}
+
+withDefaults(defineProps<Props>(), {
+    title: 'Where Quiet Moments Meet Great Books',
+    description: 'Discover new releases, bestsellers, and hidden gems on our virtual shelves. Enjoy smooth navigation and secure checkout for a seamless book-buying experience.',
+})
 
 const layout_store = useLayoutStore()
 

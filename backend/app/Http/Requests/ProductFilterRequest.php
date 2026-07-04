@@ -42,8 +42,8 @@ class ProductFilterRequest extends FormRequest
             'price_max' => ['sometimes', 'numeric', 'min:0'],
             'rating' => ['sometimes', 'integer', 'between:1,5'],
             'status' => ['sometimes', 'array'],
-            'status.*' => ['string', Rule::in(['In Stock', 'On Sale'])],
-            'sort_by' => ['sometimes', Rule::in(['default', 'popularity', 'rating', 'price_asc', 'price_desc'])],
+            'status.*' => ['string', Rule::in(['In Stock', 'On Sale', 'Bestseller'])],
+            'sort_by' => ['sometimes', Rule::in(['default', 'popularity', 'rating', 'price_asc', 'price_desc', 'newest', 'oldest'])],
         ];
     }
 

@@ -1,31 +1,42 @@
 <template>
     <aside class="product-sidebar">
-        <div v-for="group in filter_groups" :key="group.title" class="product-sidebar__block">
-            <h4 class="product-sidebar__heading">{{ group.title }}</h4>
+        <template v-if="loading">
+            <div v-for="n in 3" :key="n" class="product-sidebar__block">
+                <BaseSkeleton width="100px" height="15px" />
+                <div class="product-sidebar__skeleton-list">
+                    <BaseSkeleton v-for="line in 4" :key="line" width="80%" height="14px" />
+                </div>
+            </div>
+        </template>
 
-            <PriceFilter
-                v-if="group.type === 'price'"
-                :min="price_min_bound"
-                :max="price_max_bound"
-                :model_min="price_min"
-                :model_max="price_max"
-                @filter="on_price_filter"
-            />
+        <template v-else>
+            <div v-for="group in filter_groups" :key="group.title" class="product-sidebar__block">
+                <h4 class="product-sidebar__heading">{{ group.title }}</h4>
 
-            <FilterGroup
-                v-else-if="group.type === 'checkbox'"
-                :title="group.title"
-                :items="group.items ?? []"
-                :modelValue="checkbox_selected(group)"
-                @update:modelValue="on_checkbox_change(group, $event)"
-            />
+                <PriceFilter
+                    v-if="group.type === 'price'"
+                    :min="price_min_bound"
+                    :max="price_max_bound"
+                    :model_min="price_min"
+                    :model_max="price_max"
+                    @filter="on_price_filter"
+                />
 
-            <RatingFilter
-                v-else-if="group.type === 'rating'"
-                :modelValue="rating_selected(group)"
-                @update:modelValue="on_rating_change(group, $event)"
-            />
-        </div>
+                <FilterGroup
+                    v-else-if="group.type === 'checkbox'"
+                    :title="group.title"
+                    :items="group.items ?? []"
+                    :modelValue="checkbox_selected(group)"
+                    @update:modelValue="on_checkbox_change(group, $event)"
+                />
+
+                <RatingFilter
+                    v-else-if="group.type === 'rating'"
+                    :modelValue="rating_selected(group)"
+                    @update:modelValue="on_rating_change(group, $event)"
+                />
+            </div>
+        </template>
     </aside>
 </template>
 
@@ -34,6 +45,7 @@ import { computed } from 'vue'
 import PriceFilter from '@/components/ui/filters/PriceFilter.vue'
 import FilterGroup from '@/components/ui/filters/FilterGroup.vue'
 import RatingFilter from '@/components/ui/filters/RatingFilter.vue'
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
 import type { FilterGroup as FilterGroupConfig } from '@/types/shop'
 
 interface Props {
@@ -41,6 +53,7 @@ interface Props {
     selected?: Record<string, string[] | number | null>
     price_min?: number
     price_max?: number
+    loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -48,6 +61,7 @@ const props = withDefaults(defineProps<Props>(), {
     selected: () => ({}),
     price_min: 0,
     price_max: 100,
+    loading: false,
 })
 
 const emit = defineEmits<{
@@ -106,6 +120,13 @@ function on_price_filter(val: { min: number, max: number }) {
         color: $color-dark;
         font-family: $font-heading;
         margin-bottom: 16px;
+    }
+
+    &__skeleton-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 16px;
     }
 }
 </style>

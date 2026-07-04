@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use App\Services\CacheService;
+use App\Models\Concerns\FlushesCacheOnWrite;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ContactInfo extends Model
 {
-    use SoftDeletes;
+    use FlushesCacheOnWrite, SoftDeletes;
+
+    protected static string $cacheFlushMethod = 'flushOnContactWrite';
 
     protected $table = 'contact_info';
 
@@ -20,10 +22,4 @@ class ContactInfo extends Model
         'status',
         'sort_order',
     ];
-
-    protected static function booted(): void
-    {
-        static::saved(fn () => CacheService::flushOnContactWrite());
-        static::deleted(fn () => CacheService::flushOnContactWrite());
-    }
 }

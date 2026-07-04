@@ -11,7 +11,7 @@
                 <button class="qv-modal__close" @click="close" aria-label="Close">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
                 </button>
-                <ProductPage :quick="true" :href="href" />
+                <ProductPage :quick="true" :slug="slug" />
             </div>
         </div>
     </Teleport>
@@ -22,11 +22,11 @@ import { ref, watch, onMounted, onUnmounted } from 'vue'
 import ProductPage from '@/views/Pages/Products/ProductPage.vue'
 
 interface Props {
-    href?: string
+    slug?: string
 }
 
 withDefaults(defineProps<Props>(), {
-    href: '/products',
+    slug: '',
 })
 
 const open = ref(false)

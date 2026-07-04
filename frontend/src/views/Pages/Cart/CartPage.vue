@@ -120,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import PageBanner from '@/components/ui/base/PageBanner.vue'
 import BaseButton from '@/components/ui/base/BaseButton.vue'
@@ -131,6 +131,7 @@ import PaymentStep from './PaymentStep.vue'
 import { useShopStore } from '@/stores/shop'
 import { useCheckoutForm } from '@/composables/useCheckoutForm'
 import type { ContactData, DeliveryData, PaymentData } from '@/composables/useCheckoutForm'
+import api from '@/plugins/axios'
 
 const store = useShopStore()
 const router = useRouter()
@@ -140,6 +141,10 @@ watch(
     (length) => { if (length === 0) router.replace('/') },
     { immediate: true }
 )
+
+onMounted(() => {
+    api.get('pages/cart')
+})
 
 type StepKey = 'contact' | 'delivery' | 'payment'
 

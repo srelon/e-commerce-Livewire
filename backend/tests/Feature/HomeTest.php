@@ -3,16 +3,16 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Helpers\ShopTestHelper;
+use Tests\Helpers\TestDataHelper;
 use Tests\TestCase;
 
 class HomeTest extends TestCase
 {
-    use RefreshDatabase, ShopTestHelper;
+    use RefreshDatabase, TestDataHelper;
 
     public function test_home_returns_successful_response(): void
     {
-        $this->getJson('/api/home')->assertSuccessful();
+        $this->getJson('/api/pages/home')->assertSuccessful();
     }
 
     public function test_bestsellers_are_ordered_by_bestseller_then_rating(): void
@@ -36,7 +36,7 @@ class HomeTest extends TestCase
         ]);
         $this->createProductStock($highest);
 
-        $this->getJson('/api/home')
+        $this->getJson('/api/pages/home')
             ->assertSuccessful()
             ->assertJsonPath('data.bestsellers.0.title', 'Highest')
             ->assertJsonPath('data.bestsellers.1.title', 'High')
@@ -64,7 +64,7 @@ class HomeTest extends TestCase
             ],
         ]);
 
-        $this->getJson('/api/home')
+        $this->getJson('/api/pages/home')
             ->assertSuccessful()
             ->assertJsonPath('data.bestsellers.0.price', '24.50')
             ->assertJsonPath('data.bestsellers.0.image', 'products/first.webp');
@@ -93,7 +93,7 @@ class HomeTest extends TestCase
             'bestseller' => 1,
         ]);
 
-        $this->getJson('/api/home')
+        $this->getJson('/api/pages/home')
             ->assertSuccessful()
             ->assertJsonPath('data.best_author.name', 'Winning Author')
             ->assertJsonPath('data.best_author.content', 'A great author.');
@@ -108,7 +108,7 @@ class HomeTest extends TestCase
             ]);
         }
 
-        $response = $this->getJson('/api/home')->assertSuccessful();
+        $response = $this->getJson('/api/pages/home')->assertSuccessful();
 
         $response->assertJsonCount(9, 'data.best_rated');
         $response->assertJsonPath('data.best_rated.0.title', 'Book 10');
@@ -124,7 +124,7 @@ class HomeTest extends TestCase
             ]);
         }
 
-        $response = $this->getJson('/api/home')->assertSuccessful();
+        $response = $this->getJson('/api/pages/home')->assertSuccessful();
 
         $response->assertJsonCount(7, 'data.blog');
         $response->assertJsonPath('data.blog.0.title', 'Post 8');
@@ -136,9 +136,14 @@ class HomeTest extends TestCase
             'status' => 0,
         ]);
 
-        $this->getJson('/api/home')
+        $this->getJson('/api/pages/home')
             ->assertSuccessful()
             ->assertJsonCount(0, 'data.blog');
+    }
+
+    public function test_home_includes_seo_for_the_home_page(): void
+    {
+        $this->assertPageSeoIncluded('/api/pages/home', 'home', 'Home');
     }
 
     public function test_home_cache_is_invalidated_on_product_stock_write(): void
@@ -151,12 +156,8 @@ class HomeTest extends TestCase
             'price' => '10.00',
         ]);
 
-        $this->getJson('/api/home')->assertJsonPath('data.bestsellers.0.price', '10.00');
-
-        $stock->update([
+        $this->assertCacheInvalidatedOnWrite('/api/pages/home', $stock, 'data.bestsellers.0.price', '10.00', [
             'price' => '15.00',
-        ]);
-
-        $this->getJson('/api/home')->assertJsonPath('data.bestsellers.0.price', '15.00');
+        ], '15.00');
     }
 }

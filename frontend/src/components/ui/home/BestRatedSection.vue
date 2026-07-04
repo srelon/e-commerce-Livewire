@@ -11,16 +11,21 @@
                 </router-link>
             </div>
             <div class="rated__grid">
-                <RatedCard
-                    v-for="product in products"
-                    :key="product.slug"
-                    :title="product.title"
-                    :category="product.category ?? ''"
-                    :price="product.price ?? ''"
-                    :rating="product.rating"
-                    :image="to_storage_url(product.image)"
-                    :href="`/product/${product.slug}`"
-                />
+                <template v-if="loading">
+                    <RatedCard v-for="n in 3" :key="n" loading />
+                </template>
+                <template v-else>
+                    <RatedCard
+                        v-for="product in products"
+                        :key="product.slug"
+                        :slug="product.slug"
+                        :title="product.title"
+                        :category="product.category ?? ''"
+                        :price="product.price ?? ''"
+                        :rating="product.rating"
+                        :image="to_storage_url(product.image)"
+                    />
+                </template>
             </div>
         </div>
     </section>
@@ -30,19 +35,22 @@
 import RatedCard from '@/components/ui/product/RatedCard.vue'
 import { to_storage_url } from '@/stores/layout'
 import type { ProductSummary } from '@/types/shop'
+import type { RouteLocationRaw } from 'vue-router'
 
 interface Props {
     products?: ProductSummary[]
+    loading?: boolean
     title?: string
     view_all_label?: string
-    view_all_href?: string
+    view_all_href?: RouteLocationRaw
 }
 
 withDefaults(defineProps<Props>(), {
     products: () => [],
+    loading: false,
     title: 'Best Rated Books',
     view_all_label: 'View All Books',
-    view_all_href: '/products',
+    view_all_href: () => ({ name: 'products' }),
 })
 </script>
 

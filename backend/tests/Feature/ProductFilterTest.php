@@ -3,12 +3,12 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Helpers\ShopTestHelper;
+use Tests\Helpers\TestDataHelper;
 use Tests\TestCase;
 
 class ProductFilterTest extends TestCase
 {
-    use RefreshDatabase, ShopTestHelper;
+    use RefreshDatabase, TestDataHelper;
 
     public function test_products_returns_successful_response(): void
     {
@@ -34,8 +34,8 @@ class ProductFilterTest extends TestCase
 
         $this->getJson('/api/products?category[]=Fantasy')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.products')
-            ->assertJsonPath('data.products.0.title', 'Fantasy Book');
+            ->assertJsonCount(1, 'data.items.data')
+            ->assertJsonPath('data.items.data.0.title', 'Fantasy Book');
     }
 
     public function test_products_accept_a_single_category_string_not_just_an_array(): void
@@ -50,8 +50,8 @@ class ProductFilterTest extends TestCase
 
         $this->getJson('/api/products?category=Fantasy')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.products')
-            ->assertJsonPath('data.products.0.title', 'Fantasy Book');
+            ->assertJsonCount(1, 'data.items.data')
+            ->assertJsonPath('data.items.data.0.title', 'Fantasy Book');
     }
 
     public function test_products_accept_a_comma_separated_category_list(): void
@@ -80,7 +80,7 @@ class ProductFilterTest extends TestCase
 
         $this->getJson('/api/products?category=Fantasy,Cooking')
             ->assertSuccessful()
-            ->assertJsonCount(2, 'data.products');
+            ->assertJsonCount(2, 'data.items.data');
     }
 
     public function test_products_are_filtered_by_author(): void
@@ -102,8 +102,8 @@ class ProductFilterTest extends TestCase
 
         $this->getJson('/api/products?author[]=Winner Author')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.products')
-            ->assertJsonPath('data.products.0.title', 'By Winner');
+            ->assertJsonCount(1, 'data.items.data')
+            ->assertJsonPath('data.items.data.0.title', 'By Winner');
     }
 
     public function test_products_are_filtered_by_price_range(): void
@@ -123,8 +123,8 @@ class ProductFilterTest extends TestCase
 
         $this->getJson('/api/products?price_min=20&price_max=60')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.products')
-            ->assertJsonPath('data.products.0.title', 'Expensive Book');
+            ->assertJsonCount(1, 'data.items.data')
+            ->assertJsonPath('data.items.data.0.title', 'Expensive Book');
     }
 
     public function test_products_ignore_a_non_numeric_price_min_or_max(): void
@@ -133,7 +133,7 @@ class ProductFilterTest extends TestCase
 
         $this->getJson('/api/products?price_min=asdasd&price_max=alsogarbage')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.products');
+            ->assertJsonCount(1, 'data.items.data');
     }
 
     public function test_products_ignore_a_non_numeric_page(): void
@@ -142,7 +142,7 @@ class ProductFilterTest extends TestCase
 
         $this->getJson('/api/products?page=asdasd')
             ->assertSuccessful()
-            ->assertJsonPath('data.meta.current_page', 1);
+            ->assertJsonPath('data.items.pagination.current_page', 1);
     }
 
     public function test_products_are_filtered_by_rating(): void
@@ -158,8 +158,8 @@ class ProductFilterTest extends TestCase
 
         $this->getJson('/api/products?rating=4')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.products')
-            ->assertJsonPath('data.products.0.title', 'High Rated');
+            ->assertJsonCount(1, 'data.items.data')
+            ->assertJsonPath('data.items.data.0.title', 'High Rated');
     }
 
     public function test_products_are_filtered_by_status_on_sale(): void
@@ -178,8 +178,24 @@ class ProductFilterTest extends TestCase
 
         $this->getJson('/api/products?status[]=On Sale')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.products')
-            ->assertJsonPath('data.products.0.title', 'On Sale Book');
+            ->assertJsonCount(1, 'data.items.data')
+            ->assertJsonPath('data.items.data.0.title', 'On Sale Book');
+    }
+
+    public function test_products_are_filtered_by_status_bestseller(): void
+    {
+        $this->createProduct(null, [
+            'title' => 'Bestseller Book',
+            'bestseller' => 1,
+        ]);
+        $this->createProduct(null, [
+            'title' => 'Regular Book',
+        ]);
+
+        $this->getJson('/api/products?status[]=Bestseller')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data.items.data')
+            ->assertJsonPath('data.items.data.0.title', 'Bestseller Book');
     }
 
     public function test_products_are_sorted_by_price_ascending(): void
@@ -199,8 +215,30 @@ class ProductFilterTest extends TestCase
 
         $this->getJson('/api/products?sort_by=price_asc')
             ->assertSuccessful()
-            ->assertJsonPath('data.products.0.title', 'Cheap')
-            ->assertJsonPath('data.products.1.title', 'Expensive');
+            ->assertJsonPath('data.items.data.0.title', 'Cheap')
+            ->assertJsonPath('data.items.data.1.title', 'Expensive');
+    }
+
+    public function test_products_are_sorted_by_date_added(): void
+    {
+        $this->createProduct(null, [
+            'title' => 'Older Book',
+            'published_at' => now()->subDays(2),
+        ]);
+        $this->createProduct(null, [
+            'title' => 'Newer Book',
+            'published_at' => now(),
+        ]);
+
+        $this->getJson('/api/products?sort_by=newest')
+            ->assertSuccessful()
+            ->assertJsonPath('data.items.data.0.title', 'Newer Book')
+            ->assertJsonPath('data.items.data.1.title', 'Older Book');
+
+        $this->getJson('/api/products?sort_by=oldest')
+            ->assertSuccessful()
+            ->assertJsonPath('data.items.data.0.title', 'Older Book')
+            ->assertJsonPath('data.items.data.1.title', 'Newer Book');
     }
 
     public function test_products_response_includes_filter_groups_with_counts(): void
@@ -336,6 +374,12 @@ class ProductFilterTest extends TestCase
 
         $this->assertTrue($status_names->contains('In Stock'));
         $this->assertFalse($status_names->contains('On Sale'));
+        $this->assertFalse($status_names->contains('Bestseller'));
+    }
+
+    public function test_products_includes_seo_for_the_products_page(): void
+    {
+        $this->assertPageSeoIncluded('/api/products', 'products', 'Products');
     }
 
     public function test_products_are_paginated_nine_per_page(): void
@@ -348,8 +392,8 @@ class ProductFilterTest extends TestCase
 
         $response = $this->getJson('/api/products')->assertSuccessful();
 
-        $response->assertJsonCount(9, 'data.products');
-        $response->assertJsonPath('data.meta.total', 10);
-        $response->assertJsonPath('data.meta.last_page', 2);
+        $response->assertJsonCount(9, 'data.items.data');
+        $response->assertJsonPath('data.items.pagination.total', 10);
+        $response->assertJsonPath('data.items.pagination.last_page', 2);
     }
 }

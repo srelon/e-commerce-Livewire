@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use App\Services\CacheService;
+use App\Models\Concerns\FlushesCacheOnWrite;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductImage extends Model
 {
-    use SoftDeletes;
+    use FlushesCacheOnWrite, SoftDeletes;
+
+    protected static string $cacheFlushMethod = 'flushOnProductWrite';
 
     protected $fillable = [
         'product_id',
@@ -27,11 +29,5 @@ class ProductImage extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
-    }
-
-    protected static function booted(): void
-    {
-        static::saved(fn () => CacheService::flushOnProductWrite());
-        static::deleted(fn () => CacheService::flushOnProductWrite());
     }
 }

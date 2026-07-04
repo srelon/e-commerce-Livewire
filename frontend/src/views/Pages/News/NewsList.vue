@@ -5,140 +5,138 @@
         <div class="container">
             <div class="news__inner">
                 <div class="news__main">
+                    <ListBar :title="`${pagination.total} ${pagination.total === 1 ? 'post' : 'posts'} found`" :loading="is_loading">
+                        <template #right>
+                            <div class="news__sort-group">
+                                <PlainSelect v-model="category" :options="category_options" />
+                                <SortSelect v-model="sort_by" :options="sort_options" />
+                            </div>
+                        </template>
+                    </ListBar>
+
                     <div class="news__grid">
-                        <BlogCard
-                            v-for="post in posts"
-                            :key="post.title"
-                            v-bind="post"
-                        />
+                        <template v-if="is_loading">
+                            <BlogCard v-for="n in 6" :key="n" loading />
+                        </template>
+                        <template v-else>
+                            <BlogCard
+                                v-for="post in posts"
+                                :key="post.slug"
+                                :title="post.title"
+                                :excerpt="post.excerpt ?? ''"
+                                :category="post.category ?? ''"
+                                :author="post.author ?? ''"
+                                :date="format_date(post.date)"
+                                :image="to_storage_url(post.image)"
+                                :slug="post.slug"
+                            />
+                        </template>
                     </div>
 
                     <BasePagination
-                        :current_page="current_page"
-                        :last_page="last_page"
+                        :current_page="pagination.current_page"
+                        :last_page="pagination.last_page"
                         class="news__pagination"
                     />
                 </div>
 
-                <Sidebar
-                    :show_newsletter="true"
-                    :best_books="best_books"
-                    :book_categories="book_categories"
-                />
+                <Sidebar :show_newsletter="true" />
             </div>
         </div>
     </section>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import PageBanner from '@/components/ui/base/PageBanner.vue'
-import BlogCard from '@/components/ui/blog/BlogCard.vue'
+import ListBar from '@/components/ui/base/ListBar.vue'
 import Sidebar from '@/components/ui/sidebar/Sidebar.vue'
+import BlogCard from '@/components/ui/blog/BlogCard.vue'
 import BasePagination from '@/components/ui/base/BasePagination.vue'
+import SortSelect from '@/components/ui/base/SortSelect.vue'
+import PlainSelect from '@/components/ui/base/PlainSelect.vue'
+import api from '@/plugins/axios'
+import { to_storage_url } from '@/stores/layout'
+import { useQueryPatch } from '@/composables/useQueryPatch'
+import type { BlogPostSummary, Paginated, Pagination } from '@/types/shop'
+import type { SortKey } from '@/components/ui/base/SortSelect.vue'
 
 const route = useRoute()
-const last_page = 2
-const current_page = computed(() => Number(route.query.page) || 1)
+const { patch_query } = useQueryPatch()
 
-const best_books = [
-    {
-        title: 'Anxiety Unmasked',
-        price: '18.00',
-        image: '/images/book-image-19.webp',
-    },
-    {
-        title: 'Astral Journey',
-        price: '28.00',
-        image: '/images/book-image-24.webp',
-    },
-    {
-        title: 'Autumn Journey',
-        price: '17.00',
-        image: '/images/book-image-29.webp',
-    },
-    {
-        title: 'Best Italian Cuisines',
-        price: '25.00',
-        image: '/images/book-image-7.webp',
-    },
-    {
-        title: 'Economic Opportunity',
-        price: '22.00',
-        image: '/images/book-image-32.webp',
-    },
-]
+const sort_options: SortKey[] = ['newest', 'oldest']
+const query_key_order = ['category', 'sort_by', 'page']
 
-const book_categories = [
-    { name: 'Art & Design', count: 8 },
-    { name: 'Self-help', count: 12 },
-    { name: 'Science', count: 6 },
-    { name: 'Romance', count: 9 },
-    { name: 'Fantasy', count: 11 },
-    { name: 'Cooking', count: 10 },
-]
+const is_loading = ref(true)
+const posts = ref<BlogPostSummary[]>([])
+const categories = ref<string[]>([])
+const pagination = ref<Pagination>({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+})
 
-const posts = [
-    {
-        title: 'Blandit Praesent Morbi Faucibus',
-        excerpt: 'Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Praesent sapien massa, convallis a pellentesque nec.',
-        category: 'Literature',
-        author: 'Admin',
-        date: 'December 20, 2025',
-        image: '/images/blog-image-3.webp',
-        href: '/news/blandit-praesent',
+const sort_by = computed({
+    get: () => (route.query.sort_by as string) ?? 'newest',
+    set: (value: string) => {
+        patch_query({ sort_by: value === 'newest' ? undefined : value }, { order: query_key_order })
     },
-    {
-        title: 'Ornare Curabitur Vitae Scelerisque',
-        excerpt: 'Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Curabitur aliquet quam id dui posuere blandit.',
-        category: 'Cultural',
-        author: 'Admin',
-        date: 'December 18, 2025',
-        image: '/images/blog-image-4.webp',
-        href: '/news/ornare-curabitur',
+})
+
+const category = computed({
+    get: () => (route.query.category as string) ?? '',
+    set: (value: string) => {
+        patch_query({ category: value || undefined }, { order: query_key_order })
     },
+})
+
+const category_options = computed(() => [
     {
-        title: 'Massa Fames Eleifend Convallis',
-        excerpt: 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; proin vel ante a orci tempus eleifend.',
-        category: 'Literature',
-        author: 'Admin',
-        date: 'December 15, 2025',
-        image: '/images/blog-image-5.webp',
-        href: '/news/massa-fames',
+        value: '',
+        label: 'All Categories',
     },
+    ...categories.value.map((name) => ({
+        value: name,
+        label: name,
+    })),
+])
+
+function format_date(date: string | null): string {
+    if (!date) return ''
+    return new Date(date).toLocaleDateString('en', { month: 'long', day: 'numeric', year: 'numeric' })
+}
+
+function fetch_news() {
+    is_loading.value = true
+    api.get('news', { params: route.query }).then((res) => {
+        const items: Paginated<BlogPostSummary> = res.data.data.items
+        posts.value = items.data
+        categories.value = res.data.data.categories
+        pagination.value = items.pagination
+    }).finally(() => {
+        is_loading.value = false
+    })
+}
+
+watch(
+    () => route.query,
+    fetch_news,
     {
-        title: 'Porttitor Suspendisse Bibendum',
-        excerpt: 'Nulla porttitor accumsan tincidunt. Cras ultricies ligula sed magna dictum porta.',
-        category: 'Reading',
-        author: 'Admin',
-        date: 'December 12, 2025',
-        image: '/images/blog-image-6.webp',
-        href: '/news/porttitor-suspendisse',
+        immediate: true,
+        deep: true,
     },
-    {
-        title: 'Platea Justo Curabitur Consequat',
-        excerpt: 'Quisque velit nisi, pretium ut lacinia in, elementum id enim. Donec rutrum congue leo eget malesuada.',
-        category: 'Authors',
-        author: 'Admin',
-        date: 'December 10, 2025',
-        image: '/images/blog-image-7.webp',
-        href: '/news/platea-justo',
-    },
-    {
-        title: 'Volutpat Tempor Accumsan Porta',
-        excerpt: 'Pellentesque in ipsum id orci porta dapibus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus.',
-        category: 'Cultural',
-        author: 'Admin',
-        date: 'December 8, 2025',
-        image: '/images/blog-image-8.webp',
-        href: '/news/volutpat-tempor',
-    },
-]
+)
 </script>
 
 <style lang="scss" scoped>
 .news {
+    &__sort-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
     &__inner {
         display: flex;
         gap: 40px;

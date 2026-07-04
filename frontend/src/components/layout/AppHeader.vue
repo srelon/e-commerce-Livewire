@@ -2,7 +2,7 @@
     <header class="header">
         <div class="header__main">
             <div class="container header__main-inner">
-                <router-link to="/" class="header__logo" aria-label="Book Store">
+                <router-link :to="{ name: 'home' }" class="header__logo" aria-label="Book Store">
                     <svg class="header__logo-icon" viewBox="0 0 34 28" fill="none" aria-hidden="true">
                         <path d="M17 5L17 23" stroke="#ff6310" stroke-width="2" stroke-linecap="round"/>
                         <path d="M17 5L4 7.5L4 25L17 23Z" fill="#ff6310" fill-opacity="0.12" stroke="#ff6310" stroke-width="1.5" stroke-linejoin="round"/>
@@ -69,7 +69,7 @@
                                 <router-link
                                     v-for="cat in layout_store.categories"
                                     :key="cat.id"
-                                    :to="{ path: '/products', query: { category: cat.name } }"
+                                    :to="{ name: 'products', query: { category: cat.name } }"
                                     class="header__mega-item"
                                     :class="{ 'header__mega-item--active': cat.id === active_promo_category?.id }"
                                     @mouseenter="hovered_category = cat"

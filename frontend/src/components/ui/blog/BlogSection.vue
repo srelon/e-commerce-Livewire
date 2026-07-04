@@ -11,42 +11,55 @@
                 </router-link>
             </div>
 
-            <div v-if="featured_post" class="blog__grid">
+            <div v-if="loading || featured_post" class="blog__grid">
                 <div class="blog__col blog__col--list">
-                    <BlogCard
-                        v-for="post in left_posts"
-                        :key="post.slug"
-                        :title="post.title"
-                        :date="format_date(post.date)"
-                        :image="to_storage_url(post.image)"
-                        :href="`/news/${post.slug}`"
-                        :horizontal="true"
-                    />
+                    <template v-if="loading">
+                        <BlogCard v-for="n in 3" :key="n" :horizontal="true" loading />
+                    </template>
+                    <template v-else>
+                        <BlogCard
+                            v-for="post in left_posts"
+                            :key="post.slug"
+                            :title="post.title"
+                            :date="format_date(post.date)"
+                            :image="to_storage_url(post.image)"
+                            :slug="post.slug"
+                            :horizontal="true"
+                        />
+                    </template>
                 </div>
 
                 <div class="blog__col blog__col--featured">
-                    <article class="blog-featured">
-                        <img :src="to_storage_url(featured_post.image)" :alt="featured_post.title" class="blog-featured__img">
+                    <div v-if="loading" class="blog-featured">
+                        <BaseSkeleton radius="0" />
+                    </div>
+                    <article v-else class="blog-featured">
+                        <img :src="to_storage_url(featured_post!.image)" :alt="featured_post!.title" class="blog-featured__img">
                         <div class="blog-featured__overlay">
-                            <time class="blog-featured__date">{{ format_date(featured_post.date) }}</time>
+                            <time class="blog-featured__date">{{ format_date(featured_post!.date) }}</time>
                             <h2 class="blog-featured__title">
-                                <router-link :to="`/news/${featured_post.slug}`">{{ featured_post.title }}</router-link>
+                                <router-link :to="{ name: 'post', params: { slug: featured_post!.slug } }">{{ featured_post!.title }}</router-link>
                             </h2>
-                            <p v-if="featured_post.category" class="blog-featured__cats">In {{ featured_post.category }}</p>
+                            <p v-if="featured_post!.category" class="blog-featured__cats">In {{ featured_post!.category }}</p>
                         </div>
                     </article>
                 </div>
 
                 <div class="blog__col blog__col--list">
-                    <BlogCard
-                        v-for="post in right_posts"
-                        :key="post.slug"
-                        :title="post.title"
-                        :date="format_date(post.date)"
-                        :image="to_storage_url(post.image)"
-                        :href="`/news/${post.slug}`"
-                        :horizontal="true"
-                    />
+                    <template v-if="loading">
+                        <BlogCard v-for="n in 3" :key="n" :horizontal="true" loading />
+                    </template>
+                    <template v-else>
+                        <BlogCard
+                            v-for="post in right_posts"
+                            :key="post.slug"
+                            :title="post.title"
+                            :date="format_date(post.date)"
+                            :image="to_storage_url(post.image)"
+                            :slug="post.slug"
+                            :horizontal="true"
+                        />
+                    </template>
                 </div>
             </div>
         </div>
@@ -56,21 +69,25 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import BlogCard from '@/components/ui/blog/BlogCard.vue'
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
 import { to_storage_url } from '@/stores/layout'
 import type { BlogPostSummary } from '@/types/shop'
+import type { RouteLocationRaw } from 'vue-router'
 
 interface Props {
     posts?: BlogPostSummary[]
+    loading?: boolean
     title?: string
     view_all_label?: string
-    view_all_href?: string
+    view_all_href?: RouteLocationRaw
 }
 
 const props = withDefaults(defineProps<Props>(), {
     posts: () => [],
+    loading: false,
     title: 'Latest Blog Posts',
     view_all_label: 'View All Posts',
-    view_all_href: '/news',
+    view_all_href: () => ({ name: 'news' }),
 })
 
 const featured_post = computed(() => props.posts[0] ?? null)

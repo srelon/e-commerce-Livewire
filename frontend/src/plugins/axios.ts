@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useToast } from 'vue-toastification'
+import { useSeo } from '@/composables/useSeo'
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL ?? '/api',
@@ -34,7 +35,12 @@ function extract_error_message(error: unknown): string {
 }
 
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        const data = response.data?.data
+        useSeo(data?.page?.seo ?? data?.seo)
+
+        return response
+    },
     (error) => {
         useToast().error(extract_error_message(error))
 

@@ -3,12 +3,12 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Helpers\ShopTestHelper;
+use Tests\Helpers\TestDataHelper;
 use Tests\TestCase;
 
 class LayoutTest extends TestCase
 {
-    use RefreshDatabase, ShopTestHelper;
+    use RefreshDatabase, TestDataHelper;
 
     public function test_layout_returns_successful_response(): void
     {
@@ -82,6 +82,32 @@ class LayoutTest extends TestCase
             ->assertJsonPath('data.contacts.0.key', 'phone');
     }
 
+    public function test_layout_includes_best_selling_books(): void
+    {
+        $product = $this->createProduct(null, [
+            'title' => 'Bestseller Book',
+            'bestseller' => 1,
+        ]);
+        $this->createProductStock($product);
+
+        $this->getJson('/api/layout')
+            ->assertSuccessful()
+            ->assertJsonPath('data.best_books.0.title', 'Bestseller Book');
+    }
+
+    public function test_layout_cache_is_invalidated_on_product_write(): void
+    {
+        $product = $this->createProduct(null, [
+            'title' => 'Original Title',
+            'bestseller' => 1,
+        ]);
+        $this->createProductStock($product);
+
+        $this->assertCacheInvalidatedOnWrite('/api/layout', $product, 'data.best_books.0.title', 'Original Title', [
+            'title' => 'Updated Title',
+        ], 'Updated Title');
+    }
+
     public function test_layout_cache_is_invalidated_on_contact_write(): void
     {
         $contact = $this->createContact([
@@ -89,12 +115,8 @@ class LayoutTest extends TestCase
             'content' => 'old number',
         ]);
 
-        $this->getJson('/api/layout')->assertJsonPath('data.contacts.0.content', 'old number');
-
-        $contact->update([
+        $this->assertCacheInvalidatedOnWrite('/api/layout', $contact, 'data.contacts.0.content', 'old number', [
             'content' => 'new number',
-        ]);
-
-        $this->getJson('/api/layout')->assertJsonPath('data.contacts.0.content', 'new number');
+        ], 'new number');
     }
 }

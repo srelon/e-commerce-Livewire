@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
 trait RespondTrait
 {
     protected function paginationMeta($paginated): array
@@ -17,6 +19,14 @@ trait RespondTrait
 
     protected function respondWithJson($content, $status = 200, array $headers = [], $options = 0)
     {
+        if (is_array($content) && ($content['items'] ?? null) instanceof LengthAwarePaginator) {
+            $paginated = $content['items'];
+            $content['items'] = [
+                'data' => $paginated->items(),
+                'pagination' => $this->paginationMeta($paginated),
+            ];
+        }
+
         $response = [
             'data' => $content,
             'status' => $status,

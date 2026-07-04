@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use App\Services\CacheService;
+use App\Models\Concerns\FlushesCacheOnWrite;
 use Illuminate\Database\Eloquent\Model;
 use SolutionForest\FilamentTree\Concern\ModelTree;
 
 class Menu extends Model
 {
-    use ModelTree;
+    use FlushesCacheOnWrite, ModelTree;
+
+    protected static string $cacheFlushMethod = 'flushOnMenuWrite';
 
     protected $fillable = [
         'name',
@@ -26,11 +28,5 @@ class Menu extends Model
             'parent_id' => 'integer',
             'params' => 'array',
         ];
-    }
-
-    protected static function booted(): void
-    {
-        static::saved(fn () => CacheService::flushOnMenuWrite());
-        static::deleted(fn () => CacheService::flushOnMenuWrite());
     }
 }

@@ -442,7 +442,7 @@ class ProductSeeder extends Seeder
             ],
         ];
 
-        foreach ($products as $data) {
+        foreach ($products as $index => $data) {
             $category = ProductsCategory::where('name', $data['category'])->firstOrFail();
             $author = ProductsAuthor::where('name', $data['author'])->firstOrFail();
 
@@ -457,7 +457,7 @@ class ProductSeeder extends Seeder
                     'rating_avg' => $data['rating'],
                     'bestseller' => $data['bestseller'] ? 1 : 0,
                     'status' => 1,
-                    'published_at' => now(),
+                    'published_at' => now()->subDays(count($products) - $index),
                 ],
             );
 

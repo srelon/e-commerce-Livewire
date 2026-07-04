@@ -1,7 +1,14 @@
 <template>
     <section class="cats">
         <div class="container">
-            <div class="cats__wrapper">
+            <div v-if="!layout_store.loaded" class="cats__skeleton-track">
+                <div v-for="n in 8" :key="n" class="cats__skeleton-item">
+                    <BaseSkeleton width="56px" height="56px" circle />
+                    <BaseSkeleton width="70px" height="13px" />
+                    <BaseSkeleton width="50px" height="12px" />
+                </div>
+            </div>
+            <div v-else class="cats__wrapper">
                 <div
                     class="cats__track"
                     :style="{
@@ -26,6 +33,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import CategoryItem from '@/components/ui/home/CategoryItem.vue'
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
 import { useLayoutStore, to_storage_url } from '@/stores/layout'
 
 const VISIBLE = 8
@@ -85,6 +93,20 @@ onUnmounted(() => {
     &__track {
         display: flex;
         width: v-bind(track_width);
+    }
+
+    &__skeleton-track {
+        display: flex;
+    }
+
+    &__skeleton-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+        padding: 16px 20px;
     }
 }
 </style>

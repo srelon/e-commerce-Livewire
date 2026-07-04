@@ -3,22 +3,21 @@
 
     <section class="products section">
         <div class="container">
-            <div class="products__bar">
-                <div class="products__bar-left">
-                    <p class="products__results">{{ meta.total }} {{ meta.total === 1 ? 'result' : 'results' }} found</p>
-                    <ActiveFilters
-                        :filter_groups="filter_groups"
-                        :selected="selected"
-                        :price_min="price_min"
-                        :price_max="price_max"
-                        :price_bounds_min="price_bounds_min"
-                        :price_bounds_max="price_bounds_max"
-                        @remove="on_sidebar_filter"
-                        @clear="on_sidebar_filter"
-                    />
-                </div>
-                <SortSelect v-model="sort_by" :options="sort_options" />
-            </div>
+            <ListBar :title="`${pagination.total} ${pagination.total === 1 ? 'result' : 'results'} found`" :loading="is_loading">
+                <ActiveFilters
+                    :filter_groups="filter_groups"
+                    :selected="selected"
+                    :price_min="price_min"
+                    :price_max="price_max"
+                    :price_bounds_min="price_bounds_min"
+                    :price_bounds_max="price_bounds_max"
+                    @remove="on_sidebar_filter"
+                    @clear="on_sidebar_filter"
+                />
+                <template #right>
+                    <SortSelect v-model="sort_by" :options="sort_options" />
+                </template>
+            </ListBar>
 
             <div class="products__inner">
                 <ProductSidebar
@@ -26,28 +25,33 @@
                     :selected="selected"
                     :price_min="price_min"
                     :price_max="price_max"
+                    :loading="is_loading"
                     @filter="on_sidebar_filter"
                 />
 
                 <div class="products__main">
                     <div class="products__grid">
-                        <ProductCard
-                            v-for="product in products"
-                            :key="product.slug"
-                            :id="product.slug"
-                            :title="product.title"
-                            :author="product.author ?? ''"
-                            :category="product.category ?? ''"
-                            :price="product.price ?? ''"
-                            :rating="product.rating"
-                            :image="to_storage_url(product.image)"
-                            :href="`/product/${product.slug}`"
-                        />
+                        <template v-if="is_loading">
+                            <ProductCard v-for="n in 9" :key="n" loading />
+                        </template>
+                        <template v-else>
+                            <ProductCard
+                                v-for="product in products"
+                                :key="product.slug"
+                                :id="product.slug"
+                                :title="product.title"
+                                :author="product.author ?? ''"
+                                :category="product.category ?? ''"
+                                :price="product.price ?? ''"
+                                :rating="product.rating"
+                                :image="to_storage_url(product.image)"
+                            />
+                        </template>
                     </div>
 
                     <BasePagination
-                        :current_page="meta.current_page"
-                        :last_page="meta.last_page"
+                        :current_page="pagination.current_page"
+                        :last_page="pagination.last_page"
                         class="products__pagination"
                     />
                 </div>
@@ -60,6 +64,7 @@
 import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import PageBanner from '@/components/ui/base/PageBanner.vue'
+import ListBar from '@/components/ui/base/ListBar.vue'
 import ProductSidebar from '@/components/ui/sidebar/ProductSidebar.vue'
 import ActiveFilters from '@/components/ui/filters/ActiveFilters.vue'
 import ProductCard from '@/components/ui/product/ProductCard.vue'
@@ -68,38 +73,18 @@ import SortSelect from '@/components/ui/base/SortSelect.vue'
 import api from '@/plugins/axios'
 import { to_storage_url } from '@/stores/layout'
 import { useQueryPatch } from '@/composables/useQueryPatch'
-import type { FilterGroup, ProductListMeta, ProductSummary } from '@/types/shop'
-import type { SortOption } from '@/components/ui/base/SortSelect.vue'
+import type { FilterGroup, Paginated, Pagination, ProductSummary } from '@/types/shop'
+import type { SortKey } from '@/components/ui/base/SortSelect.vue'
 
 const route = useRoute()
 const { patch_query } = useQueryPatch()
 
-const sort_options: SortOption[] = [
-    {
-        value: 'default',
-        label: 'Default sorting',
-    },
-    {
-        value: 'popularity',
-        label: 'Sort by popularity',
-    },
-    {
-        value: 'rating',
-        label: 'Sort by rating',
-    },
-    {
-        value: 'price_asc',
-        label: 'Sort by price: low to high',
-    },
-    {
-        value: 'price_desc',
-        label: 'Sort by price: high to low',
-    },
-]
+const sort_options: SortKey[] = ['default', 'popularity', 'rating', 'price_asc', 'price_desc', 'newest', 'oldest']
 
+const is_loading = ref(true)
 const products = ref<ProductSummary[]>([])
 const filter_groups = ref<FilterGroup[]>([])
-const meta = ref<ProductListMeta>({
+const pagination = ref<Pagination>({
     current_page: 1,
     last_page: 1,
     total: 0,
@@ -195,11 +180,15 @@ function sanitize_query() {
 }
 
 function fetch_products() {
+    is_loading.value = true
     api.get('products', { params: route.query }).then((res) => {
-        products.value = res.data.data.products
+        const items: Paginated<ProductSummary> = res.data.data.items
+        products.value = items.data
         filter_groups.value = res.data.data.filter_groups
-        meta.value = res.data.data.meta
+        pagination.value = items.pagination
         sanitize_query()
+    }).finally(() => {
+        is_loading.value = false
     })
 }
 
@@ -224,32 +213,6 @@ watch(
     &__main {
         flex: 1;
         min-width: 0;
-    }
-
-    &__bar {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 24px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid $color-light;
-    }
-
-    &__bar-left {
-        display: flex;
-        align-items: flex-start;
-        flex-wrap: nowrap;
-        gap: 16px;
-        min-width: 0;
-    }
-
-    &__results {
-        width: 130px;
-        flex-shrink: 0;
-        font-size: 14px;
-        color: $color-gray;
-        white-space: nowrap;
     }
 
     &__grid {

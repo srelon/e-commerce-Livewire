@@ -1,3 +1,5 @@
+import type { PageSeo } from '@/composables/useSeo'
+
 export interface ProductSummary {
     slug: string
     title: string
@@ -21,6 +23,8 @@ export interface BlogPostSummary {
     date: string | null
     image: string | null
     category: string | null
+    excerpt?: string | null
+    author?: string | null
 }
 
 export interface FilterGroupItem {
@@ -37,8 +41,31 @@ export interface FilterGroup {
     max?: number
 }
 
-export interface ProductListMeta {
+export interface Pagination {
     current_page: number
     last_page: number
     total: number
+}
+
+export interface Paginated<T> {
+    data: T[]
+    pagination: Pagination
+}
+
+export interface AuthorListItem {
+    slug: string
+    name: string
+    initials: string
+    color: string
+    bio: string
+    books: number
+    bestsellers: number
+}
+
+export interface PageBundle {
+    title: string
+    content: string | null
+    excerpt: string | null
+    image: string | null
+    seo: PageSeo
 }

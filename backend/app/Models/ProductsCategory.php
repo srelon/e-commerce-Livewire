@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Services\CacheService;
+use App\Models\Concerns\FlushesCacheOnWrite;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductsCategory extends Model
 {
-    use SoftDeletes;
+    use FlushesCacheOnWrite, SoftDeletes;
+
+    protected static string $cacheFlushMethod = 'flushOnCategoryWrite';
 
     protected $fillable = [
         'name',
@@ -37,11 +39,5 @@ class ProductsCategory extends Model
     public function seo(): MorphOne
     {
         return $this->morphOne(SeoMeta::class, 'seo', 'type', 'record_id');
-    }
-
-    protected static function booted(): void
-    {
-        static::saved(fn () => CacheService::flushOnCategoryWrite());
-        static::deleted(fn () => CacheService::flushOnCategoryWrite());
     }
 }

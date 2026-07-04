@@ -1,28 +1,62 @@
 <template>
     <div class="author-card">
-        <div class="author-card__avatar" :style="{ background: color }">
-            {{ initials }}
+        <div v-if="loading" class="author-card__avatar">
+            <BaseSkeleton circle />
         </div>
+        <router-link
+            v-else
+            :to="{ name: 'products', query: { author: name } }"
+            class="author-card__avatar"
+            :style="{ background: color }"
+        >
+            {{ initials }}
+        </router-link>
         <div class="author-card__body">
-            <h3 class="author-card__name">
-                <router-link :to="{ path: '/products', query: { author: name } }">{{ name }}</router-link>
-            </h3>
-            <p class="author-card__bio">{{ bio }}</p>
-            <span class="author-card__books">Selling books: {{ books }}</span>
+            <template v-if="loading">
+                <div class="author-card__skeleton-lines">
+                    <BaseSkeleton width="160px" height="18px" />
+                    <BaseSkeleton width="100%" height="14px" />
+                    <BaseSkeleton width="90%" height="14px" />
+                    <BaseSkeleton width="120px" height="13px" />
+                    <BaseSkeleton width="120px" height="13px" />
+                </div>
+            </template>
+            <template v-else>
+                <h3 class="author-card__name">
+                    <router-link :to="{ name: 'products', query: { author: name } }">{{ name }}</router-link>
+                </h3>
+                <p class="author-card__bio">{{ bio }}</p>
+                <div class="author-card__stats">
+                    <span class="author-card__books">Selling books: {{ books }}</span>
+                    <span class="author-card__bestsellers">Bestsellers: {{ bestsellers }}</span>
+                </div>
+            </template>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
+
 interface Props {
-    name: string
-    initials: string
-    color: string
-    bio: string
-    books: number
+    name?: string
+    initials?: string
+    color?: string
+    bio?: string
+    books?: number
+    bestsellers?: number
+    loading?: boolean
 }
 
-defineProps<Props>()
+withDefaults(defineProps<Props>(), {
+    name: '',
+    initials: '',
+    color: '',
+    bio: '',
+    books: 0,
+    bestsellers: 0,
+    loading: false,
+})
 </script>
 
 <style lang="scss" scoped>
@@ -79,10 +113,22 @@ defineProps<Props>()
         margin-bottom: 12px;
     }
 
-    &__books {
+    &__stats {
+        display: flex;
+        gap: 16px;
+    }
+
+    &__books,
+    &__bestsellers {
         font-size: 13px;
         font-weight: 600;
         color: $color-primary;
+    }
+
+    &__skeleton-lines {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
     }
 }
 </style>

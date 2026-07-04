@@ -22,6 +22,7 @@ class LayoutService
                 'categories' => $this->productService->getCategories()->toArray(),
                 'menu' => $this->getMenu()->toArray(),
                 'contacts' => $this->getContacts()->toArray(),
+                'best_books' => $this->productService->getBestsellers(5)->toArray(),
             ],
         );
     }

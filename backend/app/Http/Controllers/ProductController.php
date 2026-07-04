@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductFilterRequest;
+use App\Services\PageService;
 use App\Services\ProductService;
 
 class ProductController extends Controller
 {
-    public function __construct(protected ProductService $productService)
+    public function __construct(protected ProductService $productService, protected PageService $pageService)
     {
     }
 
@@ -17,9 +18,9 @@ class ProductController extends Controller
         $paginated = $this->productService->getFilteredList($filters);
 
         return $this->respondWithJson([
-            'products' => $paginated->items(),
+            'items' => $paginated,
             'filter_groups' => $this->productService->getFilterGroups($filters),
-            'meta' => $this->paginationMeta($paginated),
+            'page' => $this->pageService->getPage('products'),
         ]);
     }
 }

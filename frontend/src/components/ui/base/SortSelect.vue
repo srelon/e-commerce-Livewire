@@ -1,46 +1,47 @@
 <template>
-    <select
-        :value="modelValue"
-        class="sort-select"
-        @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
-    >
-        <option v-for="option in options" :key="option.value" :value="option.value">
-            {{ option.label }}
-        </option>
-    </select>
+    <PlainSelect :model-value="modelValue" :options="select_options" @update:model-value="emit('update:modelValue', $event)" />
 </template>
 
 <script setup lang="ts">
-export interface SortOption {
-    value: string
-    label: string
+import { computed } from 'vue'
+import PlainSelect from '@/components/ui/base/PlainSelect.vue'
+
+export type SortKey =
+    | 'default'
+    | 'popularity'
+    | 'rating'
+    | 'price_asc'
+    | 'price_desc'
+    | 'newest'
+    | 'oldest'
+    | 'books'
+    | 'bestseller'
+
+const SORT_LABELS: Record<SortKey, string> = {
+    default: 'Default sorting',
+    popularity: 'Sort by popularity',
+    rating: 'Sort by rating',
+    price_asc: 'Sort by price: low to high',
+    price_desc: 'Sort by price: high to low',
+    newest: 'Newest first',
+    oldest: 'Oldest first',
+    books: 'Sort by books',
+    bestseller: 'Sort by bestseller',
 }
 
 interface Props {
-    options: SortOption[]
+    options: SortKey[]
     modelValue: string
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
     'update:modelValue': [value: string]
 }>()
+
+const select_options = computed(() => props.options.map((key) => ({
+    value: key,
+    label: SORT_LABELS[key],
+})))
 </script>
-
-<style lang="scss" scoped>
-.sort-select {
-    padding: 8px 14px;
-    border: 1.5px solid $color-light;
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: $font-body;
-    color: $color-dark;
-    outline: none;
-    cursor: pointer;
-
-    &:focus {
-        border-color: $color-primary;
-    }
-}
-</style>

@@ -1,27 +1,45 @@
 <template>
     <article class="blog-card" :class="{ 'blog-card--horizontal': horizontal }">
-        <router-link :to="href" class="blog-card__img-wrap">
+        <div v-if="loading" class="blog-card__img-wrap">
+            <BaseSkeleton radius="0" />
+        </div>
+        <router-link v-else :to="to" class="blog-card__img-wrap">
             <img :src="image" :alt="title" class="blog-card__img">
         </router-link>
+
         <div class="blog-card__body">
-            <template v-if="horizontal">
+            <template v-if="loading && horizontal">
+                <div class="blog-card__skeleton-lines">
+                    <BaseSkeleton width="70px" height="11px" />
+                    <BaseSkeleton width="90%" height="14px" />
+                </div>
+            </template>
+            <template v-else-if="loading">
+                <BaseSkeleton width="80px" height="12px" />
+                <BaseSkeleton width="90%" height="18px" />
+                <BaseSkeleton width="100%" height="60px" />
+                <BaseSkeleton width="140px" height="13px" />
+            </template>
+            <template v-else-if="horizontal">
                 <time class="blog-card__date">{{ date }}</time>
                 <h3 class="blog-card__title">
-                    <router-link :to="href">{{ title }}</router-link>
+                    <router-link :to="to">{{ title }}</router-link>
                 </h3>
             </template>
             <template v-else>
-                <span class="blog-card__category">{{ category }}</span>
+                <button class="blog-card__category" @click="go_to_filter('news', 'category', category)">{{ category }}</button>
                 <h2 class="blog-card__title">
-                    <router-link :to="href">{{ title }}</router-link>
+                    <router-link :to="to">{{ title }}</router-link>
                 </h2>
                 <p class="blog-card__excerpt">{{ excerpt }}</p>
                 <div class="blog-card__meta">
-                    <span class="blog-card__author">{{ author }}</span>
-                    <span class="blog-card__dot">·</span>
+                    <template v-if="author">
+                        <span class="blog-card__author">{{ author }}</span>
+                        <span class="blog-card__dot">·</span>
+                    </template>
                     <span class="blog-card__date">{{ date }}</span>
                 </div>
-                <router-link :to="href" class="blog-card__read-more">
+                <router-link :to="to" class="blog-card__read-more">
                     Read More
                     <svg viewBox="0 0 15 15" aria-hidden="true">
                         <path d="M1 15a1 1 0 0 1-.707-1.707L11.586 2H1.52a1 1 0 0 1 0-2h12.483q.202.002.379.075a1 1 0 0 1 .542.543 1 1 0 0 1 .076.38V13.48a1 1 0 1 1-2 0V3.414L1.707 14.707A1 1 0 0 1 1 15"/>
@@ -33,24 +51,42 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
+import { useShopFilterNav } from '@/composables/useShopFilterNav'
+
 interface Props {
-    title: string
-    date: string
-    image: string
-    href?: string
+    slug?: string
+    title?: string
+    date?: string
+    image?: string
     horizontal?: boolean
     excerpt?: string
     category?: string
     author?: string
+    loading?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
-    href: '/news',
+const props = withDefaults(defineProps<Props>(), {
+    slug: '',
+    title: '',
+    date: '',
+    image: '',
     horizontal: false,
+    excerpt: '',
+    category: '',
+    author: '',
+    loading: false,
 })
+
+const { go_to_filter } = useShopFilterNav()
+
+const to = computed(() => ({ name: 'post', params: { slug: props.slug } }))
 </script>
 
 <style lang="scss" scoped>
+@use "sass:color";
+
 .blog-card {
     display: flex;
     flex-direction: column;
@@ -133,6 +169,17 @@ withDefaults(defineProps<Props>(), {
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: $color-primary;
+        font-family: $font-body;
+        background: none;
+        border: none;
+        padding: 0;
+        align-self: flex-start;
+        cursor: pointer;
+        transition: color 0.2s;
+
+        &:hover {
+            color: color.adjust($color-primary, $lightness: -8%);
+        }
     }
 
     &__title {
@@ -185,6 +232,12 @@ withDefaults(defineProps<Props>(), {
             display: block;
             margin-bottom: 6px;
         }
+    }
+
+    &__skeleton-lines {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
     }
 
     &__read-more {

@@ -1,5 +1,5 @@
 <template>
-    <section v-if="author" class="best-author section">
+    <section v-if="loading || author" class="best-author section">
         <div class="container">
             <div class="best-author__inner">
                 <div class="best-author__left">
@@ -18,7 +18,7 @@
 
                     <p class="best-author__desc">This author received multiple awards and nominations for his work.</p>
 
-                    <router-link to="/authors" class="best-author__btn">
+                    <router-link :to="{ name: 'authors' }" class="best-author__btn">
                         Explore Collection
                         <svg viewBox="0 0 15 15" aria-hidden="true">
                             <path d="M1 15a1 1 0 0 1-.707-1.707L11.586 2H1.52a1 1 0 0 1 0-2h12.483q.202.002.379.075a1 1 0 0 1 .542.543 1 1 0 0 1 .076.38V13.48a1 1 0 1 1-2 0V3.414L1.707 14.707A1 1 0 0 1 1 15"/>
@@ -27,14 +27,22 @@
                 </div>
 
                 <div class="best-author__center">
-                    <img :src="author_photo" :alt="author.name" class="best-author__photo">
+                    <BaseSkeleton v-if="loading" width="280px" height="380px" radius="6px" />
+                    <img v-else :src="author_photo" :alt="author?.name" class="best-author__photo">
                 </div>
 
                 <div class="best-author__right">
-                    <blockquote class="best-author__quote">
-                        {{ author.content }}
-                    </blockquote>
-                    <cite class="best-author__name">{{ author.name }}</cite>
+                    <template v-if="loading">
+                        <BaseSkeleton width="90%" height="22px" />
+                        <BaseSkeleton width="60%" height="22px" />
+                        <BaseSkeleton width="140px" height="16px" />
+                    </template>
+                    <template v-else>
+                        <blockquote class="best-author__quote">
+                            {{ author?.content }}
+                        </blockquote>
+                        <cite class="best-author__name">{{ author?.name }}</cite>
+                    </template>
 
                     <div class="best-author__socials">
                         <a href="#" aria-label="Facebook" class="best-author__social">
@@ -67,14 +75,18 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
 import { to_storage_url } from '@/stores/layout'
 import type { AuthorSummary } from '@/types/shop'
 
 interface Props {
     author?: AuthorSummary | null
+    loading?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+    loading: false,
+})
 
 const author_photo = computed(() =>
     props.author?.photo ? to_storage_url(props.author.photo) : '/images/best-author-1.webp',

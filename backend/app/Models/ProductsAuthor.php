@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use App\Services\CacheService;
+use App\Models\Concerns\FlushesCacheOnWrite;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductsAuthor extends Model
 {
-    use SoftDeletes;
+    use FlushesCacheOnWrite, SoftDeletes;
+
+    protected static string $cacheFlushMethod = 'flushOnProductWrite';
 
     protected $fillable = [
         'name',
@@ -29,11 +31,5 @@ class ProductsAuthor extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class, 'author_id');
-    }
-
-    protected static function booted(): void
-    {
-        static::saved(fn () => CacheService::flushOnProductWrite());
-        static::deleted(fn () => CacheService::flushOnProductWrite());
     }
 }

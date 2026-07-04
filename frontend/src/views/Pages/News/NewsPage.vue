@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="post__footer">
-                        <router-link to="/news" class="post__back">← Back to News</router-link>
+                        <router-link :to="{ name: 'news' }" class="post__back">← Back to News</router-link>
                     </div>
                 </article>
 
@@ -55,31 +55,31 @@ const related_posts = [
         title: 'Ornare Curabitur Vitae Scelerisque',
         date: 'December 18, 2025',
         image: '/images/blog-image-4.webp',
-        href: '/news/ornare-curabitur',
+        slug: 'ornare-curabitur',
     },
     {
         title: 'Massa Fames Eleifend Convallis',
         date: 'December 15, 2025',
         image: '/images/blog-image-5.webp',
-        href: '/news/massa-fames',
+        slug: 'massa-fames',
     },
     {
         title: 'Porttitor Suspendisse Bibendum',
         date: 'December 12, 2025',
         image: '/images/blog-image-6.webp',
-        href: '/news/porttitor-suspendisse',
+        slug: 'porttitor-suspendisse',
     },
     {
         title: 'Platea Justo Curabitur Consequat',
         date: 'December 10, 2025',
         image: '/images/blog-image-7.webp',
-        href: '/news/platea-justo',
+        slug: 'platea-justo',
     },
     {
         title: 'Volutpat Tempor Accumsan Porta',
         date: 'December 8, 2025',
         image: '/images/blog-image-8.webp',
-        href: '/news/volutpat-tempor',
+        slug: 'volutpat-tempor',
     },
 ]
 </script>

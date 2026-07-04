@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import api from '@/plugins/axios'
+import type { ProductSummary } from '@/types/shop'
 
 export interface LayoutCategory {
     id: number
@@ -32,6 +33,7 @@ export const useLayoutStore = defineStore('layout', () => {
     const categories = ref<LayoutCategory[]>([])
     const menu = ref<LayoutMenuItem[]>([])
     const contacts = ref<LayoutContact[]>([])
+    const best_books = ref<ProductSummary[]>([])
 
     function fetch_layout() {
         if (loaded.value) return Promise.resolve()
@@ -41,6 +43,7 @@ export const useLayoutStore = defineStore('layout', () => {
             categories.value = data.categories
             menu.value = data.menu
             contacts.value = data.contacts
+            best_books.value = data.best_books
             loaded.value = true
         })
     }
@@ -50,6 +53,7 @@ export const useLayoutStore = defineStore('layout', () => {
         categories,
         menu,
         contacts,
+        best_books,
         fetch_layout,
     }
 })

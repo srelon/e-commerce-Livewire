@@ -70,6 +70,9 @@ class ProductService
                 if (in_array('On Sale', $statuses, true)) {
                     $q->orWhereHas('activeStock', fn (Builder $sq) => $sq->whereNotNull('before_price'));
                 }
+                if (in_array('Bestseller', $statuses, true)) {
+                    $q->orWhere('bestseller', 1);
+                }
             });
         }
     }
@@ -81,6 +84,8 @@ class ProductService
             'rating' => $query->orderByDesc('rating_avg'),
             'price_asc' => $query->orderBy($this->priceSubquery()),
             'price_desc' => $query->orderByDesc($this->priceSubquery()),
+            'newest' => $query->orderByDesc('published_at'),
+            'oldest' => $query->orderBy('published_at'),
             default => $query->orderBy('id'),
         };
     }
@@ -186,6 +191,12 @@ class ProductService
                 'name' => 'On Sale',
                 'count' => $this->filteredBaseQuery($filters, ['status'])
                     ->whereHas('activeStock', fn (Builder $q) => $q->whereNotNull('before_price'))
+                    ->count(),
+            ],
+            [
+                'name' => 'Bestseller',
+                'count' => $this->filteredBaseQuery($filters, ['status'])
+                    ->where('bestseller', 1)
                     ->count(),
             ],
         ];
