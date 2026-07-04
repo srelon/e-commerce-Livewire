@@ -66,8 +66,44 @@ class HomeTest extends TestCase
 
         $this->getJson('/api/pages/home')
             ->assertSuccessful()
-            ->assertJsonPath('data.bestsellers.0.price', '24.50')
+            ->assertJsonPath('data.bestsellers.0.stock.price', '24.50')
             ->assertJsonPath('data.bestsellers.0.image', 'products/first.webp');
+    }
+
+    public function test_bestsellers_include_stock_id_and_available_quantity(): void
+    {
+        $product = $this->createProduct(null, [
+            'bestseller' => 1,
+        ]);
+        $stock = $this->createProductStock($product, [
+            'quantity' => 20,
+        ]);
+        $this->createOrderItem($stock, [
+            'status' => 0,
+            'quantity' => 5,
+            'fact_quantity' => 0,
+        ]);
+
+        $this->getJson('/api/pages/home')
+            ->assertSuccessful()
+            ->assertJsonPath('data.bestsellers.0.stock.id', $stock->id)
+            ->assertJsonPath('data.bestsellers.0.stock.quantity', 15);
+    }
+
+    public function test_best_rated_includes_price_but_not_stock_id_or_quantity(): void
+    {
+        $product = $this->createProduct(null, [
+            'rating_avg' => 5,
+        ]);
+        $this->createProductStock($product, [
+            'price' => '19.99',
+        ]);
+
+        $this->getJson('/api/pages/home')
+            ->assertSuccessful()
+            ->assertJsonPath('data.best_rated.0.stock.price', '19.99')
+            ->assertJsonMissingPath('data.best_rated.0.stock.id')
+            ->assertJsonMissingPath('data.best_rated.0.stock.quantity');
     }
 
     public function test_best_author_is_the_one_with_most_bestseller_products(): void
@@ -156,7 +192,7 @@ class HomeTest extends TestCase
             'price' => '10.00',
         ]);
 
-        $this->assertCacheInvalidatedOnWrite('/api/pages/home', $stock, 'data.bestsellers.0.price', '10.00', [
+        $this->assertCacheInvalidatedOnWrite('/api/pages/home', $stock, 'data.bestsellers.0.stock.price', '10.00', [
             'price' => '15.00',
         ], '15.00');
     }

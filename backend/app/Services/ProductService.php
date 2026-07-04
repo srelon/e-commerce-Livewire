@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\ProductsAuthor;
 use App\Models\ProductsCategory;
 use App\Models\ProductStock;
@@ -19,6 +20,46 @@ class ProductService
         $this->applySort($query, $filters['sort_by'] ?? 'default');
 
         return $query->paginate($perPage)->through(fn (Product $product) => $this->formatProduct($product));
+    }
+
+    public function getBySlug(string $slug): ?Product
+    {
+        return Product::query()
+            ->where('slug', $slug)
+            ->whereIn('status', [1, 2])
+            ->with(['author', 'category', 'activeStock' => $this->withStockReservations(...), 'images', 'seo'])
+            ->first();
+    }
+
+    public function formatProductDetail(Product $product): array
+    {
+        return [
+            'slug' => $product->slug,
+            'title' => $product->title,
+            'author' => $product->author?->name,
+            'category' => $product->category?->name,
+            'rating' => (float) $product->rating_avg,
+            'reviews_count' => $product->reviews_count,
+            'short_description' => $product->short_description,
+            'description' => $product->description,
+            'images' => $product->images->map(fn (ProductImage $image) => $image->image['original'] ?? null)->filter()->values()->all(),
+            'stock' => $this->formatStock($product->activeStock),
+            'seo' => [
+                'title' => $product->seo?->seo_title ?? $product->title,
+                'description' => $product->seo?->seo_description ?? $product->short_description,
+                'keywords' => $product->seo?->seo_keywords,
+            ],
+        ];
+    }
+
+    public function getRelatedProducts(Product $product, int $limit = 4): Collection
+    {
+        return $this->baseQuery()
+            ->where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->limit($limit)
+            ->get()
+            ->map(fn (Product $related) => $this->formatProduct($related));
     }
 
     public function getFilterGroups(array $filters = []): array
@@ -241,10 +282,10 @@ class ProductService
 
     public function getBestRated(int $limit = 9): Collection
     {
-        return $this->topProducts(['rating_avg'], $limit);
+        return $this->topProducts(['rating_avg'], $limit, includeStock: false);
     }
 
-    protected function topProducts(array $orderByDesc, int $limit): Collection
+    protected function topProducts(array $orderByDesc, int $limit, bool $includeStock = true): Collection
     {
         $query = $this->baseQuery();
 
@@ -252,7 +293,7 @@ class ProductService
             $query->orderByDesc($column);
         }
 
-        return $query->limit($limit)->get()->map(fn (Product $product) => $this->formatProduct($product));
+        return $query->limit($limit)->get()->map(fn (Product $product) => $this->formatProduct($product, $includeStock));
     }
 
     public function getBestAuthor(): ?array
@@ -283,19 +324,52 @@ class ProductService
     {
         return Product::query()
             ->where('status', 1)
-            ->with(['author', 'category', 'activeStock', 'primaryImage']);
+            ->with(['author', 'category', 'activeStock' => $this->withStockReservations(...), 'primaryImage']);
     }
 
-    protected function formatProduct(Product $product): array
+    protected function withStockReservations($query): void
+    {
+        $query
+            ->withSum(['orderItems as pending_quantity' => fn (Builder $q) => $q->where('status', 0)], 'quantity')
+            ->withSum(['orderItems as fulfilled_quantity' => fn (Builder $q) => $q->whereIn('status', [1, 2, 3])], 'fact_quantity');
+    }
+
+    protected function availableStockQuantity(?ProductStock $stock): int
+    {
+        if (!$stock) {
+            return 0;
+        }
+
+        $reserved = ($stock->pending_quantity ?? 0) + ($stock->fulfilled_quantity ?? 0);
+
+        return max(0, $stock->quantity - $reserved);
+    }
+
+    protected function formatStock(?ProductStock $stock, bool $includeAvailability = true): array
+    {
+        $data = [
+            'price' => $stock?->price,
+            'before_price' => $stock?->before_price,
+        ];
+
+        if ($includeAvailability) {
+            $data['id'] = $stock?->id;
+            $data['quantity'] = $this->availableStockQuantity($stock);
+        }
+
+        return $data;
+    }
+
+    protected function formatProduct(Product $product, bool $includeStock = true): array
     {
         return [
             'slug' => $product->slug,
             'title' => $product->title,
             'author' => $product->author?->name,
             'category' => $product->category?->name,
-            'price' => $product->activeStock?->price,
             'rating' => (float) $product->rating_avg,
             'image' => $product->primaryImage?->image['original'] ?? null,
+            'stock' => $this->formatStock($product->activeStock, $includeStock),
         ];
     }
 }

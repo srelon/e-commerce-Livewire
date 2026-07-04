@@ -25,6 +25,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => true,
                 'images' => ['book-image-24.webp'],
+                'short_description' => 'A wanderer crosses into a realm where stars are doorways and every choice reshapes the sky.',
+                'description' => "When Mira falls through a crack in the night sky, she finds herself in a realm where constellations are living paths and every star hides a doorway to another world. Guided by a fox-shaped spirit and hunted by a fractured moon-god, she must piece together a map that was never meant to exist. Astral Journey is a sweeping tale of wonder and consequence, where the smallest choice can rewrite the heavens themselves.",
             ],
             [
                 'title' => 'Best Italian Cuisines',
@@ -34,6 +36,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => true,
                 'images' => ['book-image-7.webp'],
+                'short_description' => 'A regional tour of Italy told through its pastas, sauces, and family kitchen traditions.',
+                'description' => "From the hills of Tuscany to the coast of Sicily, this collection gathers the recipes that define Italian home cooking. Each chapter pairs a region with the dishes it's famous for, breaking down classic techniques for fresh pasta, slow-simmered sauces, and rustic breads. Best Italian Cuisines is written for cooks who want the story behind the dish as much as the dish itself.",
             ],
             [
                 'title' => 'Economic Opportunity',
@@ -43,6 +47,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => false,
                 'images' => ['book-image-32.webp'],
+                'short_description' => 'A clear-eyed look at how markets create openings, and how ordinary people can seize them.',
+                'description' => "Economic Opportunity breaks down the forces that create openings in a changing market, from shifting consumer habits to gaps left by outdated industries. Clara Whitfield draws on real case studies to show how small businesses and individual founders have turned overlooked niches into lasting ventures. Practical, grounded, and free of buzzwords, this is a guide for anyone looking to understand where value is actually created.",
             ],
             [
                 'title' => 'Journey Through Time',
@@ -52,6 +58,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['book-image-25.webp'],
+                'short_description' => 'A sweeping walk through the centuries that shaped how we live today.',
+                'description' => "Journey Through Time traces the turning points of human history, from the first cities to the age of information, without losing sight of the ordinary lives caught in between. Amelia Brooks writes history as a chain of decisions rather than a list of dates, showing how each era's choices still echo in the present. A vivid, accessible introduction for anyone curious about how we got here.",
             ],
             [
                 'title' => 'Simple Aesthetics',
@@ -61,6 +69,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => false,
                 'images' => ['book-image-26.webp'],
+                'short_description' => 'A design philosophy built on restraint, proportion, and knowing what to leave out.',
+                'description' => "Simple Aesthetics argues that good design is defined as much by what's removed as by what's added. Through case studies spanning furniture, typography, and architecture, Amelia Brooks unpacks the quiet rules behind spaces and objects that feel effortless. A thoughtful primer for designers and enthusiasts who want to understand restraint as a creative tool, not a limitation.",
             ],
             [
                 'title' => 'The Silent Forest',
@@ -70,6 +80,8 @@ class ProductSeeder extends Seeder
                 'rating' => 3,
                 'bestseller' => false,
                 'images' => ['book-image-33.webp'],
+                'short_description' => 'A recluse returns to her childhood village to find the forest around it has stopped making sound.',
+                'description' => "Years after leaving her childhood village, Nora returns to settle her late mother's affairs and finds the surrounding forest unnervingly quiet — no birds, no wind through the leaves, nothing. As she digs into old journals and older neighbors' half-told stories, she uncovers a secret the village has spent a generation trying to forget. The Silent Forest is a slow-burning, atmospheric novel about memory, guilt, and the things we bury to keep living.",
             ],
             [
                 'title' => 'Mind & Wellness',
@@ -79,6 +91,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['book-image-18.webp'],
+                'short_description' => 'Grounded, everyday practices for building calm and resilience into a busy life.',
+                'description' => "Mind & Wellness offers a practical toolkit for mental clarity, drawing on cognitive techniques, breathing exercises, and simple daily habits rather than abstract theory. Oliver Hartman writes for readers who want real strategies they can use the same day, not a philosophy to study. A steady, encouraging companion for anyone working to build calm into an overstretched routine.",
             ],
             [
                 'title' => 'The Language of Color',
@@ -88,6 +102,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-15.jpg'],
+                'short_description' => 'How color theory shapes emotion, meaning, and memory across art and design.',
+                'description' => "The Language of Color explores how artists and designers use hue, contrast, and saturation to guide the eye and stir emotion, long before a viewer consciously notices why. Oliver Hartman walks through historical palettes, modern branding, and the psychology behind why certain combinations feel warm, unsettling, or trustworthy. An engaging read for anyone who wants to see color as a deliberate language rather than a decoration.",
             ],
             [
                 'title' => 'Modern Sculpture',
@@ -97,6 +113,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => false,
                 'images' => ['cover-30.jpg'],
+                'short_description' => 'A survey of the movements and materials that redefined sculpture in the last century.',
+                'description' => "Modern Sculpture traces the shift from classical form to abstraction, industrial materials, and installation art, showing how sculptors reimagined what a three-dimensional artwork could be. Clara Whitfield profiles the key movements and the artists who broke from tradition, pairing each with the cultural shifts that pushed them forward. A rich visual and critical guide for art students and gallery-goers alike.",
             ],
             [
                 'title' => 'Design Thinking',
@@ -106,6 +124,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-45.jpg'],
+                'short_description' => 'A hands-on framework for solving real problems the way designers do.',
+                'description' => "Design Thinking breaks the creative problem-solving process into stages any team can follow — empathize, define, ideate, prototype, and test — and shows how each one applies far beyond product design. Henry Caldwell fills the book with worked examples from startups, classrooms, and nonprofits, making the framework concrete rather than theoretical. A practical starting point for anyone who wants to design better solutions, not just prettier ones.",
             ],
             [
                 'title' => 'Visual Harmony',
@@ -115,6 +135,8 @@ class ProductSeeder extends Seeder
                 'rating' => 3,
                 'bestseller' => false,
                 'images' => ['cover-55.jpg'],
+                'short_description' => 'The principles of balance and composition that hold a great design together.',
+                'description' => "Visual Harmony breaks down composition, balance, and rhythm across painting, photography, and layout design, showing the shared principles that make an image feel resolved rather than chaotic. Amelia Brooks uses side-by-side comparisons to make abstract ideas like tension and negative space easy to spot and apply. A useful reference for anyone building a visual eye from scratch.",
             ],
             [
                 'title' => 'Empires of the Ancient World',
@@ -124,6 +146,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => true,
                 'images' => ['cover-65.jpg'],
+                'short_description' => 'How ancient empires rose, ruled, and eventually gave way to what came after.',
+                'description' => "Empires of the Ancient World surveys the great powers of antiquity — from Mesopotamia to Rome — examining not just their conquests but the administrative systems, trade networks, and ideas that let them endure for centuries. Nathaniel Parker draws clear throughlines between ancient statecraft and the institutions still shaping the modern world. A sweeping, readable entry point into ancient history.",
             ],
             [
                 'title' => 'The Silk Road Chronicles',
@@ -133,6 +157,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-75.jpg'],
+                'short_description' => "The merchants, cities, and ideas carried along history's most famous trade route.",
+                'description' => "The Silk Road Chronicles follows the caravans, merchants, and pilgrims who connected East and West across thousands of miles of desert and mountain pass. Eleanor Finch shows how goods were never the only thing traveling those routes — religions, scripts, and diseases moved along with the silk and spice. A vivid account of how the ancient world was more connected than most people realize.",
             ],
             [
                 'title' => 'Revolutions That Shaped Us',
@@ -142,6 +168,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-85.jpg'],
+                'short_description' => "The uprisings and upheavals that redrew the political map of the modern era.",
+                'description' => "Revolutions That Shaped Us examines the political upheavals — from the Atlantic revolutions to the twentieth century's great uprisings — that redefined the relationship between citizens and the state. Oliver Hartman looks past the famous slogans to the everyday grievances that actually lit the fuse each time. A concise, sharp account of how the modern political order came to be.",
             ],
             [
                 'title' => 'Voices from the Past',
@@ -151,6 +179,8 @@ class ProductSeeder extends Seeder
                 'rating' => 3,
                 'bestseller' => false,
                 'images' => ['cover-100.jpg'],
+                'short_description' => 'Ordinary lives recovered from letters, diaries, and court records across the centuries.',
+                'description' => "Voices from the Past pieces together history through the words of the people who lived it — soldiers, laborers, and shopkeepers whose letters and diaries rarely make it into textbooks. Clara Whitfield lets these first-hand accounts carry the narrative, offering a grounded, human alternative to history told only through kings and battles. A moving reminder that history is made of individual lives.",
             ],
             [
                 'title' => 'The Quantum Frontier',
@@ -160,6 +190,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => true,
                 'images' => ['cover-110.jpg'],
+                'short_description' => 'A clear guide to the strange rules of quantum physics and what they mean for the future.',
+                'description' => "The Quantum Frontier walks readers through the counterintuitive world of quantum mechanics — superposition, entanglement, and the uncertainty principle — using analogies rather than equations. Henry Caldwell connects the theory to real technology on the horizon, from quantum computing to next-generation sensors. An approachable entry point into one of science's most misunderstood fields.",
             ],
             [
                 'title' => 'Life Under the Microscope',
@@ -169,6 +201,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-130.jpg'],
+                'short_description' => 'A journey into the microscopic world that makes up every living thing.',
+                'description' => "Life Under the Microscope takes readers cell by cell through the hidden machinery of living things, from the bacteria in a drop of pond water to the intricate signaling inside a human neuron. Amelia Brooks pairs each concept with vivid description of what these structures actually look like up close. A fascinating introduction to biology for curious readers of any background.",
             ],
             [
                 'title' => 'Cosmic Origins',
@@ -178,6 +212,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => false,
                 'images' => ['cover-140.jpg'],
+                'short_description' => 'From the first instant of the universe to the galaxies we see tonight.',
+                'description' => "Cosmic Origins traces the story of the universe from the first fraction of a second after the Big Bang to the formation of stars, galaxies, and eventually our own solar system. Nathaniel Parker translates decades of astrophysics into a narrative anyone can follow, without losing the wonder of the subject. A sweeping look at where everything, including us, actually came from.",
             ],
             [
                 'title' => 'The Genetic Code',
@@ -187,6 +223,8 @@ class ProductSeeder extends Seeder
                 'rating' => 3,
                 'bestseller' => false,
                 'images' => ['cover-165.jpg'],
+                'short_description' => "An accessible tour of DNA, heredity, and what genetics can and can't tell us.",
+                'description' => "The Genetic Code explains how DNA stores and transmits the instructions for life, and how modern genetics has moved from theory to tools that can read, and even edit, that code. Eleanor Finch is careful to separate what the science actually shows from the hype that often surrounds it. A balanced, grounded introduction to one of the most consequential fields in modern science.",
             ],
             [
                 'title' => 'Whispers in the Attic',
@@ -196,6 +234,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-175.jpg'],
+                'short_description' => 'A family inheritance uncovers a secret that was never meant to be found.',
+                'description' => "When Daniel inherits his grandmother's house, he expects dust and old furniture, not the locked trunk of letters hidden behind the attic wall. Piecing together decades-old correspondence, he begins to suspect his family's quiet reputation was built on something far darker than anyone let on. Whispers in the Attic is a tightly wound story about the cost of the secrets families keep to protect themselves.",
             ],
             [
                 'title' => 'The Last Letter',
@@ -205,6 +245,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => true,
                 'images' => ['cover-190.jpg'],
+                'short_description' => 'A wartime letter, decades lost in the mail, finally reaches its intended reader.',
+                'description' => "A letter written during wartime and lost for sixty years finally arrives at its destination, addressed to a woman who is now in her eighties and the only one left who might understand it. The Last Letter moves between the past and present as she retraces the story the letter was never allowed to finish telling. A quietly devastating novel about love, time, and the words we never get to say in the moment.",
             ],
             [
                 'title' => 'Shadows of Yesterday',
@@ -214,6 +256,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-210.jpg'],
+                'short_description' => "A detective's cold case reopens old wounds he thought he'd buried for good.",
+                'description' => "Twenty years after failing to solve his first case, Detective Marlowe is handed the file again when new evidence surfaces overnight. Shadows of Yesterday follows him back through a town that has spent two decades trying to forget what happened, and through his own memories of the version of himself he was back then. A moody, character-driven mystery about the cases that never really close.",
             ],
             [
                 'title' => 'A Quiet Reckoning',
@@ -223,6 +267,8 @@ class ProductSeeder extends Seeder
                 'rating' => 3,
                 'bestseller' => false,
                 'images' => ['cover-220.jpg'],
+                'short_description' => "A woman confronts the choices of her past when her estranged sister returns home.",
+                'description' => "When her estranged sister returns to settle their father's estate, Ruth is forced to revisit the falling-out that split their family apart a decade earlier. A Quiet Reckoning unfolds over a single tense week at the family home, where old resentments surface alongside a truth neither sister expected. A restrained, emotionally precise story about forgiveness on your own terms.",
             ],
             [
                 'title' => 'Rustic Italian Kitchen',
@@ -232,6 +278,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => false,
                 'images' => ['cover-235.jpg'],
+                'short_description' => 'Countryside recipes built on simple ingredients and unhurried technique.',
+                'description' => "Rustic Italian Kitchen focuses on the countryside cooking often overshadowed by restaurant-style Italian food — hearty stews, hand-rolled pasta, and bread baked in a wood-fired oven. Nathaniel Parker emphasizes technique over shortcuts, walking through each dish the way it would be made in a family kitchen. A warm, unpretentious cookbook for slow weekends and shared tables.",
             ],
             [
                 'title' => 'The Art of Fermentation',
@@ -241,6 +289,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-260.jpg'],
+                'short_description' => 'A practical guide to pickling, brewing, and culturing food at home.',
+                'description' => "The Art of Fermentation demystifies one of cooking's oldest techniques, covering everything from basic sauerkraut to home-brewed kombucha and cultured dairy. Eleanor Finch explains the science behind each process just enough to build confidence, without turning the book into a chemistry lecture. An essential guide for anyone ready to grow their own flavor instead of buying it jarred.",
             ],
             [
                 'title' => 'Spice Route Recipes',
@@ -250,6 +300,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-275.jpg'],
+                'short_description' => 'Dishes and spice blends gathered from the historic trade routes of Asia and the Middle East.',
+                'description' => "Spice Route Recipes follows the ancient trade paths that carried cinnamon, cardamom, and saffron across continents, pairing each region with the dishes those spices came to define. Oliver Hartman includes guidance on building your own spice blends from scratch, rather than relying on pre-mixed jars. A flavorful, well-researched cookbook for anyone curious where their spice rack actually comes from.",
             ],
             [
                 'title' => 'Baking with Heart',
@@ -259,6 +311,8 @@ class ProductSeeder extends Seeder
                 'rating' => 3,
                 'bestseller' => false,
                 'images' => ['cover-300.jpg'],
+                'short_description' => 'Comforting, forgiving baking recipes for every skill level.',
+                'description' => "Baking with Heart is built around recipes that forgive small mistakes — soft bread, simple cakes, and cookies that turn out right even on a first attempt. Clara Whitfield writes with the tone of someone teaching a friend in her own kitchen, focused on confidence-building rather than precision. A gentle starting point for anyone who's been intimidated by baking until now.",
             ],
             [
                 'title' => 'Rewire Your Mindset',
@@ -268,6 +322,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => true,
                 'images' => ['cover-320.jpg'],
+                'short_description' => 'A practical approach to breaking old thought patterns and building new ones.',
+                'description' => "Rewire Your Mindset uses techniques from cognitive behavioral therapy to help readers identify the automatic thoughts that quietly steer their decisions, and replace them with more useful ones. Henry Caldwell keeps the exercises short and concrete, designed to fit into a normal day rather than requiring a retreat. A no-nonsense guide for anyone ready to interrupt old patterns.",
             ],
             [
                 'title' => 'The Discipline of Focus',
@@ -277,6 +333,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-330.jpg'],
+                'short_description' => 'Practical strategies for reclaiming attention in a world built to fragment it.',
+                'description' => "The Discipline of Focus tackles distraction head-on, offering concrete strategies for structuring work, rest, and attention in an environment engineered to pull all three apart. Amelia Brooks blends research on attention with simple daily routines that are easy to actually keep. A clear-headed guide for anyone who feels like their focus has quietly slipped away.",
             ],
             [
                 'title' => 'Small Habits, Big Change',
@@ -286,6 +344,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-340.jpg'],
+                'short_description' => 'How tiny, consistent habits compound into lasting personal change.',
+                'description' => "Small Habits, Big Change makes the case that meaningful transformation rarely comes from dramatic overhauls, but from small routines repeated long enough to compound. Nathaniel Parker offers a simple framework for building habits that survive busy weeks and bad days alike. A practical, encouraging read for anyone who's tried and failed to change everything at once.",
             ],
             [
                 'title' => 'Finding Your Center',
@@ -295,6 +355,8 @@ class ProductSeeder extends Seeder
                 'rating' => 3,
                 'bestseller' => false,
                 'images' => ['cover-350.jpg'],
+                'short_description' => 'A grounded guide to steadying yourself through uncertainty and change.',
+                'description' => "Finding Your Center is written for moments of upheaval — a job loss, a move, a relationship ending — when the usual routines fall away. Eleanor Finch offers simple grounding practices and reflection exercises to help readers rebuild a sense of stability from the inside out. A calm, steady companion for navigating life's harder transitions.",
             ],
             [
                 'title' => 'Into the Wild Unknown',
@@ -304,6 +366,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => false,
                 'images' => ['cover-360.jpg'],
+                'short_description' => 'A solo trek across uncharted wilderness tests everything one traveler thought she knew.',
+                'description' => "When Sarah sets out alone across an unmapped stretch of northern wilderness, she expects hardship — not the ruins of a settlement no map acknowledges. Into the Wild Unknown follows her days of survival and discovery as the terrain reveals a history nobody back home believed existed. A propulsive adventure about pushing past the edge of what's known.",
             ],
             [
                 'title' => "The Explorer's Notebook",
@@ -313,6 +377,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-370.jpg'],
+                'short_description' => "Field notes and sketches from a life spent chasing the world's remotest places.",
+                'description' => "The Explorer's Notebook collects decades of field journals from expeditions across deserts, ice sheets, and rainforests, paired with the sketches and observations made in the moment rather than reconstructed later. Clara Whitfield keeps the writing immediate and unpolished, giving readers a rare, honest look at what exploration actually feels like. A compelling read for armchair adventurers and seasoned travelers alike.",
             ],
             [
                 'title' => 'Beyond the Horizon',
@@ -322,6 +388,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-380.jpg'],
+                'short_description' => 'A sailing crew chases a rumored island that may not exist at all.',
+                'description' => "A small sailing crew sets off in pursuit of an island that appears on only one obscure, centuries-old chart, with nothing but rumor to confirm it's really there. Beyond the Horizon follows their voyage through storms, doubt, and dwindling supplies as the line between legend and reality gets harder to hold. A briskly paced sea adventure about the pull of the unknown.",
             ],
             [
                 'title' => 'Summit Fever',
@@ -331,6 +399,8 @@ class ProductSeeder extends Seeder
                 'rating' => 3,
                 'bestseller' => false,
                 'images' => ['cover-390.jpg'],
+                'short_description' => 'A mountaineering team pushes past every warning sign on the climb of their lives.',
+                'description' => "Summit Fever follows a small climbing team on an ambitious ascent where the mountain, the weather, and their own judgment all start working against them at once. Amelia Brooks writes the climb with unflinching detail, capturing both the pull of the summit and the cost of chasing it too far. A tense, high-altitude story about ambition and its limits.",
             ],
             [
                 'title' => "The Dragon's Oath",
@@ -340,6 +410,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => true,
                 'images' => ['cover-400.jpg'],
+                'short_description' => 'A young knight binds herself to a dying dragon and inherits a war she never chose.',
+                'description' => "When Kestrel swears an oath to the last dragon of the eastern mountains, she expects a quiet bond, not an inheritance of ancient grudges and a war the dragon never finished. The Dragon's Oath follows her as she learns to wield a power that answers to blood more than will, while old enemies of the dragon line begin to circle. A richly built fantasy about the weight of promises made in desperation.",
             ],
             [
                 'title' => 'Kingdom of Ash and Ember',
@@ -349,6 +421,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => false,
                 'images' => ['cover-410.jpg'],
+                'short_description' => "A fallen kingdom's last heir must choose between rebuilding it or burning it down for good.",
+                'description' => "Kingdom of Ash and Ember opens a decade after a civil war reduced the capital to ruins, when its last surviving heir is discovered living under a false name. Eleanor Finch traces her return to a throne that may not deserve saving, surrounded by advisors who each want a different kingdom rebuilt from the wreckage. A politically sharp fantasy about power, ruin, and what's worth restoring.",
             ],
             [
                 'title' => 'The Last Sorcerer',
@@ -358,6 +432,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-420.jpg'],
+                'short_description' => 'The final practitioner of a forbidden art is forced out of hiding to save the world that outlawed him.',
+                'description' => "Generations after his order was outlawed and hunted to extinction, the last sorcerer has spent decades in hiding, keeping his magic a secret even from himself. The Last Sorcerer forces him back into the world when the very magic he abandoned turns out to be the only thing that can stop a rising catastrophe. A tightly written fantasy about power, exile, and reluctant purpose.",
             ],
             [
                 'title' => 'Realm of Shattered Crowns',
@@ -367,6 +443,8 @@ class ProductSeeder extends Seeder
                 'rating' => 3,
                 'bestseller' => false,
                 'images' => ['cover-430.jpg'],
+                'short_description' => 'Five broken kingdoms, one crown, and no ruler willing to share it.',
+                'description' => "Realm of Shattered Crowns follows five rival claimants to a single fractured throne, each convinced their kingdom's survival depends on wearing the crown alone. Clara Whitfield weaves their competing plots together across a landscape scarred by generations of war, building toward a reckoning none of them are prepared for. A sprawling, multi-perspective fantasy about ambition without compromise.",
             ],
             [
                 'title' => 'Meet Me at Midnight',
@@ -376,6 +454,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-440.jpg'],
+                'short_description' => 'Two strangers keep meeting at the same midnight diner, and neither wants to admit why they keep coming back.',
+                'description' => "Meet Me at Midnight follows two insomniacs who keep crossing paths at the same all-night diner, trading stories with strangers rather than the people who actually know them. Henry Caldwell lets their connection build slowly over shared coffee and half-told truths, long before either is ready to call it what it is. A warm, slow-burn romance about finding someone in the hours nobody else is awake for.",
             ],
             [
                 'title' => 'The Paris Promise',
@@ -385,6 +465,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => true,
                 'images' => ['cover-450.jpg'],
+                'short_description' => 'A promise made under the Eiffel Tower a decade ago finally comes due.',
+                'description' => "Ten years after promising to meet again in Paris if neither of them had settled down, Claire and Julien both show up, half-expecting the other to have forgotten. The Paris Promise follows their week retracing the city that once brought them together, forced to decide whether a decade-old promise still means what it did then. A charming, bittersweet romance about second chances.",
             ],
             [
                 'title' => 'Love in Every Season',
@@ -394,6 +476,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-460.jpg'],
+                'short_description' => 'A year-long romance told one season at a time, in a small coastal town.',
+                'description' => "Love in Every Season follows a couple through one full year in a small coastal town, from a spring meet-cute to the quiet, settled affection of the following winter. Nathaniel Parker structures the novel around the changing seasons, letting the town itself become as much a character as the two leads. A gentle, feel-good romance for readers who love a slow, believable love story.",
             ],
             [
                 'title' => 'A Second Chance at Forever',
@@ -403,6 +487,8 @@ class ProductSeeder extends Seeder
                 'rating' => 3,
                 'bestseller' => false,
                 'images' => ['cover-480.jpg'],
+                'short_description' => "Divorced exes are forced to co-plan their daughter's wedding, and old feelings won't stay buried.",
+                'description' => "When their daughter announces her engagement, two long-divorced exes are forced back into each other's lives to help plan the wedding neither expected to navigate together. A Second Chance at Forever follows the awkward dinners and old habits that resurface as they rediscover why they fell for each other in the first place. A tender romance about the doors we assume are closed for good.",
             ],
             [
                 'title' => 'The Startup Playbook',
@@ -412,6 +498,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => false,
                 'images' => ['cover-490.jpg'],
+                'short_description' => "A founder's field guide to building a company from a napkin sketch to a real business.",
+                'description' => "The Startup Playbook walks through the earliest, riskiest stages of founding a company — validating an idea, finding first customers, and surviving the cash-flow crunch before product-market fit. Oliver Hartman writes from hard-won experience rather than theory, favoring specific tactics over inspirational stories. A practical handbook for founders in the messy early innings.",
             ],
             [
                 'title' => 'Negotiate Like a Pro',
@@ -421,6 +509,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-500.jpg'],
+                'short_description' => "The tactics professional negotiators use to walk away with more, every time.",
+                'description' => "Negotiate Like a Pro breaks down negotiation into repeatable tactics — anchoring, framing, and reading the other side's real constraints — rather than vague advice to 'know your worth.' Clara Whitfield illustrates each technique with real scenarios from salary talks to major vendor contracts. A sharp, practical guide for anyone who dreads the negotiating table.",
             ],
             [
                 'title' => 'Scaling Smart',
@@ -430,6 +520,8 @@ class ProductSeeder extends Seeder
                 'rating' => 4,
                 'bestseller' => false,
                 'images' => ['cover-510.jpg'],
+                'short_description' => "How growing companies scale operations without breaking what made them work.",
+                'description' => "Scaling Smart focuses on the operational strain that hits companies right after early success — hiring too fast, process that can't keep up, culture that starts to fray. Henry Caldwell offers a grounded framework for growing headcount and complexity without losing what made the company work in the first place. Essential reading for leaders navigating a company's awkward middle stage.",
             ],
             [
                 'title' => 'The Leadership Edge',
@@ -439,6 +531,8 @@ class ProductSeeder extends Seeder
                 'rating' => 5,
                 'bestseller' => false,
                 'images' => ['cover-520.jpg'],
+                'short_description' => 'What separates competent managers from leaders people actually want to follow.',
+                'description' => "The Leadership Edge examines the difference between managing tasks and leading people, drawing on interviews with executives across industries about the moments that actually built trust with their teams. Amelia Brooks resists easy formulas, instead showing leadership as a set of habits built under pressure, not a personality type. A candid, well-researched read for anyone stepping into a leadership role.",
             ],
         ];
 

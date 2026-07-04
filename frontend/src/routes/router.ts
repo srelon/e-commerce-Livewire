@@ -44,6 +44,7 @@ const routes: RouteRecordRaw[] = [
                 name: 'product',
                 path: 'product/:slug',
                 component: ProductPage,
+                props: true,
             },
             {
                 name: 'authors',
@@ -71,6 +72,7 @@ const routes: RouteRecordRaw[] = [
                         name: 'post',
                         path: ':slug',
                         component: NewsPage,
+                        props: true,
                     },
                 ],
             },

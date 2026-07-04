@@ -1,66 +1,97 @@
 <template>
-    <PageBanner v-if="!quick" :title="product.title" />
+    <PageBanner v-if="!quick" :title="page_title" :loading="is_loading" :parent="{ label: 'Products', to: { name: 'products' } }" />
 
     <section class="product section" :class="{ 'product--quick': quick }">
         <div class="container">
             <div class="product__inner">
-                <div class="product__gallery">
-                    <button class="product__main-img" @click="lightbox_open = true" aria-label="View full image">
-                        <img :src="active_image" :alt="product.title" class="product__img">
-                        <span class="product__zoom-hint">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                        </span>
-                    </button>
-                    <ThumbSlider
-                        :images="product.images"
-                        :active="active_image"
-                        :alt="product.title"
-                        :visible="6"
-                        :item_size="72"
-                        @select="open_lightbox($event)"
-                        @hover="active_image = $event"
-                    />
-                </div>
-
-                <ImageLightbox
-                    v-model="active_image"
-                    v-model:open="lightbox_open"
-                    :images="product.images"
-                    :alt="product.title"
-                />
-
-                <div class="product__summary">
-                    <h1 class="product__title">{{ product.title }}</h1>
-                    <StarRating :rating="product.rating" :count="product.reviews" />
-                    <div class="product__price">${{ product.price }}</div>
-                    <p class="product__desc">{{ product.short_desc }}</p>
-
-                    <div class="product__actions">
-                        <div v-if="!is_in_cart" class="product__qty">
-                            <button @click="qty > 1 && qty--">−</button>
-                            <span>{{ qty }}</span>
-                            <button @click="qty++">+</button>
+                <template v-if="is_loading">
+                    <div class="product__gallery">
+                        <div class="product__main-img">
+                            <BaseSkeleton radius="12px" />
                         </div>
-                        <BaseButton v-if="!is_in_cart" class="product__add-to-cart" @click="handle_add_to_cart">
-                            Add to Cart
-                        </BaseButton>
-                        <BaseButton v-else class="product__add-to-cart" @click="store.open_popup()">
-                            View Cart
-                        </BaseButton>
+                        <div class="product__thumbs-skeleton">
+                            <BaseSkeleton v-for="n in 6" :key="n" width="72px" height="72px" radius="8px" />
+                        </div>
+                    </div>
+                    <div class="product__summary">
+                        <BaseSkeleton width="70%" height="30px" />
+                        <BaseSkeleton width="140px" height="18px" />
+                        <BaseSkeleton width="90px" height="30px" />
+                        <BaseSkeleton height="90px" />
+                        <BaseSkeleton width="220px" height="46px" radius="6px" />
+                    </div>
+                </template>
+                <template v-else-if="product">
+                    <div class="product__gallery">
+                        <button class="product__main-img" @click="lightbox_open = true" aria-label="View full image">
+                            <img :src="active_image" :alt="product.title" class="product__img">
+                            <span class="product__zoom-hint">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                            </span>
+                        </button>
+                        <ThumbSlider
+                            v-if="gallery_images.length > 1"
+                            :images="gallery_images"
+                            :active="active_image"
+                            :alt="product.title"
+                            :visible="6"
+                            :item_size="72"
+                            @select="open_lightbox($event)"
+                            @hover="active_image = $event"
+                        />
                     </div>
 
-                    <div class="product__meta">
-                        <span>Category:</span>
-                        <router-link :to="{ name: 'products', query: { category: product.category } }">{{ product.category }}</router-link>
-                    </div>
+                    <ImageLightbox
+                        v-model="active_image"
+                        v-model:open="lightbox_open"
+                        :images="gallery_images"
+                        :alt="product.title"
+                    />
 
-                    <router-link v-if="quick" :to="to" class="product__view-link">
-                        <BaseButton variant="outline">View Product</BaseButton>
-                    </router-link>
-                </div>
+                    <div class="product__summary">
+                        <h1 class="product__title">{{ product.title }}</h1>
+                        <StarRating :rating="product.rating" :count="product.reviews_count" />
+                        <div class="product__price">
+                            ${{ product.stock.price }}
+                            <span v-if="product.stock.before_price" class="product__price-before">${{ product.stock.before_price }}</span>
+                        </div>
+                        <p class="product__desc">{{ product.short_description }}</p>
+
+                        <div class="product__actions">
+                            <div v-if="!is_in_cart" class="product__qty">
+                                <button type="button" :disabled="qty <= 1" @click="decrement_qty">−</button>
+                                <input
+                                    type="number"
+                                    class="product__qty-input"
+                                    :min="1"
+                                    :max="max_qty"
+                                    v-model.number="qty"
+                                    @change="on_qty_change"
+                                >
+                                <button type="button" :disabled="qty >= max_qty" @click="increment_qty">+</button>
+                            </div>
+                            <BaseButton v-if="!is_in_cart" class="product__add-to-cart" @click="handle_add_to_cart">
+                                Add to Cart
+                            </BaseButton>
+                            <BaseButton v-else class="product__add-to-cart" @click="store.open_popup()">
+                                View Cart
+                            </BaseButton>
+                        </div>
+
+                        <div class="product__meta">
+                            <span>Category:</span>
+                            <router-link :to="{ name: 'products', query: { category: product.category } }">{{ product.category }}</router-link>
+                        </div>
+
+                        <router-link v-if="quick" :to="to" class="product__view-link">
+                            <BaseButton variant="outline">View Product</BaseButton>
+                        </router-link>
+                    </div>
+                </template>
+                <p v-else class="product__not-found">Product not found.</p>
             </div>
 
-            <div v-if="!quick" class="product__tabs">
+            <div v-if="!quick && product" class="product__tabs">
                 <div class="product__tab-nav">
                     <button
                         v-for="tab in tabs"
@@ -103,14 +134,25 @@
                 </div>
             </div>
 
-            <div v-if="!quick" class="product__related">
+            <div v-if="!quick && (is_loading || product)" class="product__related">
                 <h2 class="section__title">Related Products</h2>
                 <div class="product__related-grid">
-                    <ProductCard
-                        v-for="p in related"
-                        :key="p.title"
-                        v-bind="p"
-                    />
+                    <template v-if="is_loading">
+                        <ProductCard v-for="n in 4" :key="n" loading />
+                    </template>
+                    <template v-else>
+                        <ProductCard
+                            v-for="p in product?.related"
+                            :key="p.slug"
+                            :id="p.slug"
+                            :title="p.title"
+                            :author="p.author ?? ''"
+                            :category="p.category ?? ''"
+                            :price="p.stock.price ?? ''"
+                            :rating="p.rating"
+                            :image="to_storage_url(p.image)"
+                        />
+                    </template>
                 </div>
             </div>
         </div>
@@ -118,8 +160,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useShopStore } from '@/stores/shop'
+import api from '@/plugins/axios'
+import { to_storage_url } from '@/stores/layout'
+import type { ProductDetail } from '@/types/shop'
 
 const store = useShopStore()
 
@@ -128,31 +173,81 @@ interface Props {
     slug?: string
 }
 
-const { quick = false, slug = 'anxiety-unmasked' } = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+    quick: false,
+    slug: '',
+})
 
 import PageBanner from '@/components/ui/base/PageBanner.vue'
 import ProductCard from '@/components/ui/product/ProductCard.vue'
 import ThumbSlider from '@/components/ui/product/ThumbSlider.vue'
 import ImageLightbox from '@/components/ui/product/ImageLightbox.vue'
 import BaseButton from '@/components/ui/base/BaseButton.vue'
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
 import StarRating from '@/components/ui/base/StarRating.vue'
 
 const qty = ref(1)
 const lightbox_open = ref(false)
+const is_loading = ref(true)
+const product = ref<ProductDetail | null>(null)
+const active_image = ref('')
 
-const to = computed(() => ({ name: 'product', params: { slug } }))
-const is_in_cart = computed(() => store.in_cart(slug))
+const to = computed(() => ({ name: 'product', params: { slug: props.slug } }))
+const is_in_cart = computed(() => store.in_cart(props.slug))
+const gallery_images = computed(() => (product.value?.images ?? []).map(to_storage_url))
+const page_title = computed(() => product.value?.title ?? (is_loading.value ? '' : 'Product Not Found'))
+const max_qty = computed(() => product.value?.stock.quantity ?? 1)
+
+function clamp_qty(value: number): number {
+    if (Number.isNaN(value)) return 1
+
+    return Math.min(Math.max(Math.trunc(value), 1), max_qty.value)
+}
+
+function increment_qty() {
+    qty.value = clamp_qty(qty.value + 1)
+}
+
+function decrement_qty() {
+    qty.value = clamp_qty(qty.value - 1)
+}
+
+function on_qty_change() {
+    qty.value = clamp_qty(qty.value)
+}
 
 function handle_add_to_cart() {
+    if (!product.value) return
+
+    qty.value = clamp_qty(qty.value)
+
     store.add_to_cart({
-        id: slug,
-        title: product.title,
-        author: 'Theodore Langley',
-        price: parseFloat(product.price),
-        image: product.images[0],
+        id: props.slug,
+        title: product.value.title,
+        author: product.value.author ?? '',
+        price: parseFloat(product.value.stock.price ?? '0'),
+        image: gallery_images.value[0] ?? '',
         href: to.value,
     }, qty.value)
 }
+
+function fetch_product() {
+    if (!props.slug) return
+
+    is_loading.value = true
+    api.get(`products/${props.slug}`).then((res) => {
+        product.value = res.data.data
+        active_image.value = gallery_images.value[0] ?? ''
+        qty.value = clamp_qty(1)
+    }).catch(() => {
+        product.value = null
+    }).finally(() => {
+        is_loading.value = false
+    })
+}
+
+watch(() => props.slug, fetch_product, { immediate: true })
+
 const active_tab = ref('Description')
 const review_rating = ref(0)
 const review_text = ref('')
@@ -161,71 +256,10 @@ const review_email = ref('')
 
 const tabs = ['Description', 'Reviews (0)']
 
-const product = {
-    title: 'Anxiety Unmasked',
-    price: '18.00',
-    rating: 5,
-    reviews: 0,
-    category: 'Self-help',
-    short_desc: 'A compassionate and insightful guide to understanding anxiety, uncovering its roots, and finding practical strategies to reclaim your life and peace of mind.',
-    description: 'Anxiety Unmasked takes readers on a transformative journey into the psychology of worry, fear, and overwhelm. With evidence-based techniques drawn from cognitive behavioral therapy and mindfulness, this book offers a comprehensive roadmap to lasting calm. Whether you struggle with everyday stress or clinical anxiety, you\'ll find the tools here to build resilience and live more freely. Perfect for anyone ready to stop letting anxiety run their story.',
-    images: [
-        '/images/blog-image-4.webp',
-        '/images/book-image-7.webp',
-        '/images/book-image-19.webp',
-        '/images/book-image-24.webp',
-        '/images/book-image-25.webp',
-        '/images/book-image-18.webp',
-        '/images/book-image-26.webp',
-        '/images/blog-image-5.webp',
-        '/images/book-image-33.webp',
-        '/images/home-hero-image-1.webp',
-        '/images/home-hero-image-2.webp',
-        '/images/home-hero-image-3.webp',
-    ],
-}
-
-const active_image = ref(product.images[0])
-
 function open_lightbox(img: string) {
     active_image.value = img
     lightbox_open.value = true
 }
-
-const related = [
-    {
-        id: 'astral-journey',
-        title: 'Astral Journey',
-        author: 'Nathaniel Parker',
-        category: 'Fantasy',
-        price: '28.00',
-        image: '/images/book-image-24.webp',
-    },
-    {
-        id: 'autumn-journey',
-        title: 'Autumn Journey',
-        author: 'Samuel Wright',
-        category: 'Adventure',
-        price: '17.00',
-        image: '/images/book-image-29.webp',
-    },
-    {
-        id: 'journey-through-time',
-        title: 'Journey Through Time',
-        author: 'Amelia Brooks',
-        category: 'History',
-        price: '19.00',
-        image: '/images/book-image-25.webp',
-    },
-    {
-        id: 'mind-wellness',
-        title: 'Mind & Wellness',
-        author: 'Oliver Hartman',
-        category: 'Self-help',
-        price: '15.00',
-        image: '/images/book-image-18.webp',
-    },
-]
 </script>
 
 <style lang="scss" scoped>
@@ -257,6 +291,16 @@ const related = [
         display: flex;
         flex-direction: column;
         gap: 12px;
+    }
+
+    &__thumbs-skeleton {
+        display: flex;
+        gap: 12px;
+    }
+
+    &__not-found {
+        font-size: 16px;
+        color: $color-gray;
     }
 
     &__main-img {
@@ -334,6 +378,14 @@ const related = [
         margin-bottom: 20px;
     }
 
+    &__price-before {
+        font-size: 18px;
+        font-weight: 600;
+        color: $color-gray;
+        text-decoration: line-through;
+        margin-left: 8px;
+    }
+
     &__desc {
         font-size: 15px;
         color: $color-gray;
@@ -366,23 +418,39 @@ const related = [
             cursor: pointer;
             transition: background 0.15s;
 
-            &:hover {
+            &:hover:not(:disabled) {
                 background: $color-lightest;
             }
+
+            &:disabled {
+                color: $color-gray;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    &__qty-input {
+        width: 46px;
+        height: 46px;
+        text-align: center;
+        font-size: 15px;
+        font-weight: 600;
+        color: $color-dark;
+        font-family: $font-body;
+        border: none;
+        border-left: 1.5px solid $color-light;
+        border-right: 1.5px solid $color-light;
+        appearance: textfield;
+        outline: none;
+
+        &:focus {
+            outline: none;
         }
 
-        span {
-            width: 46px;
-            text-align: center;
-            font-size: 15px;
-            font-weight: 600;
-            color: $color-dark;
-            border-left: 1.5px solid $color-light;
-            border-right: 1.5px solid $color-light;
-            height: 46px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            appearance: none;
+            margin: 0;
         }
     }
 

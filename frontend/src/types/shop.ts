@@ -1,13 +1,34 @@
 import type { PageSeo } from '@/composables/useSeo'
 
+export interface ProductStock {
+    price: string | null
+    before_price: string | null
+    id?: number | null
+    quantity?: number
+}
+
 export interface ProductSummary {
     slug: string
     title: string
     author: string | null
     category: string | null
-    price: string | null
     rating: number
     image: string | null
+    stock: ProductStock
+}
+
+export interface ProductDetail {
+    slug: string
+    title: string
+    author: string | null
+    category: string | null
+    rating: number
+    reviews_count: number
+    short_description: string | null
+    description: string | null
+    images: string[]
+    stock: Required<ProductStock>
+    related: ProductSummary[]
 }
 
 export interface AuthorSummary {
@@ -25,6 +46,17 @@ export interface BlogPostSummary {
     category: string | null
     excerpt?: string | null
     author?: string | null
+}
+
+export interface BlogPostDetail {
+    title: string
+    slug: string
+    excerpt: string | null
+    content: string | null
+    author: string | null
+    date: string | null
+    image: string | null
+    category: string | null
 }
 
 export interface FilterGroupItem {

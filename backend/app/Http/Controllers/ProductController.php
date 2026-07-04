@@ -23,4 +23,18 @@ class ProductController extends Controller
             'page' => $this->pageService->getPage('products'),
         ]);
     }
+
+    public function show(string $slug)
+    {
+        $product = $this->productService->getBySlug($slug);
+
+        if (!$product) {
+            return $this->respondWithError('Product not found.', 404);
+        }
+
+        return $this->respondWithJson([
+            ...$this->productService->formatProductDetail($product),
+            'related' => $this->productService->getRelatedProducts($product),
+        ]);
+    }
 }

@@ -29,6 +29,34 @@ class BlogService
         return $query->paginate($perPage)->through(fn (NewsPost $post) => $this->formatPost($post));
     }
 
+    public function getBySlug(string $slug): ?NewsPost
+    {
+        return NewsPost::query()
+            ->where('slug', $slug)
+            ->where('status', 1)
+            ->with(['author', 'category', 'seo'])
+            ->first();
+    }
+
+    public function formatPostDetail(NewsPost $post): array
+    {
+        return [
+            'title' => $post->title,
+            'slug' => $post->slug,
+            'excerpt' => $post->excerpt,
+            'content' => $post->content,
+            'author' => $post->author?->name,
+            'date' => $post->published_at?->toDateString(),
+            'image' => $post->image['original'] ?? null,
+            'category' => $post->category?->name,
+            'seo' => [
+                'title' => $post->seo?->seo_title ?? $post->title,
+                'description' => $post->seo?->seo_description ?? $post->excerpt,
+                'keywords' => $post->seo?->seo_keywords,
+            ],
+        ];
+    }
+
     public function getCategories(): array
     {
         return NewsCategory::query()

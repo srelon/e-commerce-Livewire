@@ -20,6 +20,7 @@ Route::prefix('pages')->controller(StaticController::class)->group(function () {
 
 Route::prefix('products')->controller(ProductController::class)->group(function () {
     Route::get('/', 'index');
+    Route::get('{slug}', 'show');
 });
 
 Route::prefix('authors')->controller(AuthorController::class)->group(function () {
@@ -28,4 +29,5 @@ Route::prefix('authors')->controller(AuthorController::class)->group(function ()
 
 Route::prefix('news')->controller(NewsController::class)->group(function () {
     Route::get('/', 'index');
+    Route::get('{slug}', 'show');
 });

@@ -23,4 +23,15 @@ class NewsController extends Controller
             'page' => $this->pageService->getPage('news'),
         ]);
     }
+
+    public function show(string $slug)
+    {
+        $post = $this->blogService->getBySlug($slug);
+
+        if (!$post) {
+            return $this->respondWithError('Post not found.', 404);
+        }
+
+        return $this->respondWithJson($this->blogService->formatPostDetail($post));
+    }
 }

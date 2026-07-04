@@ -21,7 +21,7 @@
                         :slug="product.slug"
                         :title="product.title"
                         :category="product.category ?? ''"
-                        :price="product.price ?? ''"
+                        :price="product.stock.price ?? ''"
                         :rating="product.rating"
                         :image="to_storage_url(product.image)"
                     />

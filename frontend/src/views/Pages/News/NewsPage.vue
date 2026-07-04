@@ -1,87 +1,92 @@
 <template>
-    <PageBanner :title="post.title" />
+    <PageBanner :title="page_title" :loading="is_loading" :parent="{ label: 'News', to: { name: 'news' } }" />
 
     <section class="post section">
         <div class="container">
             <div class="post__layout">
                 <article class="post__main">
-                    <div class="post__cover">
-                        <img :src="post.image" :alt="post.title" class="post__cover-img">
-                    </div>
+                    <template v-if="is_loading">
+                        <div class="post__cover">
+                            <BaseSkeleton radius="0" />
+                        </div>
+                        <div class="post__meta">
+                            <BaseSkeleton width="80px" height="14px" />
+                            <BaseSkeleton width="60px" height="14px" />
+                            <BaseSkeleton width="100px" height="14px" />
+                        </div>
+                        <div class="post__content">
+                            <BaseSkeleton height="16px" />
+                            <BaseSkeleton height="16px" />
+                            <BaseSkeleton height="16px" width="70%" />
+                        </div>
+                    </template>
+                    <template v-else-if="post">
+                        <div class="post__cover">
+                            <img :src="to_storage_url(post.image)" :alt="post.title" class="post__cover-img">
+                        </div>
 
-                    <div class="post__meta">
-                        <span class="post__category">{{ post.category }}</span>
-                        <span class="post__dot">·</span>
-                        <span class="post__author">{{ post.author }}</span>
-                        <span class="post__dot">·</span>
-                        <span class="post__date">{{ post.date }}</span>
-                    </div>
+                        <div class="post__meta">
+                            <span class="post__category">{{ post.category }}</span>
+                            <span class="post__dot">·</span>
+                            <span class="post__author">{{ post.author }}</span>
+                            <span class="post__dot">·</span>
+                            <span class="post__date">{{ post.date }}</span>
+                        </div>
 
-                    <div class="post__content">
-                        <p v-for="(para, i) in post.content" :key="i">{{ para }}</p>
-                    </div>
+                        <div class="post__content">
+                            <p v-for="(para, i) in content_paragraphs" :key="i">{{ para }}</p>
+                        </div>
 
-                    <div class="post__footer">
-                        <router-link :to="{ name: 'news' }" class="post__back">← Back to News</router-link>
-                    </div>
+                        <div class="post__footer">
+                            <router-link :to="{ name: 'news' }" class="post__back">← Back to News</router-link>
+                        </div>
+                    </template>
+                    <p v-else class="post__not-found">Post not found.</p>
                 </article>
 
-                <Sidebar :show_newsletter="true" :recent_posts="related_posts" />
+                <Sidebar :show_newsletter="true" />
             </div>
         </div>
     </section>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, watch } from 'vue'
 import PageBanner from '@/components/ui/base/PageBanner.vue'
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
 import Sidebar from '@/components/ui/sidebar/Sidebar.vue'
+import api from '@/plugins/axios'
+import { to_storage_url } from '@/stores/layout'
+import type { BlogPostDetail } from '@/types/shop'
 
-const post = {
-    title: 'Blandit Praesent Morbi Faucibus',
-    category: 'Literature',
-    author: 'Admin',
-    date: 'December 20, 2025',
-    image: '/images/blog-image-3.webp',
-    content: [
-        'Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; proin vel ante a orci tempus eleifend ut et magna.',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur aliquet quam id dui posuere blandit. Nulla porttitor accumsan tincidunt. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Cras ultricies ligula sed magna dictum porta.',
-        'Sed porttitor lectus nibh. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Donec rutrum congue leo eget malesuada. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Pellentesque in ipsum id orci porta dapibus.',
-        'Proin eget tortor risus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Nulla quis lorem ut libero malesuada feugiat.',
-    ],
+interface Props {
+    slug?: string
 }
 
-const related_posts = [
-    {
-        title: 'Ornare Curabitur Vitae Scelerisque',
-        date: 'December 18, 2025',
-        image: '/images/blog-image-4.webp',
-        slug: 'ornare-curabitur',
-    },
-    {
-        title: 'Massa Fames Eleifend Convallis',
-        date: 'December 15, 2025',
-        image: '/images/blog-image-5.webp',
-        slug: 'massa-fames',
-    },
-    {
-        title: 'Porttitor Suspendisse Bibendum',
-        date: 'December 12, 2025',
-        image: '/images/blog-image-6.webp',
-        slug: 'porttitor-suspendisse',
-    },
-    {
-        title: 'Platea Justo Curabitur Consequat',
-        date: 'December 10, 2025',
-        image: '/images/blog-image-7.webp',
-        slug: 'platea-justo',
-    },
-    {
-        title: 'Volutpat Tempor Accumsan Porta',
-        date: 'December 8, 2025',
-        image: '/images/blog-image-8.webp',
-        slug: 'volutpat-tempor',
-    },
-]
+const props = withDefaults(defineProps<Props>(), {
+    slug: '',
+})
+
+const is_loading = ref(true)
+const post = ref<BlogPostDetail | null>(null)
+
+const page_title = computed(() => post.value?.title ?? (is_loading.value ? '' : 'Post Not Found'))
+const content_paragraphs = computed(() => (post.value?.content ?? '').split('\n\n').filter(Boolean))
+
+function fetch_post() {
+    if (!props.slug) return
+
+    is_loading.value = true
+    api.get(`news/${props.slug}`).then((res) => {
+        post.value = res.data.data
+    }).catch(() => {
+        post.value = null
+    }).finally(() => {
+        is_loading.value = false
+    })
+}
+
+watch(() => props.slug, fetch_post, { immediate: true })
 </script>
 
 <style lang="scss" scoped>
@@ -95,6 +100,11 @@ const related_posts = [
     &__main {
         flex: 1;
         min-width: 0;
+    }
+
+    &__not-found {
+        font-size: 16px;
+        color: $color-gray;
     }
 
     &__cover {

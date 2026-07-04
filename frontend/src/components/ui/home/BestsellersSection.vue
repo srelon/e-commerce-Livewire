@@ -26,7 +26,7 @@
                         :title="product.title"
                         :author="product.author ?? ''"
                         :category="product.category ?? ''"
-                        :price="product.price ?? ''"
+                        :price="product.stock.price ?? ''"
                         :image="to_storage_url(product.image)"
                     />
                 </template>

@@ -3,11 +3,16 @@
 namespace Tests\Helpers;
 
 use App\Models\ContactInfo;
+use App\Models\DeliveryService;
 use App\Models\Faq;
 use App\Models\Menu;
 use App\Models\NewsCategory;
 use App\Models\NewsPost;
+use App\Models\Order;
+use App\Models\OrderContact;
+use App\Models\OrderItem;
 use App\Models\Page;
+use App\Models\Payment;
 use App\Models\Perk;
 use App\Models\Product;
 use App\Models\ProductImage;
@@ -74,6 +79,47 @@ trait TestDataHelper
             'price' => '19.99',
             'status' => 1,
             'sort_order' => 1,
+        ], $overrides));
+    }
+
+    protected function createOrder(array $overrides = []): Order
+    {
+        $contact = OrderContact::create([
+            'first_name' => 'Test',
+            'last_name' => 'Customer',
+            'phone' => '555-0100',
+            'email' => 'test-' . uniqid() . '@example.com',
+        ]);
+        $delivery = DeliveryService::create([
+            'name' => 'Test Delivery ' . uniqid(),
+            'key' => 'test-delivery-' . uniqid(),
+            'status' => 1,
+            'price' => 5,
+        ]);
+        $payment = Payment::create([
+            'name' => 'Test Payment ' . uniqid(),
+            'key' => 'test-payment-' . uniqid(),
+            'status' => 1,
+        ]);
+
+        return Order::create(array_merge([
+            'contact_id' => $contact->id,
+            'delivery_id' => $delivery->id,
+            'payment_id' => $payment->id,
+            'status' => 0,
+        ], $overrides));
+    }
+
+    protected function createOrderItem(ProductStock $stock, array $overrides = []): OrderItem
+    {
+        return OrderItem::create(array_merge([
+            'order_id' => $this->createOrder()->id,
+            'product_id' => $stock->product_id,
+            'product_stock_id' => $stock->id,
+            'price' => $stock->price,
+            'quantity' => 1,
+            'fact_quantity' => 0,
+            'status' => 0,
         ], $overrides));
     }
 

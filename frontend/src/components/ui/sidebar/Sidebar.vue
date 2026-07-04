@@ -33,7 +33,7 @@
                     </router-link>
                     <div class="sidebar__book-info">
                         <router-link :to="{ name: 'product', params: { slug: book.slug } }" class="sidebar__book-title">{{ book.title }}</router-link>
-                        <span class="sidebar__book-price">${{ book.price }}</span>
+                        <span class="sidebar__book-price">${{ book.stock.price }}</span>
                     </div>
                 </li>
             </ul>
