@@ -15,17 +15,21 @@
             </div>
 
             <div class="bestsellers__grid">
-                <ProductCard
-                    v-for="product in products"
-                    :key="product.slug"
-                    :id="product.slug"
-                    :title="product.title"
-                    :author="product.author"
-                    :category="product.category"
-                    :price="product.price"
-                    :image="product.image"
-                    :href="`/product/${product.slug}`"
-                />
+                <template v-if="loading">
+                    <ProductCard v-for="n in 4" :key="n" loading />
+                </template>
+                <template v-else>
+                    <ProductCard
+                        v-for="product in products"
+                        :key="product.slug"
+                        :id="product.slug"
+                        :title="product.title"
+                        :author="product.author ?? ''"
+                        :category="product.category ?? ''"
+                        :price="product.price ?? ''"
+                        :image="to_storage_url(product.image)"
+                    />
+                </template>
             </div>
         </div>
     </section>
@@ -33,59 +37,27 @@
 
 <script setup lang="ts">
 import ProductCard from '@/components/ui/product/ProductCard.vue'
+import { to_storage_url } from '@/stores/layout'
+import type { ProductSummary } from '@/types/shop'
+import type { RouteLocationRaw } from 'vue-router'
 
 interface Props {
+    products?: ProductSummary[]
+    loading?: boolean
     title?: string
     description?: string
     view_all_label?: string
-    view_all_href?: string
+    view_all_href?: RouteLocationRaw
 }
 
 withDefaults(defineProps<Props>(), {
+    products: () => [],
+    loading: false,
     title: 'Bestsellers of the week',
     description: 'Quam elementum pulvinar etiam non quam. Faucibus nisl tincidunt eget nullam non nisi elementum sagittis vitae et leo duis ut diam quam.',
     view_all_label: 'View All',
-    view_all_href: '/products',
+    view_all_href: () => ({ name: 'products', query: { status: 'Bestseller' } }),
 })
-
-const products = [
-    {
-        slug: 'anxiety-unmasked',
-        title: 'Anxiety Unmasked',
-        author: 'Theodore Langley',
-        category: 'Self-help',
-        price: '18.00',
-        rating: 4,
-        image: '/images/book-image-19.webp',
-    },
-    {
-        slug: 'astral-journey',
-        title: 'Astral Journey',
-        author: 'Nathaniel Parker',
-        category: 'Fantasy',
-        price: '28.00',
-        rating: 5,
-        image: '/images/book-image-24.webp',
-    },
-    {
-        slug: 'autumn-journey',
-        title: 'Autumn Journey',
-        author: 'Samuel Wright',
-        category: 'Adventure',
-        price: '17.00',
-        rating: 3,
-        image: '/images/book-image-29.webp',
-    },
-    {
-        slug: 'best-italian-cuisines',
-        title: 'Best Italian Cuisines',
-        author: 'Nathaniel Parker',
-        category: 'Cooking',
-        price: '25.00',
-        rating: 4,
-        image: '/images/book-image-7.webp',
-    },
-]
 </script>
 
 <style lang="scss" scoped>

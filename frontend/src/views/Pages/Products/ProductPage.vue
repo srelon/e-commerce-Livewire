@@ -51,10 +51,10 @@
 
                     <div class="product__meta">
                         <span>Category:</span>
-                        <router-link :to="{ path: '/products', query: { category: product.category } }">{{ product.category }}</router-link>
+                        <router-link :to="{ name: 'products', query: { category: product.category } }">{{ product.category }}</router-link>
                     </div>
 
-                    <router-link v-if="quick" :to="href" class="product__view-link">
+                    <router-link v-if="quick" :to="to" class="product__view-link">
                         <BaseButton variant="outline">View Product</BaseButton>
                     </router-link>
                 </div>
@@ -125,10 +125,10 @@ const store = useShopStore()
 
 interface Props {
     quick?: boolean
-    href?: string
+    slug?: string
 }
 
-const { quick = false, href = '/products' } = defineProps<Props>()
+const { quick = false, slug = 'anxiety-unmasked' } = defineProps<Props>()
 
 import PageBanner from '@/components/ui/base/PageBanner.vue'
 import ProductCard from '@/components/ui/product/ProductCard.vue'
@@ -140,21 +140,17 @@ import StarRating from '@/components/ui/base/StarRating.vue'
 const qty = ref(1)
 const lightbox_open = ref(false)
 
-const product_id = computed(() => {
-    const slug = href.split('/').filter(Boolean).pop()
-    return slug ?? 'anxiety-unmasked'
-})
-
-const is_in_cart = computed(() => store.in_cart(product_id.value))
+const to = computed(() => ({ name: 'product', params: { slug } }))
+const is_in_cart = computed(() => store.in_cart(slug))
 
 function handle_add_to_cart() {
     store.add_to_cart({
-        id: product_id.value,
+        id: slug,
         title: product.title,
         author: 'Theodore Langley',
         price: parseFloat(product.price),
         image: product.images[0],
-        href,
+        href: to.value,
     }, qty.value)
 }
 const active_tab = ref('Description')
@@ -204,7 +200,6 @@ const related = [
         category: 'Fantasy',
         price: '28.00',
         image: '/images/book-image-24.webp',
-        href: '/product/astral-journey',
     },
     {
         id: 'autumn-journey',
@@ -213,7 +208,6 @@ const related = [
         category: 'Adventure',
         price: '17.00',
         image: '/images/book-image-29.webp',
-        href: '/product/autumn-journey',
     },
     {
         id: 'journey-through-time',
@@ -222,7 +216,6 @@ const related = [
         category: 'History',
         price: '19.00',
         image: '/images/book-image-25.webp',
-        href: '/product/journey-through-time',
     },
     {
         id: 'mind-wellness',
@@ -231,7 +224,6 @@ const related = [
         category: 'Self-help',
         price: '15.00',
         image: '/images/book-image-18.webp',
-        href: '/product/mind-wellness',
     },
 ]
 </script>

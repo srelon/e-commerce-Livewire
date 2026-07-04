@@ -15,13 +15,13 @@ return new class extends Migration
             $table->decimal('price', 10, 2)->unsigned();
             $table->decimal('before_price', 10, 2)->unsigned()->nullable();
             $table->decimal('real_price', 10, 2)->unsigned()->default(0);
-            $table->unsignedInteger('sort')->default(999);
+            $table->unsignedInteger('sort_order')->default(999);
             $table->tinyInteger('status')->unsigned()->default(0);
             $table->timestamps();
             $table->softDeletes();
 
             $table->index('price');
-            $table->index('sort');
+            $table->index('sort_order');
             $table->index('status');
         });
     }

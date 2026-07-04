@@ -62,7 +62,7 @@
                         <div class="cart-popup__divider" />
 
                         <div class="cart-popup__actions">
-                            <router-link to="/cart" class="cart-popup__btn cart-popup__btn--primary" @click="store.close_popup">
+                            <router-link :to="{ name: 'cart' }" class="cart-popup__btn cart-popup__btn--primary" @click="store.close_popup">
                                 Checkout
                             </router-link>
                             <button class="cart-popup__btn cart-popup__btn--outline" @click="store.close_popup">

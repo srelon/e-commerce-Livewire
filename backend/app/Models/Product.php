@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FlushesCacheOnWrite;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,7 +13,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use SoftDeletes;
+    use FlushesCacheOnWrite, SoftDeletes;
+
+    protected static string $cacheFlushMethod = 'flushOnProductWrite';
 
     protected $fillable = [
         'category_id',
@@ -58,7 +61,12 @@ class Product extends Model
 
     public function activeStock(): HasOne
     {
-        return $this->hasOne(ProductStock::class)->where('status', 1)->latest('sort');
+        return $this->hasOne(ProductStock::class)->where('status', 1)->latest('sort_order');
+    }
+
+    public function primaryImage(): HasOne
+    {
+        return $this->hasOne(ProductImage::class)->orderBy('sort_order');
     }
 
     public function seo(): MorphOne

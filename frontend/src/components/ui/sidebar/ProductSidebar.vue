@@ -1,174 +1,99 @@
 <template>
     <aside class="product-sidebar">
-        <div v-for="group in filter_groups" :key="group.title" class="product-sidebar__block">
-            <h4 class="product-sidebar__heading">{{ group.title }}</h4>
+        <template v-if="loading">
+            <div v-for="n in 3" :key="n" class="product-sidebar__block">
+                <BaseSkeleton width="100px" height="15px" />
+                <div class="product-sidebar__skeleton-list">
+                    <BaseSkeleton v-for="line in 4" :key="line" width="80%" height="14px" />
+                </div>
+            </div>
+        </template>
 
-            <PriceFilter
-                v-if="group.type === 'price'"
-                :min="0"
-                :max="100"
-                :model_min="price_min"
-                :model_max="price_max"
-                @filter="on_price_filter"
-            />
+        <template v-else>
+            <div v-for="group in filter_groups" :key="group.title" class="product-sidebar__block">
+                <h4 class="product-sidebar__heading">{{ group.title }}</h4>
 
-            <FilterGroup
-                v-else-if="group.type === 'checkbox'"
-                :title="group.title"
-                :items="group.items ?? []"
-                :modelValue="checkbox_selected(group)"
-                @update:modelValue="on_checkbox_change(group, $event)"
-            />
+                <PriceFilter
+                    v-if="group.type === 'price'"
+                    :min="price_min_bound"
+                    :max="price_max_bound"
+                    :model_min="price_min"
+                    :model_max="price_max"
+                    @filter="on_price_filter"
+                />
 
-            <RatingFilter
-                v-else-if="group.type === 'rating'"
-                :modelValue="rating_selected(group)"
-                @update:modelValue="on_rating_change(group, $event)"
-            />
-        </div>
+                <FilterGroup
+                    v-else-if="group.type === 'checkbox'"
+                    :title="group.title"
+                    :items="group.items ?? []"
+                    :modelValue="checkbox_selected(group)"
+                    @update:modelValue="on_checkbox_change(group, $event)"
+                />
+
+                <RatingFilter
+                    v-else-if="group.type === 'rating'"
+                    :modelValue="rating_selected(group)"
+                    @update:modelValue="on_rating_change(group, $event)"
+                />
+            </div>
+        </template>
     </aside>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch, nextTick } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed } from 'vue'
 import PriceFilter from '@/components/ui/filters/PriceFilter.vue'
 import FilterGroup from '@/components/ui/filters/FilterGroup.vue'
 import RatingFilter from '@/components/ui/filters/RatingFilter.vue'
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
+import type { FilterGroup as FilterGroupConfig } from '@/types/shop'
 
-const route = useRoute()
-const router = useRouter()
-
-type FilterType = 'price' | 'checkbox' | 'rating'
-
-interface FilterConfig {
-    title: string
-    type: FilterType
-    query_key: string
-    selected: string[] | number | null
-    items?: { name: string, count?: number }[]
+interface Props {
+    filter_groups?: FilterGroupConfig[]
+    selected?: Record<string, string[] | number | null>
+    price_min?: number
+    price_max?: number
+    loading?: boolean
 }
 
-const price_min = ref(0)
-const price_max = ref(100)
+const props = withDefaults(defineProps<Props>(), {
+    filter_groups: () => [],
+    selected: () => ({}),
+    price_min: 0,
+    price_max: 100,
+    loading: false,
+})
 
-const filter_groups = reactive<FilterConfig[]>([
-    {
-        title: 'Filter by Price',
-        type: 'price',
-        query_key: 'price',
-        selected: null,
-    },
-    {
-        title: 'Categories',
-        type: 'checkbox',
-        query_key: 'category',
-        selected: [],
-        items: [
-            { name: 'Art & Design', count: 8 },
-            { name: 'Self-help', count: 12 },
-            { name: 'Science', count: 6 },
-            { name: 'Romance', count: 9 },
-            { name: 'Novels', count: 14 },
-            { name: 'History', count: 5 },
-            { name: 'Fantasy', count: 11 },
-            { name: 'Business', count: 7 },
-            { name: 'Cooking', count: 10 },
-            { name: 'Adventure', count: 4 },
-        ],
-    },
-    {
-        title: 'Authors',
-        type: 'checkbox',
-        query_key: 'author',
-        selected: [],
-        items: [
-            { name: 'Oliver Hartman', count: 6 },
-            { name: 'Clara Whitfield', count: 4 },
-            { name: 'Amelia Brooks', count: 4 },
-            { name: 'Nathaniel Parker', count: 5 },
-            { name: 'Eleanor Finch', count: 3 },
-            { name: 'Samuel Wright', count: 4 },
-        ],
-    },
-    {
-        title: 'Rating',
-        type: 'rating',
-        query_key: 'rating',
-        selected: null,
-    },
-    {
-        title: 'Status',
-        type: 'checkbox',
-        query_key: 'status',
-        selected: [],
-        items: [
-            { name: 'In Stock' },
-            { name: 'On Sale' },
-        ],
-    },
-])
+const emit = defineEmits<{
+    filter: [patch: Record<string, string | undefined>]
+}>()
 
-let sync_in_progress = false
+const price_group = computed(() => props.filter_groups.find((group) => group.type === 'price'))
+const price_min_bound = computed(() => price_group.value?.min ?? 0)
+const price_max_bound = computed(() => price_group.value?.max ?? 100)
 
-function sync_from_query() {
-    sync_in_progress = true
-    for (const group of filter_groups) {
-        if (group.type === 'checkbox') {
-            const val = route.query[group.query_key]
-            group.selected = val ? (Array.isArray(val) ? val as string[] : [val as string]) : []
-        } else if (group.type === 'rating') {
-            group.selected = route.query.rating ? Number(route.query.rating) : null
-        }
-    }
-    price_min.value = route.query.price_min ? Number(route.query.price_min) : 0
-    price_max.value = route.query.price_max ? Number(route.query.price_max) : 100
-    nextTick(() => { sync_in_progress = false })
+function checkbox_selected(group: FilterGroupConfig): string[] {
+    return (props.selected[group.query_key] as string[]) ?? []
 }
 
-watch(() => route.query, sync_from_query, { immediate: true, deep: true })
-
-function build_query() {
-    const q: Record<string, string | string[]> = {}
-    for (const group of filter_groups) {
-        if (group.type === 'checkbox') {
-            const sel = group.selected as string[]
-            if (sel.length) q[group.query_key] = sel.length === 1 ? sel[0] : sel
-        } else if (group.type === 'rating' && group.selected) {
-            q.rating = String(group.selected)
-        }
-    }
-    if (price_min.value > 0) q.price_min = String(price_min.value)
-    if (price_max.value < 100) q.price_max = String(price_max.value)
-    return q
+function rating_selected(group: FilterGroupConfig): number | null {
+    return (props.selected[group.query_key] as number | null) ?? null
 }
 
-function push_to_url() {
-    router.replace({ query: build_query() })
+function on_checkbox_change(group: FilterGroupConfig, val: string[] | string | null) {
+    const sel = Array.isArray(val) ? val : val ? [val] : []
+    emit('filter', { [group.query_key]: sel.length ? sel.join(',') : undefined })
 }
 
-function checkbox_selected(group: FilterConfig): string[] | null {
-    return group.selected as string[] | null
-}
-
-function rating_selected(group: FilterConfig): number | null {
-    return group.selected as number | null
-}
-
-function on_checkbox_change(group: FilterConfig, val: string[] | string | null) {
-    group.selected = Array.isArray(val) ? val : val ? [val] : []
-    if (!sync_in_progress) push_to_url()
-}
-
-function on_rating_change(group: FilterConfig, val: number | null) {
-    group.selected = val
-    if (!sync_in_progress) push_to_url()
+function on_rating_change(group: FilterGroupConfig, val: number | null) {
+    emit('filter', { [group.query_key]: val ? String(val) : undefined })
 }
 
 function on_price_filter(val: { min: number, max: number }) {
-    price_min.value = val.min
-    price_max.value = val.max
-    push_to_url()
+    emit('filter', {
+        price_min: val.min > price_min_bound.value ? String(val.min) : undefined,
+        price_max: val.max < price_max_bound.value ? String(val.max) : undefined,
+    })
 }
 </script>
 
@@ -195,6 +120,13 @@ function on_price_filter(val: { min: number, max: number }) {
         color: $color-dark;
         font-family: $font-heading;
         margin-bottom: 16px;
+    }
+
+    &__skeleton-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 16px;
     }
 }
 </style>

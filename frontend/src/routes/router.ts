@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
 import Layout from '@/components/layout/Layout.vue'
-import Home from '@/views/Pages/Home.vue'
+import HomePage from '@/views/Pages/Static/HomePage.vue'
 import AboutPage from '@/views/Pages/Static/AboutPage.vue'
 import ContactPage from '@/views/Pages/Static/ContactPage.vue'
 import ProductList from '@/views/Pages/Products/ProductList.vue'
@@ -15,8 +15,6 @@ import NewsPage from '@/views/Pages/News/NewsPage.vue'
 import { useShopStore } from '@/stores/shop'
 import middlewarePipeline from './middlewarePipeline'
 
-const APP_NAME = 'BookStore'
-
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
@@ -25,47 +23,40 @@ const routes: RouteRecordRaw[] = [
             {
                 name: 'home',
                 path: '',
-                component: Home,
-                meta: { title: 'Home' },
+                component: HomePage,
             },
             {
                 name: 'about',
                 path: 'about-us',
                 component: AboutPage,
-                meta: { title: 'About Us' },
             },
             {
                 name: 'contact',
                 path: 'contact-us',
                 component: ContactPage,
-                meta: { title: 'Contact Us' },
             },
             {
                 name: 'products',
                 path: 'products',
                 component: ProductList,
-                meta: { title: 'Products' },
             },
             {
                 name: 'product',
                 path: 'product/:slug',
                 component: ProductPage,
-                meta: { title: 'Product' },
             },
             {
                 name: 'authors',
                 path: 'authors',
                 component: AuthorList,
-                meta: { title: 'Authors' },
             },
             {
                 name: 'cart',
                 path: 'cart',
                 component: CartPage,
-                meta: { title: 'Checkout' },
                 beforeEnter: () => {
                     const store = useShopStore()
-                    if (store.cart_items.length === 0) return '/'
+                    if (store.cart_items.length === 0) return { name: 'home' }
                 },
             },
             {
@@ -75,13 +66,11 @@ const routes: RouteRecordRaw[] = [
                         name: 'news',
                         path: '',
                         component: NewsList,
-                        meta: { title: 'News' },
                     },
                     {
                         name: 'post',
                         path: ':slug',
                         component: NewsPage,
-                        meta: { title: 'Post' },
                     },
                 ],
             },
@@ -103,10 +92,6 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    document.title = to.meta?.title
-        ? `${to.meta.title} | ${APP_NAME}`
-        : APP_NAME
-
     if (!to.meta?.middleware) {
         return next()
     }

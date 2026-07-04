@@ -12,38 +12,38 @@
         <div v-if="recent_posts?.length" class="sidebar__block">
             <h4 class="sidebar__heading">Recent Posts</h4>
             <ul class="sidebar__posts">
-                <li v-for="post in recent_posts" :key="post.href" class="sidebar__post">
-                    <router-link :to="post.href" class="sidebar__post-img-wrap">
+                <li v-for="post in recent_posts" :key="post.slug" class="sidebar__post">
+                    <router-link :to="{ name: 'post', params: { slug: post.slug } }" class="sidebar__post-img-wrap">
                         <img :src="post.image" :alt="post.title" class="sidebar__post-img">
                     </router-link>
                     <div class="sidebar__post-info">
-                        <router-link :to="post.href" class="sidebar__post-title">{{ post.title }}</router-link>
+                        <router-link :to="{ name: 'post', params: { slug: post.slug } }" class="sidebar__post-title">{{ post.title }}</router-link>
                         <time class="sidebar__post-date">{{ post.date }}</time>
                     </div>
                 </li>
             </ul>
         </div>
 
-        <div v-if="best_books?.length" class="sidebar__block">
+        <div v-if="layout_store.best_books.length" class="sidebar__block">
             <h4 class="sidebar__heading">Best Selling Books</h4>
             <ul class="sidebar__books">
-                <li v-for="book in best_books" :key="book.title" class="sidebar__book">
-                    <router-link to="/products" class="sidebar__book-img-wrap">
-                        <img :src="book.image" :alt="book.title" class="sidebar__book-img">
+                <li v-for="book in layout_store.best_books" :key="book.slug" class="sidebar__book">
+                    <router-link :to="{ name: 'product', params: { slug: book.slug } }" class="sidebar__book-img-wrap">
+                        <img :src="to_storage_url(book.image)" :alt="book.title" class="sidebar__book-img">
                     </router-link>
                     <div class="sidebar__book-info">
-                        <router-link to="/products" class="sidebar__book-title">{{ book.title }}</router-link>
+                        <router-link :to="{ name: 'product', params: { slug: book.slug } }" class="sidebar__book-title">{{ book.title }}</router-link>
                         <span class="sidebar__book-price">${{ book.price }}</span>
                     </div>
                 </li>
             </ul>
         </div>
 
-        <div v-if="book_categories?.length" class="sidebar__block">
+        <div v-if="layout_store.categories.length" class="sidebar__block">
             <h4 class="sidebar__heading">Book Categories</h4>
             <ul class="sidebar__cats">
-                <li v-for="cat in book_categories" :key="cat.name" class="sidebar__cat">
-                    <router-link to="/products">{{ cat.name }}</router-link>
+                <li v-for="cat in layout_store.categories" :key="cat.name" class="sidebar__cat">
+                    <router-link :to="{ name: 'products', query: { category: cat.name } }">{{ cat.name }}</router-link>
                     <span>{{ cat.count }}</span>
                 </li>
             </ul>
@@ -52,34 +52,25 @@
 </template>
 
 <script setup lang="ts">
-interface Book {
-    title: string
-    price: string
-    image: string
-}
-
-interface Category {
-    name: string
-    count: number
-}
+import { useLayoutStore, to_storage_url } from '@/stores/layout'
 
 interface Post {
     title: string
     date: string
     image: string
-    href: string
+    slug: string
 }
 
 interface Props {
     show_newsletter?: boolean
-    best_books?: Book[]
-    book_categories?: Category[]
     recent_posts?: Post[]
 }
 
 withDefaults(defineProps<Props>(), {
     show_newsletter: false,
 })
+
+const layout_store = useLayoutStore()
 </script>
 
 <style lang="scss" scoped>

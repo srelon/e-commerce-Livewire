@@ -4,7 +4,7 @@
             <div class="container footer__grid">
 
                 <div class="footer__col footer__col--brand">
-                    <router-link to="/" class="footer__logo" aria-label="Book Store">
+                    <router-link :to="{ name: 'home' }" class="footer__logo" aria-label="Book Store">
                         <svg class="footer__logo-icon" viewBox="0 0 34 28" fill="none" aria-hidden="true">
                             <path d="M17 5L17 23" stroke="#ff6310" stroke-width="2" stroke-linecap="round"/>
                             <path d="M17 5L4 7.5L4 25L17 23Z" fill="#ff6310" fill-opacity="0.18" stroke="#ff6310" stroke-width="1.5" stroke-linejoin="round"/>
@@ -74,11 +74,11 @@
                 <div class="footer__col">
                     <h4 class="footer__title">Explore</h4>
                     <ul class="footer__links">
-                        <li><router-link to="/about-us">About Us</router-link></li>
-                        <li><router-link to="/authors">Authors</router-link></li>
-                        <li><router-link to="/products">Products</router-link></li>
-                        <li><router-link to="/news">News</router-link></li>
-                        <li><router-link to="/contact-us">Contact Us</router-link></li>
+                        <li><router-link :to="{ name: 'about' }">About Us</router-link></li>
+                        <li><router-link :to="{ name: 'authors' }">Authors</router-link></li>
+                        <li><router-link :to="{ name: 'products' }">Products</router-link></li>
+                        <li><router-link :to="{ name: 'news' }">News</router-link></li>
+                        <li><router-link :to="{ name: 'contact' }">Contact Us</router-link></li>
                     </ul>
                 </div>
 

@@ -1,24 +1,23 @@
 <template>
-    <PageBanner title="About Us" />
+    <PageBanner :title="page?.title ?? 'About Us'" />
 
     <section class="about section">
         <div class="container">
             <div class="about__intro">
-                <h2 class="about__quote">The Right Book In The Right Hands At The Right Time Can Change The World</h2>
+                <h2 class="about__quote">{{ page?.excerpt ?? 'The Right Book In The Right Hands At The Right Time Can Change The World' }}</h2>
                 <div class="about__intro-side">
-                    <p class="about__intro-desc">We are a passionate team of book lovers dedicated to connecting readers with stories that inspire, educate, and transform. Our curated collection spans every genre.</p>
-                    <ul class="about__contact-list">
-                        <li>
-                            <svg viewBox="0 0 15 15" aria-hidden="true"><path d="M7.5 0A5.5 5.5 0 0 0 2 5.5C2 9.358 7.5 15 7.5 15S13 9.358 13 5.5A5.5 5.5 0 0 0 7.5 0m0 7.5a2 2 0 1 1 2-2 2 2 0 0 1-2 2"/></svg>
-                            <span>27 Division St, New York, NY 10002</span>
+                    <p class="about__intro-desc">{{ page?.content ?? 'We are a passionate team of book lovers dedicated to connecting readers with stories that inspire, educate, and transform. Our curated collection spans every genre.' }}</p>
+                    <ul v-if="layout_store.loaded" class="about__contact-list">
+                        <li v-for="item in contact_info" :key="item.label">
+                            <svg viewBox="0 0 15 15" aria-hidden="true"><path :d="item.icon ?? ''"/></svg>
+                            <a v-if="item.href" :href="item.href">{{ item.value }}</a>
+                            <span v-else>{{ item.value }}</span>
                         </li>
-                        <li>
-                            <svg viewBox="0 0 15 15" aria-hidden="true"><path d="M7.5.5A6.5 6.5 0 1 0 14 7 6.508 6.508 0 0 0 7.5.5m0 11.75A5.25 5.25 0 1 1 12.75 7 5.256 5.256 0 0 1 7.5 12.25M8.125 7V4.25a.625.625 0 0 0-1.25 0V7.5a.625.625 0 0 0 .625.625H10a.625.625 0 0 0 0-1.25z"/></svg>
-                            <span>Mon–Sat: 9:00AM – 6:00PM</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 15 15" aria-hidden="true"><path d="M13.5 2h-12A1.5 1.5 0 0 0 0 3.5v8A1.5 1.5 0 0 0 1.5 13h12a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 13.5 2m0 1 .09.007L7.5 7.572 1.41 3.007A.5.5 0 0 1 1.5 3zM1 11.5v-7.8l6.22 4.573a.5.5 0 0 0 .56 0L14 3.7v7.8a.5.5 0 0 1-.5.5h-12a.5.5 0 0 1-.5-.5"/></svg>
-                            <a href="mailto:hello@example.com">hello@example.com</a>
+                    </ul>
+                    <ul v-else class="about__contact-list">
+                        <li v-for="n in 3" :key="n">
+                            <BaseSkeleton width="16px" height="16px" circle />
+                            <BaseSkeleton width="160px" height="14px" />
                         </li>
                     </ul>
                 </div>
@@ -30,14 +29,24 @@
         <div class="container">
             <h2 class="section__title">Meet The People Behind Our Bookstore</h2>
             <div class="team__grid">
-                <div v-for="member in team" :key="member.name" class="team__card">
-                    <div class="team__avatar" :style="{ background: member.color }">
-                        {{ member.initials }}
+                <template v-if="is_loading">
+                    <div v-for="n in 8" :key="n" class="team__card">
+                        <BaseSkeleton width="64px" height="64px" circle class="team__avatar" />
+                        <BaseSkeleton width="80%" height="16px" class="team__name" />
+                        <BaseSkeleton width="60%" height="12px" class="team__role" />
+                        <BaseSkeleton width="100%" height="36px" class="team__bio" />
                     </div>
-                    <h3 class="team__name">{{ member.name }}</h3>
-                    <span class="team__role">{{ member.role }}</span>
-                    <p class="team__bio">{{ member.bio }}</p>
-                </div>
+                </template>
+                <template v-else>
+                    <div v-for="member in team" :key="member.name" class="team__card">
+                        <div class="team__avatar" :style="{ background: member.color }">
+                            {{ member.initials }}
+                        </div>
+                        <h3 class="team__name">{{ member.name }}</h3>
+                        <span class="team__role">{{ member.role }}</span>
+                        <p class="team__bio">{{ member.bio }}</p>
+                    </div>
+                </template>
             </div>
         </div>
     </section>
@@ -47,7 +56,7 @@
             <div class="about-cta__inner">
                 <div class="about-cta__left">
                     <h2 class="about-cta__title">Immerse Yourself In The Fascinating World Of Literature</h2>
-                    <router-link to="/products" class="about-cta__btn">Explore Collection</router-link>
+                    <router-link :to="{ name: 'products' }" class="about-cta__btn">Explore Collection</router-link>
                 </div>
                 <div class="about-cta__right">
                     <p class="about-cta__sub">Join our community</p>
@@ -64,104 +73,58 @@
     <div class="about-perks">
         <div class="container">
             <div class="about-perks__grid">
-                <div v-for="perk in perks" :key="perk.title" class="about-perks__item">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" class="about-perks__icon">
-                        <path :d="perk.icon"/>
-                    </svg>
-                    <div>
-                        <h4 class="about-perks__title">{{ perk.title }}</h4>
-                        <p class="about-perks__desc">{{ perk.desc }}</p>
+                <template v-if="is_loading">
+                    <div v-for="n in 4" :key="n" class="about-perks__item">
+                        <BaseSkeleton width="40px" height="40px" class="about-perks__icon" />
+                        <div>
+                            <BaseSkeleton width="100px" height="15px" class="about-perks__title" />
+                            <BaseSkeleton width="140px" height="13px" class="about-perks__desc" />
+                        </div>
                     </div>
-                </div>
+                </template>
+                <template v-else>
+                    <div v-for="perk in perks" :key="perk.title" class="about-perks__item">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" class="about-perks__icon">
+                            <path :d="perk.icon"/>
+                        </svg>
+                        <div>
+                            <h4 class="about-perks__title">{{ perk.title }}</h4>
+                            <p class="about-perks__desc">{{ perk.desc }}</p>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import PageBanner from '@/components/ui/base/PageBanner.vue'
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
+import api from '@/plugins/axios'
+import { useLayoutStore } from '@/stores/layout'
+import { useContactList } from '@/composables/useContactList'
+import type { PageBundle } from '@/types/shop'
+import type { Perk, TeamMember } from '@/types/global'
 
-const team = [
-    {
-        name: 'Daniel Brooks',
-        role: 'Founder & CEO',
-        initials: 'DB',
-        color: '#ff6310',
-        bio: 'Passionate bibliophile with 15 years in publishing.',
-    },
-    {
-        name: 'Emma Collins',
-        role: 'Head of Curation',
-        initials: 'EC',
-        color: '#6b4fff',
-        bio: 'Former librarian turned digital curator.',
-    },
-    {
-        name: 'Michael Reed',
-        role: 'Lead Developer',
-        initials: 'MR',
-        color: '#18b96e',
-        bio: 'Builds the tech that powers your reading journey.',
-    },
-    {
-        name: 'Oliver Grant',
-        role: 'Marketing Director',
-        initials: 'OG',
-        color: '#e84393',
-        bio: 'Storyteller at heart, strategist by trade.',
-    },
-    {
-        name: 'Sophia Turner',
-        role: 'Customer Success',
-        initials: 'ST',
-        color: '#f5a623',
-        bio: 'Making sure every reader finds their next favorite book.',
-    },
-    {
-        name: 'Ethan Walker',
-        role: 'Content Editor',
-        initials: 'EW',
-        color: '#2196f3',
-        bio: 'Reviews, edits, and helps authors shine.',
-    },
-    {
-        name: 'Lucas Meyer',
-        role: 'Logistics Manager',
-        initials: 'LM',
-        color: '#009688',
-        bio: 'Ensures your order arrives safe and on time.',
-    },
-    {
-        name: 'Noah Bennett',
-        role: 'Design Lead',
-        initials: 'NB',
-        color: '#9c27b0',
-        bio: 'Crafts the visual experience you love.',
-    },
-]
+const layout_store = useLayoutStore()
+const contact_info = useContactList()
 
-const perks = [
-    {
-        title: 'Free Delivery',
-        desc: 'On all orders over $40',
-        icon: 'M1 1h3l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L22 6H6M16 19a1 1 0 1 1-2 0 1 1 0 0 1 2 0M9 19a1 1 0 1 1-2 0 1 1 0 0 1 2 0',
-    },
-    {
-        title: '24/7 Support',
-        desc: 'Round-the-clock assistance',
-        icon: 'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z',
-    },
-    {
-        title: 'Easy Returns',
-        desc: '30-day hassle-free returns',
-        icon: 'M1 4v6h6M23 20v-6h-6M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15',
-    },
-    {
-        title: 'Secure Checkout',
-        desc: 'SSL encrypted payments',
-        icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    },
-]
+const is_loading = ref(true)
+const team = ref<TeamMember[]>([])
+const perks = ref<Perk[]>([])
+const page = ref<PageBundle | null>(null)
+
+onMounted(() => {
+    api.get('pages/about').then((res) => {
+        team.value = res.data.data.team
+        perks.value = res.data.data.perks
+        page.value = res.data.data.page
+    }).finally(() => {
+        is_loading.value = false
+    })
+})
 </script>
 
 <style lang="scss" scoped>

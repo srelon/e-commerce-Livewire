@@ -10,6 +10,7 @@
                     :max="max"
                     class="price-filter__input"
                     @input="on_slider_min"
+                    @change="emit_filter"
                 >
                 <input
                     type="range"
@@ -18,6 +19,7 @@
                     :max="max"
                     class="price-filter__input"
                     @input="on_slider_max"
+                    @change="emit_filter"
                 >
             </div>
         </div>
@@ -66,15 +68,29 @@ const props = withDefaults(defineProps<Props>(), {
     max: 100,
 })
 
+const emit = defineEmits<{
+    filter: [val: { min: number, max: number }]
+}>()
 
-const price_min = ref(props.model_min ?? props.min)
-const price_max = ref(props.model_max ?? props.max)
+const price_min = ref(clamp(props.model_min ?? props.min, props.min, props.max))
+const price_max = ref(clamp(props.model_max ?? props.max, props.min, props.max))
 
-watch(() => props.model_min, (v) => { if (v !== undefined && v !== price_min.value) price_min.value = v })
-watch(() => props.model_max, (v) => { if (v !== undefined && v !== price_max.value) price_max.value = v })
+watch(
+    () => [props.min, props.max, props.model_min, props.model_max],
+    () => {
+        price_min.value = clamp(props.model_min ?? props.min, props.min, props.max)
+        price_max.value = clamp(props.model_max ?? props.max, props.min, props.max)
+    },
+)
 
 const fill_style = computed(() => {
     const range = props.max - props.min
+    if (range <= 0) {
+        return {
+            left: '0%',
+            right: '0%',
+        }
+    }
     const left = ((price_min.value - props.min) / range) * 100
     const right = ((props.max - price_max.value) / range) * 100
     return {
@@ -89,20 +105,28 @@ function clamp(val: number, lo: number, hi: number) {
 
 function on_slider_min(e: Event) {
     price_min.value = clamp(Number((e.target as HTMLInputElement).value), props.min, price_max.value)
+    ;(e.target as HTMLInputElement).value = String(price_min.value)
 }
 
 function on_slider_max(e: Event) {
     price_max.value = clamp(Number((e.target as HTMLInputElement).value), price_min.value, props.max)
+    ;(e.target as HTMLInputElement).value = String(price_max.value)
 }
 
 function on_min_change(e: Event) {
     price_min.value = clamp(Number((e.target as HTMLInputElement).value), props.min, price_max.value)
     ;(e.target as HTMLInputElement).value = String(price_min.value)
+    emit_filter()
 }
 
 function on_max_change(e: Event) {
     price_max.value = clamp(Number((e.target as HTMLInputElement).value), price_min.value, props.max)
     ;(e.target as HTMLInputElement).value = String(price_max.value)
+    emit_filter()
+}
+
+function emit_filter() {
+    emit('filter', { min: price_min.value, max: price_max.value })
 }
 </script>
 

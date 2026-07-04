@@ -5,7 +5,7 @@ return [
      * Tree model fields
      */
     'column_name' => [
-        'order' => 'sort',
+        'order' => 'sort_order',
         'parent' => 'parent_id',
         'title' => 'name',
     ],

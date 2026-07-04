@@ -11,16 +11,21 @@
                 </router-link>
             </div>
             <div class="rated__grid">
-                <RatedCard
-                    v-for="product in products"
-                    :key="product.slug"
-                    :title="product.title"
-                    :category="product.category"
-                    :price="product.price"
-                    :rating="product.rating"
-                    :image="product.image"
-                    :href="`/product/${product.slug}`"
-                />
+                <template v-if="loading">
+                    <RatedCard v-for="n in 3" :key="n" loading />
+                </template>
+                <template v-else>
+                    <RatedCard
+                        v-for="product in products"
+                        :key="product.slug"
+                        :slug="product.slug"
+                        :title="product.title"
+                        :category="product.category ?? ''"
+                        :price="product.price ?? ''"
+                        :rating="product.rating"
+                        :image="to_storage_url(product.image)"
+                    />
+                </template>
             </div>
         </div>
     </section>
@@ -28,93 +33,25 @@
 
 <script setup lang="ts">
 import RatedCard from '@/components/ui/product/RatedCard.vue'
+import { to_storage_url } from '@/stores/layout'
+import type { ProductSummary } from '@/types/shop'
+import type { RouteLocationRaw } from 'vue-router'
 
 interface Props {
+    products?: ProductSummary[]
+    loading?: boolean
     title?: string
     view_all_label?: string
-    view_all_href?: string
+    view_all_href?: RouteLocationRaw
 }
 
 withDefaults(defineProps<Props>(), {
+    products: () => [],
+    loading: false,
     title: 'Best Rated Books',
     view_all_label: 'View All Books',
-    view_all_href: '/products',
+    view_all_href: () => ({ name: 'products' }),
 })
-
-const products = [
-    {
-        slug: 'astral-journey',
-        title: 'Astral Journey',
-        category: 'Fantasy',
-        price: '28.00',
-        rating: 0,
-        image: '/images/book-image-24.webp',
-    },
-    {
-        slug: 'autumn-journey',
-        title: 'Autumn Journey',
-        category: 'Adventure',
-        price: '17.00',
-        rating: 5,
-        image: '/images/book-image-29.webp',
-    },
-    {
-        slug: 'unforgettable-moments',
-        title: 'Unforgettable Moments',
-        category: 'Romance',
-        price: '28.00',
-        rating: 5,
-        image: '/images/book-image-26.webp',
-    },
-    {
-        slug: 'anxiety-unmasked',
-        title: 'Anxiety Unmasked',
-        category: 'Self-help',
-        price: '18.00',
-        rating: 0,
-        image: '/images/book-image-19.webp',
-    },
-    {
-        slug: 'grand-science-fair',
-        title: 'Grand Science Fair',
-        category: 'Science',
-        price: '23.00',
-        rating: 0,
-        image: '/images/book-image-18.webp',
-    },
-    {
-        slug: 'best-italian-cuisines',
-        title: 'Best Italian Cuisines',
-        category: 'Cooking',
-        price: '25.00',
-        rating: 0,
-        image: '/images/book-image-7.webp',
-    },
-    {
-        slug: 'the-future-with-crypto',
-        title: 'The Future With Crypto',
-        category: 'Business',
-        price: '28.00',
-        rating: 5,
-        image: '/images/book-image-33.webp',
-    },
-    {
-        slug: 'economic-opportunity',
-        title: 'Economic Opportunity',
-        category: 'Business',
-        price: '15.00',
-        rating: 4,
-        image: '/images/book-image-32.webp',
-    },
-    {
-        slug: 'go-where-the-love-is',
-        title: 'Go Where The Love Is',
-        category: 'Romance',
-        price: '30.00',
-        rating: 4,
-        image: '/images/book-image-25.webp',
-    },
-]
 </script>
 
 <style lang="scss" scoped>

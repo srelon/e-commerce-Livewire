@@ -45,7 +45,7 @@ class MenuSeeder extends Seeder
                 [
                     'route' => $item['route'],
                     'type' => 'route',
-                    'sort' => $sort + 1,
+                    'sort_order' => $sort + 1,
                 ],
             );
         }

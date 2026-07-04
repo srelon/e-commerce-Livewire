@@ -1,7 +1,14 @@
 <template>
     <section class="cats">
         <div class="container">
-            <div class="cats__wrapper">
+            <div v-if="!layout_store.loaded" class="cats__skeleton-track">
+                <div v-for="n in 8" :key="n" class="cats__skeleton-item">
+                    <BaseSkeleton width="56px" height="56px" circle />
+                    <BaseSkeleton width="70px" height="13px" />
+                    <BaseSkeleton width="50px" height="12px" />
+                </div>
+            </div>
+            <div v-else class="cats__wrapper">
                 <div
                     class="cats__track"
                     :style="{
@@ -11,9 +18,9 @@
                 >
                     <CategoryItem
                         v-for="cat in categories"
-                        :key="cat.name"
+                        :key="cat.id"
                         :name="cat.name"
-                        :icon="cat.icon"
+                        :icon="to_storage_url(cat.icon)"
                         :count="cat.count"
                         :style="{ width: item_width }"
                     />
@@ -26,77 +33,29 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import CategoryItem from '@/components/ui/home/CategoryItem.vue'
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
+import { useLayoutStore, to_storage_url } from '@/stores/layout'
 
 const VISIBLE = 8
 
-const categories = [
-    {
-        name: 'Art & Design',
-        icon: '/images/category-icon-1.svg',
-        count: 5,
-    },
-    {
-        name: 'Self-help',
-        icon: '/images/category-icon-6.svg',
-        count: 4,
-    },
-    {
-        name: 'Science',
-        icon: '/images/category-icon-3.svg',
-        count: 4,
-    },
-    {
-        name: 'Romance',
-        icon: '/images/category-icon-9.svg',
-        count: 4,
-    },
-    {
-        name: 'Novels',
-        icon: '/images/category-icon-4.svg',
-        count: 3,
-    },
-    {
-        name: 'History',
-        icon: '/images/category-icon-2.svg',
-        count: 5,
-    },
-    {
-        name: 'Fantasy',
-        icon: '/images/category-icon-8.svg',
-        count: 5,
-    },
-    {
-        name: 'Cooking',
-        icon: '/images/category-icon-5.svg',
-        count: 5,
-    },
-    {
-        name: 'Business',
-        icon: '/images/category-icon-10.svg',
-        count: 3,
-    },
-    {
-        name: 'Adventure',
-        icon: '/images/category-icon-7.svg',
-        count: 3,
-    },
-]
+const layout_store = useLayoutStore()
+const categories = computed(() => layout_store.categories)
 
-const total = categories.length
-const max_index = total - VISIBLE
+const total = computed(() => categories.value.length)
+const max_index = computed(() => Math.max(0, total.value - VISIBLE))
 
 const current = ref(0)
 const animated = ref(true)
 
-const offset = computed(() => -(current.value * 100) / total)
+const offset = computed(() => total.value ? -(current.value * 100) / total.value : 0)
 
-const track_width = `${(total / VISIBLE) * 100}%`
-const item_width = `${100 / total}%`
+const track_width = computed(() => `${(total.value / VISIBLE) * 100}%`)
+const item_width = computed(() => `${100 / total.value}%`)
 
 let timer: ReturnType<typeof setInterval>
 
 function advance() {
-    if (current.value >= max_index) {
+    if (current.value >= max_index.value) {
         animated.value = false
         current.value = 0
         nextTick(() => {
@@ -134,6 +93,20 @@ onUnmounted(() => {
     &__track {
         display: flex;
         width: v-bind(track_width);
+    }
+
+    &__skeleton-track {
+        display: flex;
+    }
+
+    &__skeleton-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+        padding: 16px 20px;
     }
 }
 </style>

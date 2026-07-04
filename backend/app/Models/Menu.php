@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FlushesCacheOnWrite;
 use Illuminate\Database\Eloquent\Model;
 use SolutionForest\FilamentTree\Concern\ModelTree;
 
 class Menu extends Model
 {
-    use ModelTree;
+    use FlushesCacheOnWrite, ModelTree;
+
+    protected static string $cacheFlushMethod = 'flushOnMenuWrite';
 
     protected $fillable = [
         'name',
@@ -15,7 +18,7 @@ class Menu extends Model
         'parent_id',
         'type',
         'params',
-        'sort',
+        'sort_order',
         'location',
     ];
 

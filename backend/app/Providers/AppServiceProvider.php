@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\NewsPost;
+use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductsCategory;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -27,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
             'products' => Product::class,
             'products_categories' => ProductsCategory::class,
             'news_posts' => NewsPost::class,
+            'pages' => Page::class,
         ]);
     }
 }

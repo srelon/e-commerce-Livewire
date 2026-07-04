@@ -15,7 +15,7 @@ return new class extends Migration
             $table->integer('parent_id')->default(-1);
             $table->string('type')->default('route');
             $table->json('params')->nullable();
-            $table->integer('sort')->default(0);
+            $table->integer('sort_order')->default(0);
             $table->string('location')->default('header');
             $table->timestamps();
 

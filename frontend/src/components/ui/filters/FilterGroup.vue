@@ -1,6 +1,6 @@
 <template>
     <div class="filter-group">
-        <div class="filter-group__search">
+        <div v-if="items.length > 8" class="filter-group__search">
             <input
                 v-model="search"
                 type="text"
@@ -82,7 +82,14 @@ const selected = ref<string[] | string | null>(
 )
 
 watch(selected, (val) => emit('update:modelValue', val))
-watch(() => props.modelValue, (val) => { selected.value = val ?? (props.type === 'radio' ? null : []) })
+watch(
+    () => props.modelValue,
+    (val) => {
+        const next = val ?? (props.type === 'radio' ? null : [])
+        if (JSON.stringify(next) === JSON.stringify(selected.value)) return
+        selected.value = next
+    },
+)
 </script>
 
 <style lang="scss" scoped>

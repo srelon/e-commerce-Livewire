@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
 
 export interface CartItem {
     id: string
@@ -7,7 +8,7 @@ export interface CartItem {
     author: string
     price: number
     image: string
-    href: string
+    href: RouteLocationRaw
     quantity: number
 }
 

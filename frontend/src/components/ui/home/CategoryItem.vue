@@ -1,5 +1,5 @@
 <template>
-    <router-link :to="{ path: '/products', query: { category: name } }" class="cats__item">
+    <router-link :to="{ name: 'products', query: { category: name } }" class="cats__item">
         <div class="cats__icon">
             <img :src="icon" :alt="name" width="40" height="40">
         </div>

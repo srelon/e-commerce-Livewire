@@ -61,6 +61,55 @@ class NewsPostSeeder extends Seeder
                 'image' => 'blog-image-8.webp',
                 'date' => 'December 8, 2025',
             ],
+            [
+                'title' => 'Sagittis Vitae Et Leo Duis',
+                'excerpt' => 'Quam elementum pulvinar etiam non quam. Faucibus nisl tincidunt eget nullam non nisi elementum sagittis vitae et leo.',
+                'category' => 'Literature',
+                'image' => 'blog-image-9.webp',
+                'date' => 'December 5, 2025',
+            ],
+            [
+                'title' => 'Nibh Pulvinar A Praesent Sapien',
+                'excerpt' => 'Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Praesent sapien massa, convallis a pellentesque nec egestas.',
+                'category' => 'Reading',
+                'image' => 'blog-image-3.webp',
+                'date' => 'December 2, 2025',
+            ],
+            [
+                'title' => 'Accumsan Id Imperdiet Et Porttitor',
+                'excerpt' => 'Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Curabitur aliquet quam id dui posuere blandit nulla.',
+                'category' => 'Authors',
+                'image' => 'blog-image-4.webp',
+                'date' => 'November 28, 2025',
+            ],
+            [
+                'title' => 'Elementum Id Enim Donec Rutrum',
+                'excerpt' => 'Quisque velit nisi, pretium ut lacinia in, elementum id enim. Donec rutrum congue leo eget malesuada quisque velit.',
+                'category' => 'Cultural',
+                'image' => 'blog-image-5.webp',
+                'date' => 'November 24, 2025',
+            ],
+            [
+                'title' => 'Ac Diam Sit Amet Quam Vehicula',
+                'excerpt' => 'Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Cras ultricies ligula sed magna dictum porta.',
+                'category' => 'Literature',
+                'image' => 'blog-image-6.webp',
+                'date' => 'November 19, 2025',
+            ],
+            [
+                'title' => 'Malesuada Feugiat Nulla Quis Lorem',
+                'excerpt' => 'Proin eget tortor risus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus praesent sapien massa.',
+                'category' => 'Reading',
+                'image' => 'blog-image-7.webp',
+                'date' => 'November 14, 2025',
+            ],
+            [
+                'title' => 'Dictum Porta Nibh Venenatis Cras',
+                'excerpt' => 'Nulla porttitor accumsan tincidunt. Cras ultricies ligula sed magna dictum porta nibh venenatis cras sed felis.',
+                'category' => 'Authors',
+                'image' => 'blog-image-8.webp',
+                'date' => 'November 9, 2025',
+            ],
         ];
 
         foreach ($posts as $data) {

@@ -3,7 +3,7 @@
         <div class="container">
             <h1 class="page-banner__title">{{ title }}</h1>
             <nav class="page-banner__breadcrumb" aria-label="Breadcrumb">
-                <router-link to="/">Home</router-link>
+                <router-link :to="{ name: 'home' }">Home</router-link>
                 <span class="page-banner__sep">›</span>
                 <span>{{ title }}</span>
             </nav>

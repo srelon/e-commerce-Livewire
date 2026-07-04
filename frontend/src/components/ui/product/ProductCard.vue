@@ -1,22 +1,36 @@
 <template>
     <div class="book-card">
         <div class="book-card__figure">
-            <router-link :to="href" class="book-card__img-link">
+            <BaseSkeleton v-if="loading" radius="0" />
+            <router-link v-else :to="to" class="book-card__img-link">
                 <img :src="image" :alt="title" class="book-card__img">
             </router-link>
         </div>
 
-        <div class="book-card__body">
+        <div v-if="loading" class="book-card__body">
+            <div class="book-card__title-row">
+                <BaseSkeleton width="70%" height="15px" />
+                <BaseSkeleton width="30px" height="15px" />
+            </div>
+            <div class="book-card__meta">
+                <BaseSkeleton width="120px" height="13px" />
+            </div>
+            <div class="book-card__footer">
+                <BaseSkeleton width="50px" height="18px" />
+                <BaseSkeleton width="90px" height="30px" radius="6px" />
+            </div>
+        </div>
+        <div v-else class="book-card__body">
             <div class="book-card__title-row">
                 <h3 class="book-card__title">
-                    <router-link :to="href">{{ title }}</router-link>
+                    <router-link :to="to">{{ title }}</router-link>
                 </h3>
                 <span v-if="rating !== undefined" class="book-card__rating-badge">★ {{ rating }}</span>
             </div>
             <div class="book-card__meta">
-                <span class="book-card__author">{{ author }}</span>
+                <button class="book-card__author" @click="go_to_filter('products', 'author', author)">{{ author }}</button>
                 <span class="book-card__separator">·</span>
-                <button class="book-card__category" @click="go_to_category">{{ category }}</button>
+                <button class="book-card__category" @click="go_to_filter('products', 'category', category)">{{ category }}</button>
             </div>
             <div class="book-card__footer">
                 <span class="book-card__price">${{ price }}</span>
@@ -26,7 +40,7 @@
                             <path d="M13.4,3.2c-0.9-0.8-2.3-1-3.5-0.8C8.9,2.6,8.1,3,7.5,3.7C6.9,3,6.1,2.6,5.2,2.4c-1.3-0.2-2.6,0-3.6,0.8C0.7,3.9,0.1,5,0,6.1c-0.1,1.3,0.3,2.6,1.3,3.7c1.2,1.4,5.6,4.7,5.8,4.8L7.5,15L8,14.6c0.2-0.1,4.5-3.5,5.7-4.8c1-1.1,1.4-2.4,1.3-3.7C14.9,5,14.3,3.9,13.4,3.2z"/>
                         </svg>
                     </button>
-                    <QuickView :href="href" />
+                    <QuickView :slug="id" />
                     <template v-if="is_in_cart">
                         <button class="book-card__cart book-card__cart--in" @click="store.open_popup()">
                             View Cart
@@ -45,30 +59,37 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import QuickView from '@/components/ui/product/QuickView.vue'
 import BaseButton from '@/components/ui/base/BaseButton.vue'
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
 import { useShopStore } from '@/stores/shop'
+import { useShopFilterNav } from '@/composables/useShopFilterNav'
 
 interface Props {
-    id: string
-    title: string
-    author: string
-    category: string
-    price: string
-    image: string
-    href?: string
+    id?: string
+    title?: string
+    author?: string
+    category?: string
+    price?: string
+    image?: string
     rating?: number
+    loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    href: '/product',
+    id: '',
+    title: '',
+    author: '',
+    category: '',
+    price: '',
+    image: '',
+    loading: false,
 })
 
 const store = useShopStore()
-const route = useRoute()
-const router = useRouter()
+const { go_to_filter } = useShopFilterNav()
 
+const to = computed(() => ({ name: 'product', params: { slug: props.id } }))
 const is_in_cart = computed(() => store.in_cart(props.id))
 
 function handle_add_to_cart() {
@@ -78,16 +99,8 @@ function handle_add_to_cart() {
         author: props.author,
         price: parseFloat(props.price),
         image: props.image,
-        href: props.href ?? '/product',
+        href: to.value,
     })
-}
-
-function go_to_category() {
-    if (route.path === '/products') {
-        router.replace({ query: { ...route.query, category: props.category } })
-    } else {
-        router.push({ path: '/products', query: { category: props.category } })
-    }
 }
 </script>
 
@@ -159,6 +172,7 @@ function go_to_category() {
         gap: 6px;
     }
 
+    &__author,
     &__category {
         color: inherit;
         font-size: inherit;
