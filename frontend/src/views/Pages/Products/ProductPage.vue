@@ -50,7 +50,7 @@
 
                     <div class="product__summary">
                         <h1 class="product__title">{{ product.title }}</h1>
-                        <StarRating :rating="product.rating" :count="product.reviews_count" />
+                        <StarRating :rating="product.rating" :count="product.reviews_count" @click-count="on_view_reviews" />
                         <div class="product__price">
                             ${{ product.stock.price }}
                             <span v-if="product.stock.before_price" class="product__price-before">${{ product.stock.before_price }}</span>
@@ -91,47 +91,19 @@
                 <p v-else class="product__not-found">Product not found.</p>
             </div>
 
-            <div v-if="!quick && product" class="product__tabs">
-                <div class="product__tab-nav">
-                    <button
-                        v-for="tab in tabs"
-                        :key="tab"
-                        class="product__tab-btn"
-                        :class="{ 'product__tab-btn--active': active_tab === tab }"
-                        @click="active_tab = tab"
-                    >
-                        {{ tab }}
-                    </button>
-                </div>
-                <div class="product__tab-content">
-                    <div v-if="active_tab === 'Description'">
-                        <p>{{ product.description }}</p>
-                    </div>
-                    <div v-else-if="active_tab === 'Reviews (0)'" class="product__reviews">
-                        <p class="product__no-reviews">There are no reviews yet. Be the first to write one.</p>
-                        <form class="product__review-form" @submit.prevent>
-                            <div class="product__review-rating">
-                                <label>Your Rating</label>
-                                <div class="product__stars">
-                                    <button
-                                        v-for="i in 5"
-                                        :key="i"
-                                        type="button"
-                                        class="product__star-btn"
-                                        :class="{ 'product__star-btn--filled': i <= review_rating }"
-                                        @click="review_rating = i"
-                                    >★</button>
-                                </div>
-                            </div>
-                            <textarea v-model="review_text" rows="4" placeholder="Write your review..."></textarea>
-                            <div class="product__review-row">
-                                <input v-model="review_name" type="text" placeholder="Your name">
-                                <input v-model="review_email" type="email" placeholder="Your email">
-                            </div>
-                            <button type="submit" class="product__review-submit">Submit Review</button>
-                        </form>
-                    </div>
-                </div>
+            <div v-if="!quick && product" ref="tabs_wrap">
+                <BaseTabs v-model="active_tab" :tabs="tabs" class="product__tabs">
+                    <template #label="{ tab }">{{ tab === 'Reviews' ? `Reviews (${product.reviews_count})` : tab }}</template>
+
+                    <p v-if="active_tab === 'Description'" class="product__description-text">{{ product.description }}</p>
+                    <ReviewsPanel
+                        v-else-if="active_tab === 'Reviews'"
+                        :product_slug="product.slug"
+                        :product_title="product.title"
+                        :product_rating="product.rating"
+                        :product_reviews_count="product.reviews_count"
+                    />
+                </BaseTabs>
             </div>
 
             <div v-if="!quick && (is_loading || product)" class="product__related">
@@ -160,13 +132,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useShopStore } from '@/stores/shop'
+import { useWebsocketStore } from '@/stores/websocket'
 import api from '@/plugins/axios'
 import { to_storage_url } from '@/stores/layout'
 import type { ProductDetail } from '@/types/shop'
 
 const store = useShopStore()
+const websocket_store = useWebsocketStore()
+const route = useRoute()
 
 interface Props {
     quick?: boolean
@@ -179,9 +155,11 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 import PageBanner from '@/components/ui/base/PageBanner.vue'
+import BaseTabs from '@/components/ui/base/BaseTabs.vue'
 import ProductCard from '@/components/ui/product/ProductCard.vue'
 import ThumbSlider from '@/components/ui/product/ThumbSlider.vue'
 import ImageLightbox from '@/components/ui/product/ImageLightbox.vue'
+import ReviewsPanel from '@/components/ui/product/ReviewsPanel.vue'
 import BaseButton from '@/components/ui/base/BaseButton.vue'
 import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
 import StarRating from '@/components/ui/base/StarRating.vue'
@@ -191,6 +169,7 @@ const lightbox_open = ref(false)
 const is_loading = ref(true)
 const product = ref<ProductDetail | null>(null)
 const active_image = ref('')
+const tabs_wrap = ref<HTMLElement | null>(null)
 
 const to = computed(() => ({ name: 'product', params: { slug: props.slug } }))
 const is_in_cart = computed(() => store.in_cart(props.slug))
@@ -231,6 +210,23 @@ function handle_add_to_cart() {
     }, qty.value)
 }
 
+let subscribed_channel: string | null = null
+
+function subscribe_to_reviews(slug: string) {
+    if (subscribed_channel) websocket_store.unsubscribe(subscribed_channel)
+    subscribed_channel = `reviews.products.${slug}`
+    websocket_store.subscribe(subscribed_channel)
+}
+
+function on_review_product_update(e: Event) {
+    const data = (e as CustomEvent).detail
+
+    if (!product.value || !data.product) return
+
+    product.value.rating = data.product.rating
+    product.value.reviews_count = data.product.reviews_count
+}
+
 function fetch_product() {
     if (!props.slug) return
 
@@ -239,6 +235,7 @@ function fetch_product() {
         product.value = res.data.data
         active_image.value = gallery_images.value[0] ?? ''
         qty.value = clamp_qty(1)
+        subscribe_to_reviews(props.slug)
     }).catch(() => {
         product.value = null
     }).finally(() => {
@@ -248,13 +245,31 @@ function fetch_product() {
 
 watch(() => props.slug, fetch_product, { immediate: true })
 
-const active_tab = ref('Description')
-const review_rating = ref(0)
-const review_text = ref('')
-const review_name = ref('')
-const review_email = ref('')
+onMounted(() => {
+    window.addEventListener('ws:review.created', on_review_product_update)
+    window.addEventListener('ws:review.updated', on_review_product_update)
+    window.addEventListener('ws:review.deleted', on_review_product_update)
+})
 
-const tabs = ['Description', 'Reviews (0)']
+onUnmounted(() => {
+    if (subscribed_channel) websocket_store.unsubscribe(subscribed_channel)
+    window.removeEventListener('ws:review.created', on_review_product_update)
+    window.removeEventListener('ws:review.updated', on_review_product_update)
+    window.removeEventListener('ws:review.deleted', on_review_product_update)
+})
+
+const active_tab = ref(route.query.tab === 'reviews' ? 'Reviews' : 'Description')
+
+const tabs = ['Description', 'Reviews']
+
+watch(() => props.slug, () => {
+    active_tab.value = route.query.tab === 'reviews' ? 'Reviews' : 'Description'
+})
+
+function on_view_reviews() {
+    active_tab.value = 'Reviews'
+    nextTick(() => tabs_wrap.value?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+}
 
 function open_lightbox(img: string) {
     active_image.value = img
@@ -263,8 +278,6 @@ function open_lightbox(img: string) {
 </script>
 
 <style lang="scss" scoped>
-@use "sass:color";
-
 .product {
     &--quick {
         padding: 32px 0 24px;
@@ -510,122 +523,10 @@ function open_lightbox(img: string) {
         margin-bottom: 60px;
     }
 
-    &__tab-nav {
-        display: flex;
-        gap: 0;
-        border-bottom: 1px solid $color-light;
-        margin-bottom: 32px;
-    }
-
-    &__tab-btn {
-        padding: 12px 24px;
-        font-size: 15px;
-        font-weight: 600;
-        font-family: $font-body;
-        color: $color-gray;
-        border-bottom: 2px solid transparent;
-        margin-bottom: -1px;
-        cursor: pointer;
-        transition: color 0.2s, border-color 0.2s;
-
-        &:hover {
-            color: $color-dark;
-        }
-
-        &--active {
-            color: $color-dark;
-            border-bottom-color: $color-primary;
-        }
-    }
-
-    &__tab-content {
+    &__description-text {
         font-size: 15px;
         color: $color-gray;
         line-height: 1.75;
-    }
-
-    &__no-reviews {
-        margin-bottom: 24px;
-        color: $color-gray;
-        font-size: 14px;
-    }
-
-    &__review-form {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        max-width: 560px;
-
-        textarea,
-        input {
-            padding: 11px 14px;
-            border: 1.5px solid $color-light;
-            border-radius: 6px;
-            font-size: 14px;
-            font-family: $font-body;
-            outline: none;
-            resize: vertical;
-
-            &:focus {
-                border-color: $color-primary;
-            }
-        }
-    }
-
-    &__review-rating {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-
-        label {
-            font-size: 14px;
-            font-weight: 600;
-            color: $color-dark;
-        }
-    }
-
-    &__stars {
-        display: flex;
-        gap: 4px;
-    }
-
-    &__star-btn {
-        font-size: 24px;
-        color: $color-light;
-        cursor: pointer;
-        transition: color 0.15s;
-        font-family: inherit;
-
-        &--filled {
-            color: #f5a623;
-        }
-
-        &:hover {
-            color: #f5a623;
-        }
-    }
-
-    &__review-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-    }
-
-    &__review-submit {
-        align-self: flex-start;
-        padding: 11px 28px;
-        background: $color-primary;
-        color: $color-white;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 600;
-        font-family: $font-body;
-        cursor: pointer;
-        transition: background 0.2s;
-
-        &:hover {
-            background: color.adjust($color-primary, $lightness: -8%);
-        }
     }
 
     &__related-grid {

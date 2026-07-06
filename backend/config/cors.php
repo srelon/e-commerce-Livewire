@@ -4,7 +4,7 @@ $allowed_origins = collect(explode(',', env('SANCTUM_STATEFUL_DOMAINS', '')))
     ->map(function ($domain) {
         $domain = trim($domain);
 
-        if (!$domain) {
+        if (! $domain) {
             return null;
         }
 
@@ -14,7 +14,7 @@ $allowed_origins = collect(explode(',', env('SANCTUM_STATEFUL_DOMAINS', '')))
 
         $scheme = env('APP_ENV') === 'local' ? 'http://' : 'https://';
 
-        return $scheme . $domain;
+        return $scheme.$domain;
     })
     ->filter()
     ->values()

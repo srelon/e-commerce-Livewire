@@ -17,20 +17,17 @@ class DeliveryService extends Model
         'price',
     ];
 
-    protected function casts(): array
-    {
+    protected function casts(): array {
         return [
             'price' => 'decimal:2',
         ];
     }
 
-    public function branches(): HasMany
-    {
+    public function branches(): HasMany {
         return $this->hasMany(DeliveryBranch::class, 'delivery_id');
     }
 
-    public function orders(): HasMany
-    {
+    public function orders(): HasMany {
         return $this->hasMany(Order::class, 'delivery_id');
     }
 }

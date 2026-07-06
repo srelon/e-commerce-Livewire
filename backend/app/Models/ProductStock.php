@@ -24,8 +24,7 @@ class ProductStock extends Model
         'status',
     ];
 
-    protected function casts(): array
-    {
+    protected function casts(): array {
         return [
             'price' => 'decimal:2',
             'before_price' => 'decimal:2',
@@ -33,13 +32,11 @@ class ProductStock extends Model
         ];
     }
 
-    public function product(): BelongsTo
-    {
+    public function product(): BelongsTo {
         return $this->belongsTo(Product::class);
     }
 
-    public function orderItems(): HasMany
-    {
+    public function orderItems(): HasMany {
         return $this->hasMany(OrderItem::class);
     }
 }

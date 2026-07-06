@@ -21,31 +21,26 @@ class UserNotification extends Model
         'read_at',
     ];
 
-    protected function casts(): array
-    {
+    protected function casts(): array {
         return [
             'data' => 'array',
             'read_at' => 'datetime',
         ];
     }
 
-    public function user(): BelongsTo
-    {
+    public function user(): BelongsTo {
         return $this->belongsTo(User::class);
     }
 
-    public function fromUser(): BelongsTo
-    {
+    public function fromUser(): BelongsTo {
         return $this->belongsTo(User::class, 'from_user_id');
     }
 
-    public function product(): BelongsTo
-    {
+    public function product(): BelongsTo {
         return $this->belongsTo(Product::class);
     }
 
-    public function review(): BelongsTo
-    {
+    public function review(): BelongsTo {
         return $this->belongsTo(Review::class, 'review_id');
     }
 }

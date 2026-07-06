@@ -12,7 +12,7 @@ export interface ProductSummary {
     title: string
     author: string | null
     category: string | null
-    rating: number
+    rating: number | null
     image: string | null
     stock: ProductStock
 }
@@ -22,7 +22,7 @@ export interface ProductDetail {
     title: string
     author: string | null
     category: string | null
-    rating: number
+    rating: number | null
     reviews_count: number
     short_description: string | null
     description: string | null

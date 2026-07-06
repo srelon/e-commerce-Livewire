@@ -9,20 +9,20 @@ class AccessList extends Field
 {
     protected string $view = 'filament.forms.components.access-list';
 
-    protected function setUp(): void
-    {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->afterStateHydrated(function (self $component, $record) {
-            if (!$record?->id) {
+            if (! $record?->id) {
                 $component->state([]);
+
                 return;
             }
 
             $state = DB::table('admin_role_access')
                 ->where('role_id', $record->id)
                 ->get()
-                ->map(fn ($row) => $row->access_id . ':' . $row->type)
+                ->map(fn ($row) => $row->access_id.':'.$row->type)
                 ->toArray();
 
             $component->state($state);
@@ -31,7 +31,9 @@ class AccessList extends Field
         $this->dehydrated(false);
 
         $this->saveRelationshipsUsing(function (self $component, $record, $state) {
-            if (!$record?->id) return;
+            if (! $record?->id) {
+                return;
+            }
 
             DB::table('admin_role_access')->where('role_id', $record->id)->delete();
 
@@ -39,6 +41,7 @@ class AccessList extends Field
                 ->filter(fn ($item) => str_contains($item, ':'))
                 ->map(function ($item) use ($record) {
                     [$access_id, $type] = explode(':', $item);
+
                     return [
                         'role_id' => $record->id,
                         'access_id' => (int) $access_id,
@@ -47,7 +50,7 @@ class AccessList extends Field
                 })
                 ->toArray();
 
-            if (!empty($rows)) {
+            if (! empty($rows)) {
                 DB::table('admin_role_access')->insert($rows);
             }
         });

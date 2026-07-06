@@ -10,13 +10,11 @@ class ProductFilterTest extends TestCase
 {
     use RefreshDatabase, TestDataHelper;
 
-    public function test_products_returns_successful_response(): void
-    {
+    public function test_products_returns_successful_response(): void {
         $this->getJson('/api/products')->assertSuccessful();
     }
 
-    public function test_products_are_filtered_by_category(): void
-    {
+    public function test_products_are_filtered_by_category(): void {
         $fantasy = $this->createCategory([
             'name' => 'Fantasy',
             'slug' => 'fantasy',
@@ -38,8 +36,7 @@ class ProductFilterTest extends TestCase
             ->assertJsonPath('data.items.data.0.title', 'Fantasy Book');
     }
 
-    public function test_products_accept_a_single_category_string_not_just_an_array(): void
-    {
+    public function test_products_accept_a_single_category_string_not_just_an_array(): void {
         $fantasy = $this->createCategory([
             'name' => 'Fantasy',
             'slug' => 'fantasy',
@@ -54,8 +51,7 @@ class ProductFilterTest extends TestCase
             ->assertJsonPath('data.items.data.0.title', 'Fantasy Book');
     }
 
-    public function test_products_accept_a_comma_separated_category_list(): void
-    {
+    public function test_products_accept_a_comma_separated_category_list(): void {
         $fantasy = $this->createCategory([
             'name' => 'Fantasy',
             'slug' => 'fantasy',
@@ -83,8 +79,7 @@ class ProductFilterTest extends TestCase
             ->assertJsonCount(2, 'data.items.data');
     }
 
-    public function test_products_are_filtered_by_author(): void
-    {
+    public function test_products_are_filtered_by_author(): void {
         $winner = $this->createAuthor([
             'name' => 'Winner Author',
         ]);
@@ -106,8 +101,7 @@ class ProductFilterTest extends TestCase
             ->assertJsonPath('data.items.data.0.title', 'By Winner');
     }
 
-    public function test_products_are_filtered_by_price_range(): void
-    {
+    public function test_products_are_filtered_by_price_range(): void {
         $cheap = $this->createProduct(null, [
             'title' => 'Cheap Book',
         ]);
@@ -127,8 +121,7 @@ class ProductFilterTest extends TestCase
             ->assertJsonPath('data.items.data.0.title', 'Expensive Book');
     }
 
-    public function test_products_ignore_a_non_numeric_price_min_or_max(): void
-    {
+    public function test_products_ignore_a_non_numeric_price_min_or_max(): void {
         $this->createProduct();
 
         $this->getJson('/api/products?price_min=asdasd&price_max=alsogarbage')
@@ -136,8 +129,7 @@ class ProductFilterTest extends TestCase
             ->assertJsonCount(1, 'data.items.data');
     }
 
-    public function test_products_ignore_a_non_numeric_page(): void
-    {
+    public function test_products_ignore_a_non_numeric_page(): void {
         $this->createProduct();
 
         $this->getJson('/api/products?page=asdasd')
@@ -145,8 +137,7 @@ class ProductFilterTest extends TestCase
             ->assertJsonPath('data.items.pagination.current_page', 1);
     }
 
-    public function test_products_are_filtered_by_rating(): void
-    {
+    public function test_products_are_filtered_by_rating(): void {
         $this->createProduct(null, [
             'title' => 'Low Rated',
             'rating_avg' => 3,
@@ -162,8 +153,7 @@ class ProductFilterTest extends TestCase
             ->assertJsonPath('data.items.data.0.title', 'High Rated');
     }
 
-    public function test_products_are_filtered_by_status_on_sale(): void
-    {
+    public function test_products_are_filtered_by_status_on_sale(): void {
         $product = $this->createProduct(null, [
             'title' => 'On Sale Book',
         ]);
@@ -182,8 +172,7 @@ class ProductFilterTest extends TestCase
             ->assertJsonPath('data.items.data.0.title', 'On Sale Book');
     }
 
-    public function test_products_are_filtered_by_status_bestseller(): void
-    {
+    public function test_products_are_filtered_by_status_bestseller(): void {
         $this->createProduct(null, [
             'title' => 'Bestseller Book',
             'bestseller' => 1,
@@ -198,8 +187,7 @@ class ProductFilterTest extends TestCase
             ->assertJsonPath('data.items.data.0.title', 'Bestseller Book');
     }
 
-    public function test_products_are_sorted_by_price_ascending(): void
-    {
+    public function test_products_are_sorted_by_price_ascending(): void {
         $expensive = $this->createProduct(null, [
             'title' => 'Expensive',
         ]);
@@ -219,8 +207,7 @@ class ProductFilterTest extends TestCase
             ->assertJsonPath('data.items.data.1.title', 'Expensive');
     }
 
-    public function test_products_are_sorted_by_date_added(): void
-    {
+    public function test_products_are_sorted_by_date_added(): void {
         $this->createProduct(null, [
             'title' => 'Older Book',
             'published_at' => now()->subDays(2),
@@ -241,8 +228,7 @@ class ProductFilterTest extends TestCase
             ->assertJsonPath('data.items.data.1.title', 'Newer Book');
     }
 
-    public function test_products_response_includes_filter_groups_with_counts(): void
-    {
+    public function test_products_response_includes_filter_groups_with_counts(): void {
         $category = $this->createCategory([
             'name' => 'Fantasy',
             'slug' => 'fantasy',
@@ -260,8 +246,7 @@ class ProductFilterTest extends TestCase
         $this->assertSame(1, $category_group['items'][0]['count']);
     }
 
-    public function test_filter_groups_exclude_categories_and_authors_with_no_products(): void
-    {
+    public function test_filter_groups_exclude_categories_and_authors_with_no_products(): void {
         $with_products = $this->createCategory([
             'name' => 'Fantasy',
             'slug' => 'fantasy',
@@ -292,8 +277,7 @@ class ProductFilterTest extends TestCase
         $this->assertFalse($author_names->contains('No Books'));
     }
 
-    public function test_filter_groups_narrow_down_when_a_category_is_selected(): void
-    {
+    public function test_filter_groups_narrow_down_when_a_category_is_selected(): void {
         $fantasy = $this->createCategory([
             'name' => 'Fantasy',
             'slug' => 'fantasy',
@@ -334,8 +318,7 @@ class ProductFilterTest extends TestCase
         $this->assertTrue($category_names->contains('Cooking'), 'other categories stay visible so the user can switch');
     }
 
-    public function test_filter_groups_keep_a_selected_item_visible_even_at_zero_count(): void
-    {
+    public function test_filter_groups_keep_a_selected_item_visible_even_at_zero_count(): void {
         $fantasy = $this->createCategory([
             'name' => 'Fantasy',
             'slug' => 'fantasy',
@@ -362,8 +345,7 @@ class ProductFilterTest extends TestCase
         $this->assertSame(0, $author_item['count']);
     }
 
-    public function test_status_filter_group_excludes_on_sale_when_no_product_is_on_sale(): void
-    {
+    public function test_status_filter_group_excludes_on_sale_when_no_product_is_on_sale(): void {
         $product = $this->createProduct();
         $this->createProductStock($product);
 
@@ -377,13 +359,11 @@ class ProductFilterTest extends TestCase
         $this->assertFalse($status_names->contains('Bestseller'));
     }
 
-    public function test_products_includes_seo_for_the_products_page(): void
-    {
+    public function test_products_includes_seo_for_the_products_page(): void {
         $this->assertPageSeoIncluded('/api/products', 'products', 'Products');
     }
 
-    public function test_products_are_paginated_nine_per_page(): void
-    {
+    public function test_products_are_paginated_nine_per_page(): void {
         for ($i = 1; $i <= 10; $i++) {
             $this->createProduct(null, [
                 'title' => "Book {$i}",

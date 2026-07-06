@@ -10,13 +10,11 @@ class AuthorFilterTest extends TestCase
 {
     use RefreshDatabase, TestDataHelper;
 
-    public function test_authors_returns_successful_response(): void
-    {
+    public function test_authors_returns_successful_response(): void {
         $this->getJson('/api/authors')->assertSuccessful();
     }
 
-    public function test_authors_include_their_book_count(): void
-    {
+    public function test_authors_include_their_book_count(): void {
         $author = $this->createAuthor([
             'name' => 'Prolific Author',
         ]);
@@ -33,8 +31,7 @@ class AuthorFilterTest extends TestCase
         $this->assertSame(2, $authors->firstWhere('name', 'Prolific Author')['books']);
     }
 
-    public function test_authors_include_their_bestseller_count(): void
-    {
+    public function test_authors_include_their_bestseller_count(): void {
         $author = $this->createAuthor([
             'name' => 'Bestselling Author',
         ]);
@@ -56,8 +53,7 @@ class AuthorFilterTest extends TestCase
         $this->assertSame(2, $authors->firstWhere('name', 'Bestselling Author')['bestsellers']);
     }
 
-    public function test_authors_are_sorted_by_books(): void
-    {
+    public function test_authors_are_sorted_by_books(): void {
         $prolific = $this->createAuthor([
             'name' => 'Prolific Author',
         ]);
@@ -79,8 +75,7 @@ class AuthorFilterTest extends TestCase
             ->assertJsonPath('data.items.data.0.name', 'Prolific Author');
     }
 
-    public function test_authors_are_sorted_by_bestseller(): void
-    {
+    public function test_authors_are_sorted_by_bestseller(): void {
         $bestseller_author = $this->createAuthor([
             'name' => 'Bestseller Author',
         ]);
@@ -100,8 +95,7 @@ class AuthorFilterTest extends TestCase
             ->assertJsonPath('data.items.data.0.name', 'Bestseller Author');
     }
 
-    public function test_authors_are_sorted_by_date_added(): void
-    {
+    public function test_authors_are_sorted_by_date_added(): void {
         $older = $this->createAuthor([
             'name' => 'Older Author',
         ]);
@@ -124,13 +118,11 @@ class AuthorFilterTest extends TestCase
             ->assertJsonPath('data.items.data.0.name', 'Older Author');
     }
 
-    public function test_authors_includes_seo_for_the_authors_page(): void
-    {
+    public function test_authors_includes_seo_for_the_authors_page(): void {
         $this->assertPageSeoIncluded('/api/authors', 'authors', 'Authors');
     }
 
-    public function test_authors_are_paginated(): void
-    {
+    public function test_authors_are_paginated(): void {
         for ($i = 1; $i <= 8; $i++) {
             $this->createAuthor([
                 'name' => "Author {$i}",

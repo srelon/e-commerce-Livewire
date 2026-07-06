@@ -8,12 +8,9 @@ use App\Services\PageService;
 
 class AuthorController extends Controller
 {
-    public function __construct(protected AuthorService $authorService, protected PageService $pageService)
-    {
-    }
+    public function __construct(protected AuthorService $authorService, protected PageService $pageService) {}
 
-    public function index(AuthorFilterRequest $request)
-    {
+    public function index(AuthorFilterRequest $request) {
         $paginated = $this->authorService->getFilteredList($request->filters());
 
         return $this->respondWithJson([

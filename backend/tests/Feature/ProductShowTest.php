@@ -10,15 +10,13 @@ class ProductShowTest extends TestCase
 {
     use RefreshDatabase, TestDataHelper;
 
-    public function test_product_show_returns_successful_response(): void
-    {
+    public function test_product_show_returns_successful_response(): void {
         $product = $this->createProduct();
 
         $this->getJson("/api/products/{$product->slug}")->assertSuccessful();
     }
 
-    public function test_product_show_returns_full_product_details(): void
-    {
+    public function test_product_show_returns_full_product_details(): void {
         $category = $this->createCategory([
             'name' => 'Fantasy',
         ]);
@@ -65,13 +63,19 @@ class ProductShowTest extends TestCase
             ->assertJsonPath('data.seo.title', 'Astral Journey');
     }
 
-    public function test_product_show_returns_404_for_unknown_slug(): void
-    {
+    public function test_product_show_returns_null_rating_when_product_has_no_reviews(): void {
+        $product = $this->createProduct();
+
+        $this->getJson("/api/products/{$product->slug}")
+            ->assertSuccessful()
+            ->assertJsonPath('data.rating', null);
+    }
+
+    public function test_product_show_returns_404_for_unknown_slug(): void {
         $this->getJson('/api/products/does-not-exist')->assertNotFound();
     }
 
-    public function test_product_show_returns_404_for_a_deleted_product(): void
-    {
+    public function test_product_show_returns_404_for_a_deleted_product(): void {
         $product = $this->createProduct(null, [
             'status' => 4,
         ]);
@@ -79,8 +83,7 @@ class ProductShowTest extends TestCase
         $this->getJson("/api/products/{$product->slug}")->assertNotFound();
     }
 
-    public function test_product_show_is_reachable_when_archived(): void
-    {
+    public function test_product_show_is_reachable_when_archived(): void {
         $product = $this->createProduct(null, [
             'status' => 2,
         ]);
@@ -88,8 +91,7 @@ class ProductShowTest extends TestCase
         $this->getJson("/api/products/{$product->slug}")->assertSuccessful();
     }
 
-    public function test_product_show_includes_related_products_from_the_same_category(): void
-    {
+    public function test_product_show_includes_related_products_from_the_same_category(): void {
         $category = $this->createCategory();
         $other_category = $this->createCategory();
         $product = $this->createProduct($category, [

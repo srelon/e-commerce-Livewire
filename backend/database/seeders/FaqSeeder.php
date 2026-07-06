@@ -7,8 +7,7 @@ use Illuminate\Database\Seeder;
 
 class FaqSeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $items = [
             [
                 'title' => 'How long does shipping take?',

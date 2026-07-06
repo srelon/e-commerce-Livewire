@@ -10,11 +10,9 @@ class HomeService
         protected ProductService $productService,
         protected BlogService $blogService,
         protected PageService $pageService,
-    ) {
-    }
+    ) {}
 
-    public function getHome(): array
-    {
+    public function getHome(): array {
         return Cache::tags([CacheService::TAG_HOME])->remember(
             'home.data',
             CacheService::TTL_HOME,

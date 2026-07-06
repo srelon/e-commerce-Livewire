@@ -10,8 +10,7 @@ use Illuminate\Support\Str;
 
 class NewsPostSeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $posts = [
             [
                 'title' => 'Blandit Praesent Morbi Faucibus',

@@ -1,0 +1,8 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "braces_position": {
+            "functions_opening_brace": "same_line"
+        }
+    }
+}

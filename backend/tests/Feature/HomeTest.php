@@ -10,13 +10,11 @@ class HomeTest extends TestCase
 {
     use RefreshDatabase, TestDataHelper;
 
-    public function test_home_returns_successful_response(): void
-    {
+    public function test_home_returns_successful_response(): void {
         $this->getJson('/api/pages/home')->assertSuccessful();
     }
 
-    public function test_bestsellers_are_ordered_by_bestseller_then_rating(): void
-    {
+    public function test_bestsellers_are_ordered_by_bestseller_then_rating(): void {
         $low = $this->createProduct(null, [
             'title' => 'Low',
             'bestseller' => 0,
@@ -43,8 +41,7 @@ class HomeTest extends TestCase
             ->assertJsonPath('data.bestsellers.2.title', 'Low');
     }
 
-    public function test_bestsellers_include_price_and_cover_image(): void
-    {
+    public function test_bestsellers_include_price_and_cover_image(): void {
         $product = $this->createProduct(null, [
             'bestseller' => 1,
         ]);
@@ -70,8 +67,7 @@ class HomeTest extends TestCase
             ->assertJsonPath('data.bestsellers.0.image', 'products/first.webp');
     }
 
-    public function test_bestsellers_include_stock_id_and_available_quantity(): void
-    {
+    public function test_bestsellers_include_stock_id_and_available_quantity(): void {
         $product = $this->createProduct(null, [
             'bestseller' => 1,
         ]);
@@ -90,8 +86,7 @@ class HomeTest extends TestCase
             ->assertJsonPath('data.bestsellers.0.stock.quantity', 15);
     }
 
-    public function test_best_rated_includes_price_but_not_stock_id_or_quantity(): void
-    {
+    public function test_best_rated_includes_price_but_not_stock_id_or_quantity(): void {
         $product = $this->createProduct(null, [
             'rating_avg' => 5,
         ]);
@@ -106,8 +101,7 @@ class HomeTest extends TestCase
             ->assertJsonMissingPath('data.best_rated.0.stock.quantity');
     }
 
-    public function test_best_author_is_the_one_with_most_bestseller_products(): void
-    {
+    public function test_best_author_is_the_one_with_most_bestseller_products(): void {
         $winner = $this->createAuthor([
             'name' => 'Winning Author',
             'content' => 'A great author.',
@@ -135,8 +129,7 @@ class HomeTest extends TestCase
             ->assertJsonPath('data.best_author.content', 'A great author.');
     }
 
-    public function test_best_rated_returns_up_to_nine_products_ordered_by_rating(): void
-    {
+    public function test_best_rated_returns_up_to_nine_products_ordered_by_rating(): void {
         for ($i = 1; $i <= 10; $i++) {
             $this->createProduct(null, [
                 'title' => "Book {$i}",
@@ -150,8 +143,7 @@ class HomeTest extends TestCase
         $response->assertJsonPath('data.best_rated.0.title', 'Book 10');
     }
 
-    public function test_blog_returns_latest_seven_posts(): void
-    {
+    public function test_blog_returns_latest_seven_posts(): void {
         for ($i = 1; $i <= 8; $i++) {
             $this->createNewsPost([
                 'title' => "Post {$i}",
@@ -166,8 +158,7 @@ class HomeTest extends TestCase
         $response->assertJsonPath('data.blog.0.title', 'Post 8');
     }
 
-    public function test_blog_excludes_unpublished_posts(): void
-    {
+    public function test_blog_excludes_unpublished_posts(): void {
         $this->createNewsPost([
             'status' => 0,
         ]);
@@ -177,13 +168,11 @@ class HomeTest extends TestCase
             ->assertJsonCount(0, 'data.blog');
     }
 
-    public function test_home_includes_seo_for_the_home_page(): void
-    {
+    public function test_home_includes_seo_for_the_home_page(): void {
         $this->assertPageSeoIncluded('/api/pages/home', 'home', 'Home');
     }
 
-    public function test_home_cache_is_invalidated_on_product_stock_write(): void
-    {
+    public function test_home_cache_is_invalidated_on_product_stock_write(): void {
         $product = $this->createProduct(null, [
             'title' => 'Cached Book',
             'bestseller' => 1,

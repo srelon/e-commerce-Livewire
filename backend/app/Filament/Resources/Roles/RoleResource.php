@@ -32,10 +32,9 @@ class RoleResource extends BaseResource
 
     protected static ?int $navigationSort = 11;
 
-    public static function form(Schema $schema): Schema
-    {
+    public static function form(Schema $schema): Schema {
         return $schema
-            ->disabled(!static::hasAccess('edit'))
+            ->disabled(! static::hasAccess('edit'))
             ->components([
                 TextInput::make('name')
                     ->required()
@@ -49,8 +48,7 @@ class RoleResource extends BaseResource
             ]);
     }
 
-    public static function table(Table $table): Table
-    {
+    public static function table(Table $table): Table {
         return $table
             ->columns([
                 TextColumn::make('id')
@@ -85,13 +83,11 @@ class RoleResource extends BaseResource
             ]);
     }
 
-    public static function getRelations(): array
-    {
+    public static function getRelations(): array {
         return [];
     }
 
-    public static function getPages(): array
-    {
+    public static function getPages(): array {
         return [
             'index' => ListRoles::route('/'),
             'create' => CreateRole::route('/create'),

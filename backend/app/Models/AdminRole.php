@@ -10,14 +10,12 @@ class AdminRole extends Model
 {
     protected $fillable = ['name', 'label'];
 
-    public function accesses(): BelongsToMany
-    {
+    public function accesses(): BelongsToMany {
         return $this->belongsToMany(AdminAccess::class, 'admin_role_access', 'role_id', 'access_id')
             ->distinct();
     }
 
-    public function admins(): HasMany
-    {
+    public function admins(): HasMany {
         return $this->hasMany(Admin::class, 'role_id');
     }
 }

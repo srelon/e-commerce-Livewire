@@ -32,6 +32,9 @@ logs-app:
 logs-db:
 	$(DOCKER_COMPOSE) logs -f db
 
+logs-websocket:
+	$(DOCKER_COMPOSE) logs -f websocket
+
 scheduler-logs:
 	docker logs -f filament_scheduler
 
@@ -49,3 +52,9 @@ site:
 	@echo ""
 	@echo "  Site dev:  http://127.0.0.1:5173"
 	@echo ""
+
+test:
+	docker exec -it filament_app bash -c "cd /var/www/backend && php artisan test"
+
+format:
+	docker exec -it filament_app bash -c "cd /var/www/backend && ./vendor/bin/pint"

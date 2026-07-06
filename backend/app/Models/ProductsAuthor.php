@@ -21,15 +21,13 @@ class ProductsAuthor extends Model
         'content',
     ];
 
-    protected function casts(): array
-    {
+    protected function casts(): array {
         return [
             'photo' => 'array',
         ];
     }
 
-    public function products(): HasMany
-    {
+    public function products(): HasMany {
         return $this->hasMany(Product::class, 'author_id');
     }
 }

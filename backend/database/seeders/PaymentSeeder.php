@@ -7,8 +7,7 @@ use Illuminate\Database\Seeder;
 
 class PaymentSeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $payments = [
             [
                 'name' => 'Pay by Card Online',

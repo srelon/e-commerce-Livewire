@@ -19,15 +19,13 @@ class ProductImage extends Model
         'sort_order',
     ];
 
-    protected function casts(): array
-    {
+    protected function casts(): array {
         return [
             'image' => 'array',
         ];
     }
 
-    public function product(): BelongsTo
-    {
+    public function product(): BelongsTo {
         return $this->belongsTo(Product::class);
     }
 }

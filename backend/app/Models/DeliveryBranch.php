@@ -19,13 +19,11 @@ class DeliveryBranch extends Model
         'hash',
     ];
 
-    public function delivery(): BelongsTo
-    {
+    public function delivery(): BelongsTo {
         return $this->belongsTo(DeliveryService::class, 'delivery_id');
     }
 
-    public function orders(): HasMany
-    {
+    public function orders(): HasMany {
         return $this->hasMany(Order::class, 'delivery_branch_id');
     }
 }

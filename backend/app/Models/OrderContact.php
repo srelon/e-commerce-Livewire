@@ -17,8 +17,7 @@ class OrderContact extends Model
         'email',
     ];
 
-    public function orders(): HasMany
-    {
+    public function orders(): HasMany {
         return $this->hasMany(Order::class, 'contact_id');
     }
 }

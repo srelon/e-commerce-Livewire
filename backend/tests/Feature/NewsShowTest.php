@@ -10,15 +10,13 @@ class NewsShowTest extends TestCase
 {
     use RefreshDatabase, TestDataHelper;
 
-    public function test_news_show_returns_successful_response(): void
-    {
+    public function test_news_show_returns_successful_response(): void {
         $post = $this->createNewsPost();
 
         $this->getJson("/api/news/{$post->slug}")->assertSuccessful();
     }
 
-    public function test_news_show_returns_full_post_details(): void
-    {
+    public function test_news_show_returns_full_post_details(): void {
         $category = $this->createNewsCategory([
             'name' => 'Literature',
         ]);
@@ -38,13 +36,11 @@ class NewsShowTest extends TestCase
             ->assertJsonPath('data.seo.title', 'A Great Post');
     }
 
-    public function test_news_show_returns_404_for_unknown_slug(): void
-    {
+    public function test_news_show_returns_404_for_unknown_slug(): void {
         $this->getJson('/api/news/does-not-exist')->assertNotFound();
     }
 
-    public function test_news_show_returns_404_for_an_unpublished_post(): void
-    {
+    public function test_news_show_returns_404_for_an_unpublished_post(): void {
         $post = $this->createNewsPost([
             'status' => 0,
         ]);

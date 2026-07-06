@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\MenuResource;
 use App\Models\ContactInfo;
 use App\Models\Menu;
 use Illuminate\Support\Collection;
@@ -9,12 +10,9 @@ use Illuminate\Support\Facades\Cache;
 
 class LayoutService
 {
-    public function __construct(protected ProductService $productService)
-    {
-    }
+    public function __construct(protected ProductService $productService) {}
 
-    public function getLayout(): array
-    {
+    public function getLayout(): array {
         return Cache::tags([CacheService::TAG_LAYOUT])->remember(
             'layout.data',
             CacheService::TTL_LAYOUT,
@@ -27,8 +25,7 @@ class LayoutService
         );
     }
 
-    protected function getMenu(): Collection
-    {
+    protected function getMenu(): Collection {
         return Menu::query()
             ->where('parent_id', -1)
             ->where('location', 'header')
@@ -38,20 +35,11 @@ class LayoutService
             ->map(fn (Menu $item) => $this->formatMenuItem($item));
     }
 
-    protected function formatMenuItem(Menu $item): array
-    {
-        return [
-            'id' => $item->id,
-            'name' => $item->name,
-            'type' => $item->type,
-            'route' => $item->route,
-            'params' => $item->params,
-            'children' => $item->children->map(fn (Menu $child) => $this->formatMenuItem($child))->all(),
-        ];
+    protected function formatMenuItem(Menu $item): array {
+        return (new MenuResource($item))->resolve();
     }
 
-    protected function getContacts(): Collection
-    {
+    protected function getContacts(): Collection {
         return ContactInfo::query()
             ->where('status', 1)
             ->orderBy('sort_order')

@@ -7,13 +7,11 @@ use Illuminate\Validation\Rule;
 
 class NewsletterSubscribeRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
+    public function authorize(): bool {
         return true;
     }
 
-    public function rules(): array
-    {
+    public function rules(): array {
         return [
             'email' => [
                 'required',
@@ -23,8 +21,7 @@ class NewsletterSubscribeRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
-    {
+    public function messages(): array {
         return [
             'email.unique' => 'This email is already subscribed.',
         ];

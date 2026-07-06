@@ -7,8 +7,7 @@ use Illuminate\Database\Seeder;
 
 class DeliveryServiceSeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $services = [
             [
                 'name' => 'Pickup',

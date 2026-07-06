@@ -23,13 +23,11 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
-    public function boot(): void
-    {
+    public function boot(): void {
         CreateAction::configureUsing(fn (CreateAction $action) => $action->color('info'));
     }
 
-    public function panel(Panel $panel): Panel
-    {
+    public function panel(Panel $panel): Panel {
         return $panel
             ->default()
             ->id('admin')

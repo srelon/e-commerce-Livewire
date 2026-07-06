@@ -12,8 +12,7 @@ class CreateRole extends CreateRecord
 {
     protected static string $resource = RoleResource::class;
 
-    protected function getHeaderActions(): array
-    {
+    protected function getHeaderActions(): array {
         return [
             Action::make('create_access')
                 ->label('Add Access')

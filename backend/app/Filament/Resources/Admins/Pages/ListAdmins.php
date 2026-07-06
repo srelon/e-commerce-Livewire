@@ -10,8 +10,7 @@ class ListAdmins extends ListRecords
 {
     protected static string $resource = AdminResource::class;
 
-    protected function getHeaderActions(): array
-    {
+    protected function getHeaderActions(): array {
         return [
             CreateAction::make()->visible(fn () => static::getResource()::canCreate()),
         ];

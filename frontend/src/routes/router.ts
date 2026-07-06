@@ -11,8 +11,10 @@ import CartPage from '@/views/Pages/Cart/CartPage.vue'
 import AuthorList from '@/views/Pages/Authors/AuthorList.vue'
 import NewsList from '@/views/Pages/News/NewsList.vue'
 import NewsPage from '@/views/Pages/News/NewsPage.vue'
+import NotificationsPage from '@/views/Pages/Notifications/NotificationsPage.vue'
 
 import { useShopStore } from '@/stores/shop'
+import { useAuthStore } from '@/stores/auth'
 import middlewarePipeline from './middlewarePipeline'
 
 const routes: RouteRecordRaw[] = [
@@ -58,6 +60,29 @@ const routes: RouteRecordRaw[] = [
                 beforeEnter: () => {
                     const store = useShopStore()
                     if (store.cart_items.length === 0) return { name: 'home' }
+                },
+            },
+            {
+                name: 'notifications',
+                path: 'notifications',
+                component: NotificationsPage,
+                beforeEnter: async () => {
+                    await useAuthStore().ensure_ready()
+
+                    if (!useAuthStore().is_authenticated) return { name: 'home' }
+                },
+            },
+            {
+                name: 'reset-password',
+                path: 'reset-password',
+                component: { render: () => null },
+                beforeEnter: (to) => {
+                    useAuthStore().set_reset_pending({
+                        token: String(to.query.token ?? ''),
+                        email: String(to.query.email ?? ''),
+                    })
+
+                    return { name: 'home' }
                 },
             },
             {

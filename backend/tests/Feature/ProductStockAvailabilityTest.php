@@ -10,8 +10,7 @@ class ProductStockAvailabilityTest extends TestCase
 {
     use RefreshDatabase, TestDataHelper;
 
-    public function test_available_quantity_equals_stock_quantity_with_no_orders(): void
-    {
+    public function test_available_quantity_equals_stock_quantity_with_no_orders(): void {
         $product = $this->createProduct();
         $stock = $this->createProductStock($product, [
             'quantity' => 20,
@@ -23,8 +22,7 @@ class ProductStockAvailabilityTest extends TestCase
             ->assertJsonPath('data.items.data.0.stock.quantity', 20);
     }
 
-    public function test_pending_order_items_reserve_by_their_ordered_quantity(): void
-    {
+    public function test_pending_order_items_reserve_by_their_ordered_quantity(): void {
         $product = $this->createProduct();
         $stock = $this->createProductStock($product, [
             'quantity' => 20,
@@ -40,8 +38,7 @@ class ProductStockAvailabilityTest extends TestCase
             ->assertJsonPath('data.items.data.0.stock.quantity', 15);
     }
 
-    public function test_shipped_delivered_and_completed_order_items_reserve_by_fact_quantity_not_ordered_quantity(): void
-    {
+    public function test_shipped_delivered_and_completed_order_items_reserve_by_fact_quantity_not_ordered_quantity(): void {
         $product = $this->createProduct();
         $stock = $this->createProductStock($product, [
             'quantity' => 20,
@@ -67,8 +64,7 @@ class ProductStockAvailabilityTest extends TestCase
             ->assertJsonPath('data.items.data.0.stock.quantity', 11);
     }
 
-    public function test_cancelled_order_items_do_not_reserve_any_quantity(): void
-    {
+    public function test_cancelled_order_items_do_not_reserve_any_quantity(): void {
         $product = $this->createProduct();
         $stock = $this->createProductStock($product, [
             'quantity' => 20,
@@ -84,8 +80,7 @@ class ProductStockAvailabilityTest extends TestCase
             ->assertJsonPath('data.items.data.0.stock.quantity', 20);
     }
 
-    public function test_available_quantity_never_goes_below_zero(): void
-    {
+    public function test_available_quantity_never_goes_below_zero(): void {
         $product = $this->createProduct();
         $stock = $this->createProductStock($product, [
             'quantity' => 5,

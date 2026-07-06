@@ -14,26 +14,21 @@ class StaticController extends Controller
         protected ContactService $contactService,
         protected AboutService $aboutService,
         protected PageService $pageService,
-    ) {
-    }
+    ) {}
 
-    public function home()
-    {
+    public function home() {
         return $this->respondWithJson($this->homeService->getHome());
     }
 
-    public function contact()
-    {
+    public function contact() {
         return $this->respondWithJson($this->contactService->getContact());
     }
 
-    public function about()
-    {
+    public function about() {
         return $this->respondWithJson($this->aboutService->getAbout());
     }
 
-    public function show(string $slug)
-    {
+    public function show(string $slug) {
         return $this->respondWithJson($this->pageService->getPage($slug));
     }
 }

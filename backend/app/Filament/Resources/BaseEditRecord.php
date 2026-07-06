@@ -7,9 +7,8 @@ use Filament\Resources\Pages\EditRecord;
 
 abstract class BaseEditRecord extends EditRecord
 {
-    protected function beforeSave(): void
-    {
-        if (!static::getResource()::canEdit($this->record)) {
+    protected function beforeSave(): void {
+        if (! static::getResource()::canEdit($this->record)) {
             Notification::make()
                 ->title('Access denied')
                 ->danger()
@@ -19,9 +18,8 @@ abstract class BaseEditRecord extends EditRecord
         }
     }
 
-    protected function getFormActions(): array
-    {
-        if (!static::getResource()::canEdit($this->record)) {
+    protected function getFormActions(): array {
+        if (! static::getResource()::canEdit($this->record)) {
             return [];
         }
 

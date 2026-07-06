@@ -7,8 +7,7 @@ use Illuminate\Database\Seeder;
 
 class AccessesSeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $accesses = [
             [
                 'key' => 'users',
