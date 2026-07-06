@@ -10,13 +10,11 @@ class NewsFilterTest extends TestCase
 {
     use RefreshDatabase, TestDataHelper;
 
-    public function test_news_returns_successful_response(): void
-    {
+    public function test_news_returns_successful_response(): void {
         $this->getJson('/api/news')->assertSuccessful();
     }
 
-    public function test_news_excludes_unpublished_posts(): void
-    {
+    public function test_news_excludes_unpublished_posts(): void {
         $this->createNewsPost([
             'title' => 'Published Post',
         ]);
@@ -31,8 +29,7 @@ class NewsFilterTest extends TestCase
             ->assertJsonPath('data.items.data.0.title', 'Published Post');
     }
 
-    public function test_news_are_sorted_by_date_added(): void
-    {
+    public function test_news_are_sorted_by_date_added(): void {
         $this->createNewsPost([
             'title' => 'Older Post',
             'published_at' => now()->subDays(2),
@@ -53,8 +50,7 @@ class NewsFilterTest extends TestCase
             ->assertJsonPath('data.items.data.1.title', 'Newer Post');
     }
 
-    public function test_news_are_filtered_by_category(): void
-    {
+    public function test_news_are_filtered_by_category(): void {
         $fantasy = $this->createNewsCategory([
             'name' => 'Fantasy',
         ]);
@@ -76,8 +72,7 @@ class NewsFilterTest extends TestCase
             ->assertJsonPath('data.items.data.0.title', 'Fantasy Post');
     }
 
-    public function test_news_response_includes_active_categories(): void
-    {
+    public function test_news_response_includes_active_categories(): void {
         $this->createNewsCategory([
             'name' => 'Fantasy',
         ]);
@@ -93,13 +88,11 @@ class NewsFilterTest extends TestCase
         $this->assertFalse($categories->contains('Inactive Category'));
     }
 
-    public function test_news_includes_seo_for_the_news_page(): void
-    {
+    public function test_news_includes_seo_for_the_news_page(): void {
         $this->assertPageSeoIncluded('/api/news', 'news', 'News');
     }
 
-    public function test_news_are_paginated_six_per_page(): void
-    {
+    public function test_news_are_paginated_six_per_page(): void {
         for ($i = 1; $i <= 8; $i++) {
             $this->createNewsPost([
                 'title' => "Post {$i}",

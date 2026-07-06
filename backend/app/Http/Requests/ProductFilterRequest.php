@@ -7,15 +7,13 @@ use Illuminate\Validation\Rule;
 
 class ProductFilterRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
+    public function authorize(): bool {
         return true;
     }
 
-    protected function prepareForValidation(): void
-    {
+    protected function prepareForValidation(): void {
         foreach (['category', 'author', 'status'] as $key) {
-            if (!$this->has($key) || is_array($this->input($key))) {
+            if (! $this->has($key) || is_array($this->input($key))) {
                 continue;
             }
 
@@ -24,15 +22,14 @@ class ProductFilterRequest extends FormRequest
         }
 
         foreach (['price_min', 'price_max'] as $key) {
-            if ($this->has($key) && !is_numeric($this->input($key))) {
+            if ($this->has($key) && ! is_numeric($this->input($key))) {
                 $this->query->remove($key);
                 $this->request->remove($key);
             }
         }
     }
 
-    public function rules(): array
-    {
+    public function rules(): array {
         return [
             'category' => ['sometimes', 'array'],
             'category.*' => ['string'],
@@ -47,8 +44,7 @@ class ProductFilterRequest extends FormRequest
         ];
     }
 
-    public function filters(): array
-    {
+    public function filters(): array {
         return [
             'category' => $this->input('category'),
             'author' => $this->input('author'),

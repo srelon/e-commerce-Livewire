@@ -10,13 +10,11 @@ class ContactTest extends TestCase
 {
     use RefreshDatabase, TestDataHelper;
 
-    public function test_contact_returns_successful_response(): void
-    {
+    public function test_contact_returns_successful_response(): void {
         $this->getJson('/api/pages/contact')->assertSuccessful();
     }
 
-    public function test_contact_includes_active_faqs_in_order(): void
-    {
+    public function test_contact_includes_active_faqs_in_order(): void {
         $this->createFaq([
             'title' => 'Second question',
             'content' => 'Second answer',
@@ -44,8 +42,7 @@ class ContactTest extends TestCase
             ->assertJsonPath('data.faqs.1.question', 'Second question');
     }
 
-    public function test_contact_cache_is_invalidated_on_faq_write(): void
-    {
+    public function test_contact_cache_is_invalidated_on_faq_write(): void {
         $faq = $this->createFaq([
             'title' => 'Original question',
         ]);
@@ -55,13 +52,11 @@ class ContactTest extends TestCase
         ], 'Updated question');
     }
 
-    public function test_contact_includes_seo_for_the_contact_page(): void
-    {
+    public function test_contact_includes_seo_for_the_contact_page(): void {
         $this->assertPageSeoIncluded('/api/pages/contact', 'contact', 'Contact Us', 'Contact SEO Title');
     }
 
-    public function test_contact_cache_is_invalidated_on_page_write(): void
-    {
+    public function test_contact_cache_is_invalidated_on_page_write(): void {
         $page = $this->createPage([
             'slug' => 'contact',
             'title' => 'Contact Us',

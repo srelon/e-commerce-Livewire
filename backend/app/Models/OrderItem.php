@@ -21,26 +21,22 @@ class OrderItem extends Model
         'status',
     ];
 
-    protected function casts(): array
-    {
+    protected function casts(): array {
         return [
             'price' => 'decimal:2',
             'paid_amount' => 'decimal:2',
         ];
     }
 
-    public function order(): BelongsTo
-    {
+    public function order(): BelongsTo {
         return $this->belongsTo(Order::class);
     }
 
-    public function product(): BelongsTo
-    {
+    public function product(): BelongsTo {
         return $this->belongsTo(Product::class);
     }
 
-    public function stock(): BelongsTo
-    {
+    public function stock(): BelongsTo {
         return $this->belongsTo(ProductStock::class, 'product_stock_id');
     }
 }

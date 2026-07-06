@@ -23,15 +23,13 @@ class Page extends Model
         'sort_order',
     ];
 
-    protected function casts(): array
-    {
+    protected function casts(): array {
         return [
             'image' => 'array',
         ];
     }
 
-    public function seo(): MorphOne
-    {
+    public function seo(): MorphOne {
         return $this->morphOne(SeoMeta::class, 'seo', 'type', 'record_id');
     }
 }

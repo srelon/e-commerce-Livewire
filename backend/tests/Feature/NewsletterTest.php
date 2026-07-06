@@ -10,8 +10,7 @@ class NewsletterTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_subscribes_a_new_email(): void
-    {
+    public function test_subscribes_a_new_email(): void {
         $this->postJson('/api/newsletter', [
             'email' => 'reader@example.com',
         ])
@@ -24,8 +23,7 @@ class NewsletterTest extends TestCase
         ]);
     }
 
-    public function test_rejects_an_already_subscribed_email(): void
-    {
+    public function test_rejects_an_already_subscribed_email(): void {
         NewsletterSubscriber::create([
             'email' => 'reader@example.com',
             'status' => 1,
@@ -40,8 +38,7 @@ class NewsletterTest extends TestCase
         $this->assertDatabaseCount('newsletter_subscribers', 1);
     }
 
-    public function test_rejects_an_invalid_email(): void
-    {
+    public function test_rejects_an_invalid_email(): void {
         $this->postJson('/api/newsletter', [
             'email' => 'not-an-email',
         ])

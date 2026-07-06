@@ -25,7 +25,7 @@
                 <h3 class="book-card__title">
                     <router-link :to="to">{{ title }}</router-link>
                 </h3>
-                <span v-if="rating !== undefined" class="book-card__rating-badge">★ {{ rating }}</span>
+                <span v-if="rating" class="book-card__rating-badge">★ {{ rating }}</span>
             </div>
             <div class="book-card__meta">
                 <button class="book-card__author" @click="go_to_filter('products', 'author', author)">{{ author }}</button>
@@ -42,9 +42,9 @@
                     </button>
                     <QuickView :slug="id" />
                     <template v-if="is_in_cart">
-                        <button class="book-card__cart book-card__cart--in" @click="store.open_popup()">
+                        <BaseButton variant="primary" class="book-card__cart" @click="store.open_popup()">
                             View Cart
-                        </button>
+                        </BaseButton>
                     </template>
                     <template v-else>
                         <BaseButton variant="outline" class="book-card__cart" @click="handle_add_to_cart">
@@ -72,7 +72,7 @@ interface Props {
     category?: string
     price?: string
     image?: string
-    rating?: number
+    rating?: number | null
     loading?: boolean
 }
 
@@ -105,8 +105,6 @@ function handle_add_to_cart() {
 </script>
 
 <style lang="scss" scoped>
-@use "sass:color";
-
 .book-card {
     &__figure {
         border-radius: 8px;
@@ -231,18 +229,6 @@ function handle_add_to_cart() {
     &__cart {
         font-size: 13px;
         padding: 6px 14px;
-
-        &--in {
-            background: $color-primary;
-            color: $color-white;
-            border-color: $color-primary;
-            cursor: pointer;
-
-            &:hover {
-                background: color.adjust($color-primary, $lightness: -8%);
-                border-color: color.adjust($color-primary, $lightness: -8%);
-            }
-        }
     }
 }
 </style>

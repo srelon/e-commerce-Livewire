@@ -10,8 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class AdminSeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $superadmin_role = AdminRole::firstOrCreate(
             ['name' => 'superadmin'],
             ['label' => 'Super Admin'],

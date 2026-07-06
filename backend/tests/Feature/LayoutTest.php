@@ -10,13 +10,11 @@ class LayoutTest extends TestCase
 {
     use RefreshDatabase, TestDataHelper;
 
-    public function test_layout_returns_successful_response(): void
-    {
+    public function test_layout_returns_successful_response(): void {
         $this->getJson('/api/layout')->assertSuccessful();
     }
 
-    public function test_layout_includes_active_categories_with_product_count(): void
-    {
+    public function test_layout_includes_active_categories_with_product_count(): void {
         $category = $this->createCategory([
             'name' => 'Fantasy',
             'slug' => 'fantasy',
@@ -30,8 +28,7 @@ class LayoutTest extends TestCase
             ->assertJsonPath('data.categories.0.count', 1);
     }
 
-    public function test_layout_includes_header_menu_with_nested_children(): void
-    {
+    public function test_layout_includes_header_menu_with_nested_children(): void {
         $parent = $this->createMenuItem([
             'name' => 'Products',
             'route' => 'products',
@@ -54,8 +51,7 @@ class LayoutTest extends TestCase
             ->assertJsonPath('data.menu.0.children.0.params.category', 'fantasy');
     }
 
-    public function test_layout_excludes_footer_menu_items(): void
-    {
+    public function test_layout_excludes_footer_menu_items(): void {
         $this->createMenuItem([
             'location' => 'footer',
         ]);
@@ -65,8 +61,7 @@ class LayoutTest extends TestCase
             ->assertJsonCount(0, 'data.menu');
     }
 
-    public function test_layout_includes_active_contacts_only(): void
-    {
+    public function test_layout_includes_active_contacts_only(): void {
         $this->createContact([
             'key' => 'phone',
             'status' => 1,
@@ -82,8 +77,7 @@ class LayoutTest extends TestCase
             ->assertJsonPath('data.contacts.0.key', 'phone');
     }
 
-    public function test_layout_includes_best_selling_books(): void
-    {
+    public function test_layout_includes_best_selling_books(): void {
         $product = $this->createProduct(null, [
             'title' => 'Bestseller Book',
             'bestseller' => 1,
@@ -95,8 +89,7 @@ class LayoutTest extends TestCase
             ->assertJsonPath('data.best_books.0.title', 'Bestseller Book');
     }
 
-    public function test_layout_cache_is_invalidated_on_product_write(): void
-    {
+    public function test_layout_cache_is_invalidated_on_product_write(): void {
         $product = $this->createProduct(null, [
             'title' => 'Original Title',
             'bestseller' => 1,
@@ -108,8 +101,7 @@ class LayoutTest extends TestCase
         ], 'Updated Title');
     }
 
-    public function test_layout_cache_is_invalidated_on_contact_write(): void
-    {
+    public function test_layout_cache_is_invalidated_on_contact_write(): void {
         $contact = $this->createContact([
             'key' => 'phone',
             'content' => 'old number',

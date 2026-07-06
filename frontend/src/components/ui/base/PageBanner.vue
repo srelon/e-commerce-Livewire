@@ -1,22 +1,44 @@
 <template>
     <div class="page-banner">
         <div class="container">
-            <h1 class="page-banner__title">{{ title }}</h1>
-            <nav class="page-banner__breadcrumb" aria-label="Breadcrumb">
-                <router-link :to="{ name: 'home' }">Home</router-link>
-                <span class="page-banner__sep">›</span>
-                <span>{{ title }}</span>
-            </nav>
+            <template v-if="loading">
+                <BaseSkeleton width="220px" height="24px" />
+            </template>
+            <template v-else>
+                <h1 class="page-banner__title">{{ title }}</h1>
+                <nav class="page-banner__breadcrumb" aria-label="Breadcrumb">
+                    <router-link :to="{ name: 'home' }">Home</router-link>
+                    <span class="page-banner__sep">›</span>
+                    <template v-if="parent">
+                        <router-link :to="parent.to">{{ parent.label }}</router-link>
+                        <span class="page-banner__sep">›</span>
+                    </template>
+                    <span>{{ title }}</span>
+                </nav>
+            </template>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-interface Props {
-    title: string
+import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
+import type { RouteLocationRaw } from 'vue-router'
+
+interface Crumb {
+    label: string
+    to: RouteLocationRaw
 }
 
-defineProps<Props>()
+interface Props {
+    title?: string
+    loading?: boolean
+    parent?: Crumb
+}
+
+withDefaults(defineProps<Props>(), {
+    title: '',
+    loading: false,
+})
 </script>
 
 <style lang="scss" scoped>

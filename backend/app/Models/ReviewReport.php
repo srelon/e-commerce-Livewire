@@ -16,13 +16,11 @@ class ReviewReport extends Model
         'reason',
     ];
 
-    public function review(): BelongsTo
-    {
+    public function review(): BelongsTo {
         return $this->belongsTo(Review::class, 'review_id');
     }
 
-    public function user(): BelongsTo
-    {
+    public function user(): BelongsTo {
         return $this->belongsTo(User::class);
     }
 }

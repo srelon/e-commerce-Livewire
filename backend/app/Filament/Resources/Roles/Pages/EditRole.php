@@ -13,13 +13,11 @@ class EditRole extends BaseEditRecord
 {
     protected static string $resource = RoleResource::class;
 
-    protected function authorizeAccess(): void
-    {
+    protected function authorizeAccess(): void {
         abort_unless(auth('admins')->user()?->hasAccess('roles.view'), 403);
     }
 
-    protected function getHeaderActions(): array
-    {
+    protected function getHeaderActions(): array {
         return [
             Action::make('create_access')
                 ->label('Add Access')

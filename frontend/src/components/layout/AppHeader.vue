@@ -29,6 +29,7 @@
                 </div>
 
                 <div class="header__actions">
+                    <NotificationBell v-if="auth_store.is_authenticated" />
                     <a
                         v-for="action in actions"
                         :key="action.label"
@@ -36,7 +37,7 @@
                         class="header__action"
                         :class="{ 'header__action--cart': action.label === 'Cart' }"
                         :aria-label="action.label"
-                        @click.prevent="action.label === 'Cart' ? store.open_popup() : undefined"
+                        @click.prevent="on_action_click(action.label)"
                     >
                         <svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true">
                             <path :d="action.icon" />
@@ -160,12 +161,15 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useShopStore } from '@/stores/shop'
+import { useAuthStore } from '@/stores/auth'
 import { useLayoutStore, to_storage_url, menu_route_target, type LayoutCategory } from '@/stores/layout'
+import NotificationBell from '@/components/ui/notifications/NotificationBell.vue'
 
 const cats_open = ref(false)
 const open_menu_id = ref<number | null>(null)
 const hovered_category = ref<LayoutCategory | null>(null)
 const store = useShopStore()
+const auth_store = useAuthStore()
 const layout_store = useLayoutStore()
 
 const active_promo_category = computed(() => hovered_category.value ?? layout_store.categories[0] ?? null)
@@ -186,6 +190,18 @@ const actions = [
         icon: 'M14.1,1.6C14,0.7,13.3,0,12.4,0H2.7C1.7,0,1,0.7,0.9,1.6L0.1,13.1c0,0.5,0.1,1,0.5,1.3C0.9,14.8,1.3,15,1.8,15h11.4c0.5,0,0.9-0.2,1.3-0.6c0.3-0.4,0.5-0.8,0.5-1.3L14.1,1.6z',
     },
 ]
+
+function on_action_click(label: string) {
+    if (label === 'Cart') {
+        store.open_popup()
+    } else if (label === 'My Account') {
+        if (auth_store.is_authenticated) {
+            auth_store.logout()
+        } else {
+            auth_store.open_modal('login')
+        }
+    }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -23,21 +23,18 @@ class ProductsCategory extends Model
         'status',
     ];
 
-    protected function casts(): array
-    {
+    protected function casts(): array {
         return [
             'icon' => 'array',
             'image' => 'array',
         ];
     }
 
-    public function products(): HasMany
-    {
+    public function products(): HasMany {
         return $this->hasMany(Product::class, 'category_id');
     }
 
-    public function seo(): MorphOne
-    {
+    public function seo(): MorphOne {
         return $this->morphOne(SeoMeta::class, 'seo', 'type', 'record_id');
     }
 }

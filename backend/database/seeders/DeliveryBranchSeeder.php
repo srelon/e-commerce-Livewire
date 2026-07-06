@@ -8,8 +8,7 @@ use Illuminate\Database\Seeder;
 
 class DeliveryBranchSeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $nova_poshta = DeliveryService::where('key', 'nova_poshta')->firstOrFail();
 
         $branches_by_city = [

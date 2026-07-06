@@ -7,20 +7,17 @@ use Illuminate\Validation\Rule;
 
 abstract class SortFilterRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
+    public function authorize(): bool {
         return true;
     }
 
-    public function rules(): array
-    {
+    public function rules(): array {
         return [
             'sort_by' => ['sometimes', Rule::in($this->sortKeys())],
         ];
     }
 
-    public function filters(): array
-    {
+    public function filters(): array {
         return [
             'sort_by' => $this->input('sort_by', $this->sortKeys()[0]),
         ];

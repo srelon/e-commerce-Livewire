@@ -9,17 +9,15 @@ class RegistrationsChartWidget extends Widget
 {
     protected string $view = 'filament.widgets.registrations-chart-widget';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public array $chart_data = [];
 
-    public function mount(): void
-    {
+    public function mount(): void {
         $this->loadData();
     }
 
-    private function loadData(): void
-    {
+    private function loadData(): void {
         $rows = User::selectRaw('DATE(created_at) as date, COUNT(*) as count')
             ->where('created_at', '>=', now()->subDays(30))
             ->groupBy('date')

@@ -3,10 +3,7 @@
         <div v-if="show_newsletter" class="sidebar__block">
             <h4 class="sidebar__heading">Newsletter</h4>
             <p class="sidebar__newsletter-text">Subscribe to get the latest news and offers.</p>
-            <form class="sidebar__newsletter-form" @submit.prevent>
-                <input type="email" placeholder="Your email address" required>
-                <button type="submit">Subscribe</button>
-            </form>
+            <NewsletterForm />
         </div>
 
         <div v-if="recent_posts?.length" class="sidebar__block">
@@ -33,7 +30,7 @@
                     </router-link>
                     <div class="sidebar__book-info">
                         <router-link :to="{ name: 'product', params: { slug: book.slug } }" class="sidebar__book-title">{{ book.title }}</router-link>
-                        <span class="sidebar__book-price">${{ book.price }}</span>
+                        <span class="sidebar__book-price">${{ book.stock.price }}</span>
                     </div>
                 </li>
             </ul>
@@ -53,6 +50,7 @@
 
 <script setup lang="ts">
 import { useLayoutStore, to_storage_url } from '@/stores/layout'
+import NewsletterForm from '@/components/ui/forms/NewsletterForm.vue'
 
 interface Post {
     title: string
@@ -74,8 +72,6 @@ const layout_store = useLayoutStore()
 </script>
 
 <style lang="scss" scoped>
-@use "sass:color";
-
 .sidebar {
     width: 280px;
     flex-shrink: 0;
@@ -108,41 +104,6 @@ const layout_store = useLayoutStore()
         color: $color-gray;
         line-height: 1.6;
         margin-bottom: 14px;
-    }
-
-    &__newsletter-form {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-
-        input {
-            padding: 10px 14px;
-            border: 1.5px solid $color-light;
-            border-radius: 6px;
-            font-size: 14px;
-            font-family: $font-body;
-            outline: none;
-
-            &:focus {
-                border-color: $color-primary;
-            }
-        }
-
-        button {
-            padding: 10px;
-            background: $color-primary;
-            color: $color-white;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            font-family: $font-body;
-            cursor: pointer;
-            transition: background 0.2s;
-
-            &:hover {
-                background: color.adjust($color-primary, $lightness: -8%);
-            }
-        }
     }
 
     &__posts {

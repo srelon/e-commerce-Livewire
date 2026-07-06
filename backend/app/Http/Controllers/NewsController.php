@@ -8,12 +8,9 @@ use App\Services\PageService;
 
 class NewsController extends Controller
 {
-    public function __construct(protected BlogService $blogService, protected PageService $pageService)
-    {
-    }
+    public function __construct(protected BlogService $blogService, protected PageService $pageService) {}
 
-    public function index(NewsFilterRequest $request)
-    {
+    public function index(NewsFilterRequest $request) {
         $filters = $request->filters();
         $paginated = $this->blogService->getFilteredList($filters);
 
@@ -22,5 +19,15 @@ class NewsController extends Controller
             'categories' => $this->blogService->getCategories(),
             'page' => $this->pageService->getPage('news'),
         ]);
+    }
+
+    public function show(string $slug) {
+        $post = $this->blogService->getBySlug($slug);
+
+        if (! $post) {
+            return $this->respondWithError('Post not found.', 404);
+        }
+
+        return $this->respondWithJson($this->blogService->formatPostDetail($post));
     }
 }

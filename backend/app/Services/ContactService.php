@@ -2,17 +2,15 @@
 
 namespace App\Services;
 
+use App\Http\Resources\FaqResource;
 use App\Models\Faq;
 use Illuminate\Support\Facades\Cache;
 
 class ContactService
 {
-    public function __construct(protected PageService $pageService)
-    {
-    }
+    public function __construct(protected PageService $pageService) {}
 
-    public function getContact(): array
-    {
+    public function getContact(): array {
         return Cache::tags([CacheService::TAG_CONTACT])->remember(
             'contact.data',
             CacheService::TTL_CONTACT,
@@ -23,16 +21,12 @@ class ContactService
         );
     }
 
-    protected function getFaqs()
-    {
+    protected function getFaqs() {
         return Faq::query()
             ->where('type', 'contact')
             ->where('status', 1)
             ->orderBy('sort_order')
             ->get()
-            ->map(fn (Faq $faq) => [
-                'question' => $faq->title,
-                'answer' => $faq->content,
-            ]);
+            ->map(fn (Faq $faq) => (new FaqResource($faq))->resolve());
     }
 }

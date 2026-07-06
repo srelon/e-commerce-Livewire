@@ -11,15 +11,13 @@ class ListUsers extends ListRecords
 {
     protected static string $resource = UserResource::class;
 
-    protected function getHeaderActions(): array
-    {
+    protected function getHeaderActions(): array {
         return [
             CreateAction::make()->visible(fn () => static::getResource()::canCreate()),
         ];
     }
 
-    protected function getHeaderWidgets(): array
-    {
+    protected function getHeaderWidgets(): array {
         return [
             RegistrationsChartWidget::class,
         ];

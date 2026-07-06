@@ -11,20 +11,17 @@ class EditAdmin extends BaseEditRecord
 {
     protected static string $resource = AdminResource::class;
 
-    protected function authorizeAccess(): void
-    {
+    protected function authorizeAccess(): void {
         abort_unless(auth('admins')->user()?->hasAccess('admins.view'), 403);
     }
 
-    protected function getHeaderActions(): array
-    {
+    protected function getHeaderActions(): array {
         return [
             DeleteAction::make()->visible(fn () => static::getResource()::canEdit($this->record)),
         ];
     }
 
-    protected function afterSave(): void
-    {
+    protected function afterSave(): void {
         if (Auth::guard('admins')->id() === $this->record->id) {
             $fresh = $this->record->fresh();
             Auth::guard('admins')->setUser($fresh);

@@ -39,6 +39,7 @@ const emit = defineEmits<{
 
     &__field {
         @include form-field-base;
+        width: 100%;
         padding-right: 36px;
         background: $color-white;
         appearance: none;

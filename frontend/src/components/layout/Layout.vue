@@ -6,6 +6,7 @@
         </main>
         <AppFooter />
         <CartPopup />
+        <AuthModal />
     </div>
 </template>
 
@@ -13,6 +14,7 @@
 import AppHeader from './AppHeader.vue'
 import AppFooter from './AppFooter.vue'
 import CartPopup from '@/components/ui/cart/CartPopup.vue'
+import AuthModal from '@/components/ui/auth/AuthModal.vue'
 </script>
 
 <style lang="scss" scoped>

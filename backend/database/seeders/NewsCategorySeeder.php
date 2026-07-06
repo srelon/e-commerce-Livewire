@@ -8,8 +8,7 @@ use Illuminate\Support\Str;
 
 class NewsCategorySeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $categories = ['Literature', 'Cultural', 'Reading', 'Authors'];
 
         foreach ($categories as $name) {

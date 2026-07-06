@@ -22,14 +22,12 @@ class MenuTree extends TreePage
 
     protected static int $maxDepth = 2;
 
-    protected static function hasAccess(string $type): bool
-    {
-        return auth('admins')->user()?->hasAccess(static::$accessKey . '.' . $type) ?? false;
+    protected static function hasAccess(string $type): bool {
+        return auth('admins')->user()?->hasAccess(static::$accessKey.'.'.$type) ?? false;
     }
 
     // Must stay in sync with the route names in frontend/src/routes/router.ts
-    protected static function routeOptions(): array
-    {
+    protected static function routeOptions(): array {
         return [
             'home' => 'Home',
             'products' => 'Products (list)',
@@ -44,40 +42,35 @@ class MenuTree extends TreePage
     }
 
     // Routes with a dynamic ":slug" segment in router.ts — value is looked up by "slug", label shown by "title"
-    protected static function routeSlugModels(): array
-    {
+    protected static function routeSlugModels(): array {
         return [
             'product' => Product::class,
             'post' => NewsPost::class,
         ];
     }
 
-    public static function canAccess(): bool
-    {
+    public static function canAccess(): bool {
         return static::hasAccess('view');
     }
 
-    protected function getTreeToolbarActions(): array
-    {
+    protected function getTreeToolbarActions(): array {
         return [];
     }
 
-    protected function getActions(): array
-    {
+    protected function getActions(): array {
         return [
             ...($this->hasCreateAction() ? [$this->getCreateAction()] : []),
         ];
     }
 
-    protected function getFormSchema(): array
-    {
+    protected function getFormSchema(): array {
         $can_edit = static::hasAccess('edit');
 
         return [
             TextInput::make('name')
                 ->required()
                 ->maxLength(255)
-                ->disabled(!$can_edit),
+                ->disabled(! $can_edit),
             Select::make('type')
                 ->options([
                     'link' => 'External link',
@@ -86,27 +79,27 @@ class MenuTree extends TreePage
                 ->default('route')
                 ->required()
                 ->live()
-                ->disabled(!$can_edit),
+                ->disabled(! $can_edit),
             TextInput::make('route')
                 ->label('URL')
                 ->maxLength(255)
                 ->visible(fn ($get) => $get('type') === 'link')
                 ->dehydrated(fn ($get) => $get('type') === 'link')
-                ->disabled(!$can_edit),
+                ->disabled(! $can_edit),
             Select::make('route')
                 ->label('Route')
                 ->options(static::routeOptions())
                 ->visible(fn ($get) => $get('type') === 'route')
                 ->dehydrated(fn ($get) => $get('type') === 'route')
                 ->live()
-                ->disabled(!$can_edit),
+                ->disabled(! $can_edit),
             Select::make('params.slug')
                 ->label('Target')
                 ->searchable()
                 ->getSearchResultsUsing(function (string $search, $get) {
                     $model = static::routeSlugModels()[$get('route')] ?? null;
 
-                    if (!$model) {
+                    if (! $model) {
                         return [];
                     }
 
@@ -123,7 +116,7 @@ class MenuTree extends TreePage
                 })
                 ->visible(fn ($get) => $get('type') === 'route' && $get('route') && array_key_exists($get('route'), static::routeSlugModels()))
                 ->dehydrated(fn ($get) => $get('type') === 'route' && $get('route') && array_key_exists($get('route'), static::routeSlugModels()))
-                ->disabled(!$can_edit),
+                ->disabled(! $can_edit),
             Select::make('location')
                 ->options([
                     'header' => 'Header',
@@ -131,37 +124,31 @@ class MenuTree extends TreePage
                 ])
                 ->default('header')
                 ->required()
-                ->disabled(!$can_edit),
+                ->disabled(! $can_edit),
         ];
     }
 
-    protected function hasCreateAction(): bool
-    {
+    protected function hasCreateAction(): bool {
         return static::hasAccess('edit');
     }
 
-    protected function hasDeleteAction(): bool
-    {
+    protected function hasDeleteAction(): bool {
         return static::hasAccess('edit');
     }
 
-    protected function hasEditAction(): bool
-    {
+    protected function hasEditAction(): bool {
         return true;
     }
 
-    protected function hasViewAction(): bool
-    {
+    protected function hasViewAction(): bool {
         return false;
     }
 
-    protected function getHeaderWidgets(): array
-    {
+    protected function getHeaderWidgets(): array {
         return [];
     }
 
-    protected function getFooterWidgets(): array
-    {
+    protected function getFooterWidgets(): array {
         return [];
     }
 }

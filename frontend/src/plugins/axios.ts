@@ -11,6 +11,27 @@ const api = axios.create({
     withCredentials: true,
 })
 
+function get_cookie(name: string): string | null {
+    const match = document.cookie.match(new RegExp(`(^|; )${name}=([^;]*)`))
+
+    return match ? decodeURIComponent(match[2]) : null
+}
+
+api.interceptors.request.use(async (config) => {
+    if (config.method !== 'get') {
+        if (!get_cookie('XSRF-TOKEN')) {
+            await axios.get(`${import.meta.env.VITE_API_URL ?? '/api'}/csrf-cookie`, { withCredentials: true })
+        }
+
+        const token = get_cookie('XSRF-TOKEN')
+        if (token) {
+            config.headers['X-XSRF-TOKEN'] = token
+        }
+    }
+
+    return config
+})
+
 function extract_error_message(error: unknown): string {
     if (axios.isAxiosError(error)) {
         const errors = error.response?.data?.errors

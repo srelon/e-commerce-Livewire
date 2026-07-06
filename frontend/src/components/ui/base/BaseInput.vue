@@ -7,7 +7,7 @@
             :placeholder="placeholder"
             :rows="rows"
             class="base-input__field"
-            :class="{ 'base-input__field--error': display_error }"
+            :class="{ 'base-input__field--error': display_error, 'base-input__field--pill': pill }"
             @input="on_input"
             @blur="on_blur"
         ></textarea>
@@ -17,7 +17,7 @@
             :type="type"
             :placeholder="placeholder"
             class="base-input__field"
-            :class="{ 'base-input__field--error': display_error }"
+            :class="{ 'base-input__field--error': display_error, 'base-input__field--pill': pill }"
             @input="on_input"
             @blur="on_blur"
         >
@@ -37,12 +37,14 @@ interface Props {
     placeholder?: string
     rows?: number
     error?: string
+    pill?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     type: 'text',
     rows: 5,
     name: '',
+    pill: false,
 })
 
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
@@ -111,6 +113,11 @@ function on_blur(event: Event) {
 
         &::placeholder {
             color: $color-gray;
+        }
+
+        &--pill {
+            border-radius: 30px;
+            padding: 10px 16px;
         }
     }
 

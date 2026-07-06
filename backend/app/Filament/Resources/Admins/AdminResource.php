@@ -33,10 +33,9 @@ class AdminResource extends BaseResource
 
     protected static ?int $navigationSort = 10;
 
-    public static function form(Schema $schema): Schema
-    {
+    public static function form(Schema $schema): Schema {
         return $schema
-            ->disabled(!static::hasAccess('edit'))
+            ->disabled(! static::hasAccess('edit'))
             ->components([
                 FileUpload::make('avatar')
                     ->image()
@@ -68,8 +67,7 @@ class AdminResource extends BaseResource
             ]);
     }
 
-    public static function table(Table $table): Table
-    {
+    public static function table(Table $table): Table {
         return $table
             ->columns([
                 TextColumn::make('id')
@@ -103,13 +101,11 @@ class AdminResource extends BaseResource
             ]);
     }
 
-    public static function getRelations(): array
-    {
+    public static function getRelations(): array {
         return [];
     }
 
-    public static function getPages(): array
-    {
+    public static function getPages(): array {
         return [
             'index' => ListAdmins::route('/'),
             'create' => CreateAdmin::route('/create'),

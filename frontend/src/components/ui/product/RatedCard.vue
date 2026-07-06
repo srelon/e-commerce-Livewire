@@ -41,7 +41,7 @@ interface Props {
     title?: string
     category?: string
     price?: string
-    rating?: number
+    rating?: number | null
     image?: string
     loading?: boolean
 }

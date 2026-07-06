@@ -10,13 +10,11 @@ class AboutTest extends TestCase
 {
     use RefreshDatabase, TestDataHelper;
 
-    public function test_about_returns_successful_response(): void
-    {
+    public function test_about_returns_successful_response(): void {
         $this->getJson('/api/pages/about')->assertSuccessful();
     }
 
-    public function test_about_includes_active_team_members_in_order(): void
-    {
+    public function test_about_includes_active_team_members_in_order(): void {
         $this->createTeamMember([
             'name' => 'Second Member',
             'sort_order' => 2,
@@ -37,13 +35,11 @@ class AboutTest extends TestCase
             ->assertJsonPath('data.team.1.name', 'Second Member');
     }
 
-    public function test_about_includes_seo_for_the_about_page(): void
-    {
+    public function test_about_includes_seo_for_the_about_page(): void {
         $this->assertPageSeoIncluded('/api/pages/about', 'about', 'About Us', 'About SEO Title');
     }
 
-    public function test_about_cache_is_invalidated_on_team_member_write(): void
-    {
+    public function test_about_cache_is_invalidated_on_team_member_write(): void {
         $member = $this->createTeamMember([
             'name' => 'Original Name',
         ]);
@@ -53,8 +49,7 @@ class AboutTest extends TestCase
         ], 'Updated Name');
     }
 
-    public function test_about_cache_is_invalidated_on_page_write(): void
-    {
+    public function test_about_cache_is_invalidated_on_page_write(): void {
         $page = $this->createPage([
             'slug' => 'about',
             'title' => 'About Us',
@@ -66,8 +61,7 @@ class AboutTest extends TestCase
         ], 'Updated excerpt.');
     }
 
-    public function test_about_includes_active_perks_in_order(): void
-    {
+    public function test_about_includes_active_perks_in_order(): void {
         $this->createPerk([
             'title' => 'Second Perk',
             'sort_order' => 2,
@@ -88,8 +82,7 @@ class AboutTest extends TestCase
             ->assertJsonPath('data.perks.1.title', 'Second Perk');
     }
 
-    public function test_about_cache_is_invalidated_on_perk_write(): void
-    {
+    public function test_about_cache_is_invalidated_on_perk_write(): void {
         $perk = $this->createPerk([
             'title' => 'Original Perk',
         ]);

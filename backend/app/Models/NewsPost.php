@@ -27,31 +27,26 @@ class NewsPost extends Model
         'status',
     ];
 
-    protected function casts(): array
-    {
+    protected function casts(): array {
         return [
             'image' => 'array',
             'published_at' => 'datetime',
         ];
     }
 
-    public function category(): BelongsTo
-    {
+    public function category(): BelongsTo {
         return $this->belongsTo(NewsCategory::class, 'category_id');
     }
 
-    public function author(): BelongsTo
-    {
+    public function author(): BelongsTo {
         return $this->belongsTo(Admin::class, 'author_id');
     }
 
-    public function seo(): MorphOne
-    {
+    public function seo(): MorphOne {
         return $this->morphOne(SeoMeta::class, 'seo', 'type', 'record_id');
     }
 
-    public function reviews(): MorphMany
-    {
+    public function reviews(): MorphMany {
         return $this->morphMany(Review::class, 'reviewable', 'type', 'record_id');
     }
 }

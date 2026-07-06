@@ -7,8 +7,7 @@ use Illuminate\Database\Seeder;
 
 class TeamMemberSeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $members = [
             [
                 'name' => 'Daniel Brooks',

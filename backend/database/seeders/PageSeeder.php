@@ -8,8 +8,7 @@ use Illuminate\Database\Seeder;
 
 class PageSeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $pages = [
             [
                 'slug' => 'home',

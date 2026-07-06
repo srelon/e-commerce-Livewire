@@ -7,8 +7,7 @@ use Illuminate\Database\Seeder;
 
 class MenuSeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $items = [
             [
                 'name' => 'Home',

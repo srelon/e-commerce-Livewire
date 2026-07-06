@@ -7,8 +7,7 @@ use Illuminate\Database\Seeder;
 
 class ProductsAuthorSeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $authors = [
             [
                 'slug' => 'oliver-hartman',

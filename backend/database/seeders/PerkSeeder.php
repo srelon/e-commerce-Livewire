@@ -7,8 +7,7 @@ use Illuminate\Database\Seeder;
 
 class PerkSeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $perks = [
             [
                 'title' => 'Free Delivery',

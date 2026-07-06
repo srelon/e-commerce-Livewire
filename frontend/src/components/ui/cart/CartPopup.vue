@@ -62,12 +62,12 @@
                         <div class="cart-popup__divider" />
 
                         <div class="cart-popup__actions">
-                            <router-link :to="{ name: 'cart' }" class="cart-popup__btn cart-popup__btn--primary" @click="store.close_popup">
-                                Checkout
+                            <router-link :to="{ name: 'cart' }" class="cart-popup__link" @click="store.close_popup">
+                                <BaseButton variant="primary" class="cart-popup__btn">Checkout</BaseButton>
                             </router-link>
-                            <button class="cart-popup__btn cart-popup__btn--outline" @click="store.close_popup">
+                            <BaseButton variant="primary-outline" class="cart-popup__btn" @click="store.close_popup">
                                 Continue Shopping
-                            </button>
+                            </BaseButton>
                         </div>
                     </template>
                 </div>
@@ -78,12 +78,12 @@
 
 <script setup lang="ts">
 import { useShopStore } from '@/stores/shop'
+import BaseButton from '@/components/ui/base/BaseButton.vue'
 
 const store = useShopStore()
 </script>
 
 <style lang="scss" scoped>
-@use "sass:color";
 
 .cart-popup-overlay {
     position: fixed;
@@ -340,42 +340,16 @@ const store = useShopStore()
         flex-shrink: 0;
     }
 
+    &__link {
+        flex: 1;
+        display: flex;
+    }
+
     &__btn {
         flex: 1;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 13px 20px;
+        width: 100%;
         border-radius: 999px;
-        font-size: 15px;
-        font-weight: 600;
-        font-family: $font-body;
-        cursor: pointer;
-        transition: background 0.2s, color 0.2s, border-color 0.2s;
-        text-decoration: none;
-        border: 2px solid transparent;
-
-        &--primary {
-            background: $color-primary;
-            color: $color-white;
-            border-color: $color-primary;
-
-            &:hover {
-                background: color.adjust($color-primary, $lightness: -8%);
-                border-color: color.adjust($color-primary, $lightness: -8%);
-            }
-        }
-
-        &--outline {
-            background: transparent;
-            color: $color-primary;
-            border-color: $color-primary;
-
-            &:hover {
-                background: $color-primary;
-                color: $color-white;
-            }
-        }
+        padding: 13px 20px;
     }
 }
 

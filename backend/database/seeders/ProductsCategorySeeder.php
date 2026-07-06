@@ -8,8 +8,7 @@ use Illuminate\Support\Str;
 
 class ProductsCategorySeeder extends Seeder
 {
-    public function run(): void
-    {
+    public function run(): void {
         $categories = [
             [
                 'name' => 'Art & Design',
