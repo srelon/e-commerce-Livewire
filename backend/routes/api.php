@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NewsletterController;
@@ -35,6 +36,7 @@ Route::prefix('pages')->controller(StaticController::class)->group(function () {
     Route::get('home', 'home');
     Route::get('contact', 'contact');
     Route::get('about', 'about');
+    Route::get('cart', [CartController::class, 'page']);
     Route::get('{slug}', 'show');
 });
 
@@ -43,13 +45,20 @@ Route::prefix('products')->controller(ProductController::class)->group(function 
     Route::get('{slug}', 'show');
 });
 
-Route::prefix('products/{slug}/reviews')->controller(ReviewController::class)->group(function () {
-    Route::get('/', 'index');
-    Route::post('/', 'store')->middleware('auth:sanctum');
-    Route::put('{review}', 'update')->middleware('auth:sanctum');
-    Route::delete('{review}', 'destroy')->middleware('auth:sanctum');
-    Route::post('{review}/react', 'react')->middleware('auth:sanctum');
-    Route::post('{review}/report', 'report')->middleware('auth:sanctum');
+Route::prefix('products/{slug}/reviews')->controller(ReviewController::class)->middleware('auth:sanctum')->group(function () {
+    Route::get('/', 'index')->withoutMiddleware('auth:sanctum');
+    Route::post('/', 'store');
+    Route::put('{review}', 'update');
+    Route::delete('{review}', 'destroy');
+    Route::post('{review}/react', 'react');
+    Route::post('{review}/report', 'report');
+});
+
+Route::prefix('cart')->controller(CartController::class)->middleware('auth:sanctum')->group(function () {
+    Route::post('items', 'store');
+    Route::post('sync', 'sync');
+    Route::delete('items/{slug}', 'destroy');
+    Route::post('orders', 'checkout')->withoutMiddleware('auth:sanctum');
 });
 
 Route::prefix('notifications')->controller(NotificationController::class)->middleware('auth:sanctum')->group(function () {

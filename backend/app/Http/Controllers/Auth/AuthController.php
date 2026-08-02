@@ -15,13 +15,13 @@ class AuthController extends Controller
     public function register(RegisterRequest $request) {
         $user = $this->authService->register($request->validated());
 
-        return $this->respondWithJson(['user' => $this->authService->formatUser($user)]);
+        return $this->respondWithJson($this->authService->formatUserWithCart($user));
     }
 
     public function login(LoginRequest $request) {
         $request->authenticate();
 
-        return $this->respondWithJson(['user' => $this->authService->formatUser($request->user())]);
+        return $this->respondWithJson($this->authService->formatUserWithCart($request->user()));
     }
 
     public function logout(Request $request) {

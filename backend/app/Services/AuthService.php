@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Password;
 
 class AuthService
 {
+    public function __construct(protected CartService $cartService) {}
+
     public function register(array $data): User {
         $user = User::create([
             'name' => $data['name'],
@@ -44,5 +46,12 @@ class AuthService
 
     public function formatUser(User $user): array {
         return (new UserResource($user))->resolve();
+    }
+
+    public function formatUserWithCart(?User $user): array {
+        return [
+            'user' => $user ? $this->formatUser($user) : null,
+            'cart' => $user ? $this->cartService->getItems($user) : null,
+        ];
     }
 }

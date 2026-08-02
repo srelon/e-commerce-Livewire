@@ -5,26 +5,7 @@
         <div class="container">
             <div class="checkout__inner">
                 <div class="checkout__main">
-                    <div class="checkout__items-block">
-                        <div class="checkout__items-head">
-                            <h3 class="checkout__items-title">Order Items ({{ store.cart_count }})</h3>
-                            <BaseButton type="button" variant="text" @click="store.open_popup()">
-                                Edit Items
-                            </BaseButton>
-                        </div>
-
-                        <div class="checkout__items">
-                            <div v-for="item in store.cart_items" :key="item.id" class="checkout__item">
-                                <img :src="item.image" :alt="item.title" class="checkout__item-img">
-                                <div class="checkout__item-info">
-                                    <p class="checkout__item-title">{{ item.title }}</p>
-                                    <p class="checkout__item-author">{{ item.author }}</p>
-                                </div>
-                                <span class="checkout__item-qty">x{{ item.quantity }}</span>
-                                <span class="checkout__item-price">${{ (item.price * item.quantity).toFixed(2) }}</span>
-                            </div>
-                        </div>
-                    </div>
+                    <CheckoutItemsList />
 
                     <CheckoutStep
                         :step_number="1"
@@ -54,12 +35,12 @@
                     >
                         <DeliveryStep
                             :initial_data="delivery"
+                            :options="delivery_options"
                             @change="delivery = $event"
                             @complete="on_complete('delivery', $event)"
                         />
                         <template #summary>
-                            <p v-if="delivery.method === 'pickup'">Pickup</p>
-                            <p v-else>Nova Poshta — {{ delivery.city }}, {{ delivery.warehouse }}</p>
+                            <p>{{ delivery_summary_label }}</p>
                         </template>
                     </CheckoutStep>
 
@@ -72,48 +53,22 @@
                     >
                         <PaymentStep
                             :initial_data="payment"
+                            :options="payment_options"
                             @change="payment = $event"
                             @complete="on_complete('payment', $event)"
                         />
                         <template #summary>
-                            <p>{{ payment.method === 'card' ? 'Pay by Card Online' : 'Cash on Delivery' }}</p>
+                            <p>{{ payment_summary_label }}</p>
                         </template>
                     </CheckoutStep>
                 </div>
 
-                <aside class="checkout__sidebar">
-                    <div class="checkout__summary">
-                        <h3 class="checkout__summary-title">Order Summary</h3>
-
-                        <div class="checkout__summary-row">
-                            <span>Order Subtotal</span>
-                            <span>${{ store.cart_total.toFixed(2) }}</span>
-                        </div>
-                        <div class="checkout__summary-row">
-                            <span>Shipping Cost</span>
-                            <span>{{ delivery_cost_label }}</span>
-                        </div>
-                        <p class="checkout__summary-note">
-                            Shipping is paid separately at the carrier's rates and is not included in the order total.
-                        </p>
-
-                        <div class="checkout__summary-divider" />
-
-                        <div class="checkout__summary-row checkout__summary-row--total">
-                            <span>Total to Pay</span>
-                            <span>${{ store.cart_total.toFixed(2) }}</span>
-                        </div>
-
-                        <BaseButton
-                            type="button"
-                            class="checkout__confirm"
-                            :disabled="!can_confirm"
-                            @click="confirm_order"
-                        >
-                            Place Order
-                        </BaseButton>
-                    </div>
-                </aside>
+                <CheckoutSummary
+                    :delivery_cost_label="delivery_cost_label"
+                    :can_confirm="can_confirm"
+                    :is_placing_order="is_placing_order"
+                    @confirm="confirm_order"
+                />
             </div>
         </div>
     </section>
@@ -122,18 +77,22 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 import PageBanner from '@/components/ui/base/PageBanner.vue'
-import BaseButton from '@/components/ui/base/BaseButton.vue'
 import CheckoutStep from '@/components/ui/cart/CheckoutStep.vue'
+import CheckoutItemsList from '@/components/ui/cart/CheckoutItemsList.vue'
+import CheckoutSummary from '@/components/ui/cart/CheckoutSummary.vue'
 import ContactStep from './ContactStep.vue'
 import DeliveryStep from './DeliveryStep.vue'
 import PaymentStep from './PaymentStep.vue'
 import { useShopStore } from '@/stores/shop'
+import { useAuthStore } from '@/stores/auth'
 import { useCheckoutForm } from '@/composables/useCheckoutForm'
-import type { ContactData, DeliveryData, PaymentData } from '@/composables/useCheckoutForm'
+import type { ContactData, DeliveryData, PaymentData, DeliveryOption, PaymentOption, SavedContact } from '@/types/shop'
 import api from '@/plugins/axios'
 
 const store = useShopStore()
+const auth_store = useAuthStore()
 const router = useRouter()
 
 watch(
@@ -142,16 +101,51 @@ watch(
     { immediate: true }
 )
 
+const delivery_options = ref<DeliveryOption[]>([])
+const payment_options = ref<PaymentOption[]>([])
+
+const { contact, delivery, payment, clear_form } = useCheckoutForm()
+
+function fill_from_saved_contact(saved: SavedContact | null) {
+    if (!saved) return
+
+    contact.value = {
+        first_name: saved.first_name,
+        last_name: saved.last_name,
+        phone: saved.phone,
+        email: saved.email,
+    }
+
+    if (saved.delivery_id) {
+        delivery.value = {
+            delivery_id: saved.delivery_id,
+            branch_id: saved.branch_id,
+        }
+    }
+}
+
+function fetch_cart_bundle() {
+    return api.get('pages/cart').then((res) => {
+        fill_from_saved_contact(res.data.data?.contact ?? null)
+        delivery_options.value = res.data.data?.delivery_options ?? []
+        payment_options.value = res.data.data?.payment_options ?? []
+    })
+}
+
 onMounted(() => {
-    api.get('pages/cart')
+    fetch_cart_bundle()
+
+    auth_store.ensure_ready().then(() => {
+        watch(() => auth_store.user, (new_user, old_user) => {
+            if (new_user && !old_user) fetch_cart_bundle()
+        })
+    })
 })
 
 type StepKey = 'contact' | 'delivery' | 'payment'
 
 const current_step = ref<StepKey | null>('contact')
 const done = ref({ contact: false, delivery: false, payment: false })
-
-const { contact, delivery, payment, clear_form } = useCheckoutForm()
 
 function on_complete(step: StepKey, data: ContactData | DeliveryData | PaymentData) {
     if (step === 'contact') contact.value = data as ContactData
@@ -172,21 +166,56 @@ const can_confirm = computed(() =>
     done.value.contact && done.value.delivery && done.value.payment && current_step.value === null
 )
 
+const selected_delivery_option = computed(() => delivery_options.value.find((o) => o.id === delivery.value.delivery_id))
+
 const delivery_cost_label = computed(() => {
     if (!done.value.delivery) return '—'
-    return delivery.value.method === 'pickup' ? 'Free' : "Carrier's rates"
+    const option = selected_delivery_option.value
+    if (!option) return '—'
+    if (option.price) return `$${Number(option.price).toFixed(2)}`
+    return option.requires_branch ? "Carrier's rates" : 'Free'
 })
 
-function confirm_order() {
+const delivery_summary_label = computed(() => {
+    const option = selected_delivery_option.value
+    if (!option) return ''
+    if (!option.requires_branch) return option.name
+
+    const branch = option.branches.find((b) => b.id === delivery.value.branch_id)
+    return branch ? `${option.name} — ${branch.city}, ${branch.branch}` : option.name
+})
+
+const payment_summary_label = computed(() => payment_options.value.find((o) => o.key === payment.value.method)?.name ?? '')
+
+const is_placing_order = ref(false)
+
+async function confirm_order() {
     if (!can_confirm.value) return
-    clear_form()
-    console.log('Order confirmed', {
-        contact: contact.value,
-        delivery: delivery.value,
-        payment: payment.value,
-        items: store.cart_items,
-        total: store.cart_total,
-    })
+
+    is_placing_order.value = true
+    try {
+        const res = await api.post('cart/orders', {
+            contact: contact.value,
+            delivery: delivery.value,
+            payment: payment.value,
+            items: store.cart_items.map((item) => ({
+                slug: item.id,
+                quantity: item.quantity,
+            })),
+        })
+
+        store.set_last_order({ public_id: res.data.data.public_id })
+        await router.push({ name: 'order-success' })
+        clear_form()
+        store.clear_cart()
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 422) {
+            const conflicts = error.response.data?.items as { slug: string; available: number }[] | undefined
+            conflicts?.forEach((conflict) => store.set_qty(conflict.slug, conflict.available))
+        }
+    } finally {
+        is_placing_order.value = false
+    }
 }
 </script>
 
@@ -203,138 +232,6 @@ function confirm_order() {
         display: flex;
         flex-direction: column;
         gap: 20px;
-    }
-
-    &__items-block {
-        border: 1.5px solid $color-light;
-        border-radius: 10px;
-        padding: 20px 24px;
-    }
-
-    &__items-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 16px;
-    }
-
-    &__items-title {
-        font-size: 16px;
-        font-weight: 700;
-        color: $color-dark;
-    }
-
-    &__items {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-    }
-
-    &__item {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-    }
-
-    &__item-img {
-        width: 48px;
-        height: 64px;
-        object-fit: cover;
-        border-radius: 6px;
-        flex-shrink: 0;
-    }
-
-    &__item-info {
-        flex: 1;
-        min-width: 0;
-    }
-
-    &__item-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: $color-dark;
-        line-height: 1.3;
-    }
-
-    &__item-author {
-        font-size: 12px;
-        color: $color-gray;
-    }
-
-    &__item-qty {
-        font-size: 13px;
-        color: $color-gray;
-        flex-shrink: 0;
-    }
-
-    &__item-price {
-        font-size: 14px;
-        font-weight: 700;
-        color: $color-primary;
-        flex-shrink: 0;
-        min-width: 60px;
-        text-align: right;
-    }
-
-    &__sidebar {
-        position: sticky;
-        top: 90px;
-    }
-
-    &__summary {
-        border: 1.5px solid $color-light;
-        border-radius: 10px;
-        padding: 24px;
-    }
-
-    &__summary-title {
-        font-size: 16px;
-        font-weight: 700;
-        color: $color-dark;
-        margin-bottom: 16px;
-    }
-
-    &__summary-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-        color: $color-gray;
-        margin-bottom: 8px;
-
-        span:last-child {
-            font-weight: 600;
-            color: $color-dark;
-        }
-
-        &--total {
-            font-size: 16px;
-            font-weight: 700;
-            color: $color-dark;
-            margin-bottom: 0;
-
-            span:last-child {
-                color: $color-primary;
-                font-size: 18px;
-            }
-        }
-    }
-
-    &__summary-note {
-        font-size: 12px;
-        color: $color-gray;
-        line-height: 1.5;
-        margin-bottom: 16px;
-    }
-
-    &__summary-divider {
-        height: 1px;
-        background: $color-light;
-        margin: 16px 0;
-    }
-
-    &__confirm {
-        width: 100%;
-        margin-top: 20px;
     }
 }
 </style>

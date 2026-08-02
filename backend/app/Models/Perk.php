@@ -10,7 +10,7 @@ class Perk extends Model
 {
     use FlushesCacheOnWrite, SoftDeletes;
 
-    protected static string $cacheFlushMethod = 'flushOnPerkWrite';
+    protected static string $cacheFlushTrigger = 'perk';
 
     protected $fillable = [
         'title',

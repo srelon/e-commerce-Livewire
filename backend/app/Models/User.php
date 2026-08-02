@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Concerns\HasNumericPublicId;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -17,7 +18,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasNumericPublicId, Notifiable;
 
     /**
      * Get the attributes that should be cast.
@@ -29,20 +30,6 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    protected static function booted(): void {
-        static::creating(function (User $user) {
-            $user->public_id ??= static::generatePublicId();
-        });
-    }
-
-    protected static function generatePublicId(): string {
-        do {
-            $id = (string) random_int(10000000, 99999999);
-        } while (static::where('public_id', $id)->exists());
-
-        return $id;
     }
 
     public function cart(): HasOne {

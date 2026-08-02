@@ -8,6 +8,7 @@ import ContactPage from '@/views/Pages/Static/ContactPage.vue'
 import ProductList from '@/views/Pages/Products/ProductList.vue'
 import ProductPage from '@/views/Pages/Products/ProductPage.vue'
 import CartPage from '@/views/Pages/Cart/CartPage.vue'
+import OrderSuccessPage from '@/views/Pages/Cart/OrderSuccessPage.vue'
 import AuthorList from '@/views/Pages/Authors/AuthorList.vue'
 import NewsList from '@/views/Pages/News/NewsList.vue'
 import NewsPage from '@/views/Pages/News/NewsPage.vue'
@@ -60,6 +61,15 @@ const routes: RouteRecordRaw[] = [
                 beforeEnter: () => {
                     const store = useShopStore()
                     if (store.cart_items.length === 0) return { name: 'home' }
+                },
+            },
+            {
+                name: 'order-success',
+                path: 'order-success',
+                component: OrderSuccessPage,
+                beforeEnter: () => {
+                    const store = useShopStore()
+                    if (!store.last_order) return { name: 'home' }
                 },
             },
             {

@@ -41,8 +41,8 @@ make bash  # Enter the backend container shell
 
 | Service         | URL                          |
 |-----------------|-------------------------------|
-| API             | http://127.0.0.1:8000        |
-| Filament Admin  | http://127.0.0.1:8000/admin  |
+| API             | http://127.0.0.1:8880/api    |
+| Filament Admin  | http://127.0.0.1:8880/admin  |
 | Site            | http://127.0.0.1:8880        |
 | phpMyAdmin      | http://127.0.0.1:8080        |
 | WebSocket       | ws://127.0.0.1:6001          |

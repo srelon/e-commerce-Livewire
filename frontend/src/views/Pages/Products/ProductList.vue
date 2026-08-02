@@ -44,6 +44,7 @@
                                 :category="product.category ?? ''"
                                 :price="product.stock.price ?? ''"
                                 :rating="product.rating"
+                                :quantity="product.stock.quantity"
                                 :image="to_storage_url(product.image)"
                             />
                         </template>

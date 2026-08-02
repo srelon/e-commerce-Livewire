@@ -3,11 +3,13 @@ import { ref, computed } from 'vue'
 import { useToast } from 'vue-toastification'
 import api from '@/plugins/axios'
 import type { AuthUser, ResetCredentials } from '@/types/auth'
+import type { ServerCartItem } from '@/types/shop'
 
 export type AuthTab = 'login' | 'register' | 'forgot' | 'reset'
 
 export const useAuthStore = defineStore('auth', () => {
     const user = ref<AuthUser | null>(null)
+    const cart = ref<ServerCartItem[] | null>(null)
     const modal_open = ref(false)
     const active_tab = ref<AuthTab>('login')
     const reset_credentials = ref<ResetCredentials | null>(null)
@@ -23,13 +25,15 @@ export const useAuthStore = defineStore('auth', () => {
         modal_open.value = false
     }
 
-    function set_user(new_user: AuthUser) {
+    function set_user(new_user: AuthUser, new_cart: ServerCartItem[] = []) {
         user.value = new_user
+        cart.value = new_cart
     }
 
     function fetch_user() {
         return api.get('auth/profile').then((res) => {
             user.value = res.data.data.user
+            cart.value = res.data.data.cart
         })
     }
 
@@ -44,6 +48,7 @@ export const useAuthStore = defineStore('auth', () => {
     function logout() {
         return api.post('auth/logout').then(() => {
             user.value = null
+            cart.value = null
             useToast().success('You have been logged out.')
         })
     }
@@ -55,6 +60,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     return {
         user,
+        cart,
         is_authenticated,
         modal_open,
         active_tab,

@@ -3,41 +3,48 @@
         <BaseRadioGroup
             v-model="local.method"
             name="payment_method"
-            :options="payment_methods"
+            :options="method_options"
         />
 
-        <BaseButton type="button" @click="on_continue">Continue</BaseButton>
+        <BaseButton type="button" :disabled="!is_valid" @click="on_continue">Continue</BaseButton>
     </div>
 </template>
 
 <script setup lang="ts">
+import { computed, watch } from 'vue'
 import BaseButton from '@/components/ui/base/BaseButton.vue'
 import BaseRadioGroup from '@/components/ui/base/BaseRadioGroup.vue'
 import { useWizardStep } from '@/composables/useWizardStep'
+import type { PaymentData, PaymentOption } from '@/types/shop'
 
-interface PaymentData {
-    method: 'card' | 'cash'
-}
-
-const props = defineProps<{ initial_data: PaymentData }>()
+const props = defineProps<{
+    initial_data: PaymentData
+    options: PaymentOption[]
+}>()
 
 const emit = defineEmits<{
     change: [data: PaymentData]
     complete: [data: PaymentData]
 }>()
 
-const { local, on_continue } = useWizardStep<PaymentData>(props.initial_data, emit)
+const { local, is_valid, on_continue } = useWizardStep<PaymentData>(
+    props.initial_data,
+    emit,
+    (data) => !!data.method
+)
 
-const payment_methods: { value: PaymentData['method']; label: string }[] = [
-    {
-        value: 'card',
-        label: 'Pay by Card Online',
+const method_options = computed(() => props.options.map((option) => ({
+    value: option.key,
+    label: option.name,
+})))
+
+watch(
+    () => props.options,
+    (options) => {
+        if (!local.method && options.length) local.method = options[0].key
     },
-    {
-        value: 'cash',
-        label: 'Cash on Delivery',
-    },
-]
+    { immediate: true }
+)
 </script>
 
 <style lang="scss" scoped>

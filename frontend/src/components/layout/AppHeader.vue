@@ -162,7 +162,8 @@
 import { ref, computed } from 'vue'
 import { useShopStore } from '@/stores/shop'
 import { useAuthStore } from '@/stores/auth'
-import { useLayoutStore, to_storage_url, menu_route_target, type LayoutCategory } from '@/stores/layout'
+import { useLayoutStore, to_storage_url, menu_route_target } from '@/stores/layout'
+import type { LayoutCategory } from '@/types/global'
 import NotificationBell from '@/components/ui/notifications/NotificationBell.vue'
 
 const cats_open = ref(false)

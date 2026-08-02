@@ -10,7 +10,7 @@ class Menu extends Model
 {
     use FlushesCacheOnWrite, ModelTree;
 
-    protected static string $cacheFlushMethod = 'flushOnMenuWrite';
+    protected static string $cacheFlushTrigger = 'menu';
 
     protected $fillable = [
         'name',

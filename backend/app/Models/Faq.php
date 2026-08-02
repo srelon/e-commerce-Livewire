@@ -10,7 +10,7 @@ class Faq extends Model
 {
     use FlushesCacheOnWrite, SoftDeletes;
 
-    protected static string $cacheFlushMethod = 'flushOnFaqWrite';
+    protected static string $cacheFlushTrigger = 'faq';
 
     protected $fillable = [
         'title',

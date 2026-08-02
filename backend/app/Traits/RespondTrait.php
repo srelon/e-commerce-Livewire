@@ -33,11 +33,11 @@ trait RespondTrait
         return response()->json($response, $status, $headers, $options);
     }
 
-    protected function respondWithError($message = 'An error occurred', $code = 400, $status = 400, array $headers = [], $options = 0) {
-        $content = [
+    protected function respondWithError($message = 'An error occurred', $code = 400, $status = 400, array $headers = [], $options = 0, array $extra = []) {
+        $content = array_merge([
             'status' => $code,
             'errors' => $message,
-        ];
+        ], $extra);
 
         return response()->json($content, $code, $headers, $options);
     }

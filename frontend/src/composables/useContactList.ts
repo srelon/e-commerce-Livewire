@@ -1,12 +1,6 @@
 import { computed } from 'vue'
 import { useLayoutStore } from '@/stores/layout'
-
-export interface ContactListItem {
-    label: string
-    value: string
-    href: string | null
-    icon: string | null
-}
+import type { ContactListItem } from '@/types/global'
 
 export function useContactList() {
     const layout_store = useLayoutStore()

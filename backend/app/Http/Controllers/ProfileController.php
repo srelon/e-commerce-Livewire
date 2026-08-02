@@ -13,8 +13,6 @@ class ProfileController extends Controller
     public function show(Request $request) {
         $user = Auth::guard('web')->user();
 
-        return $this->respondWithJson([
-            'user' => $user ? $this->authService->formatUser($user) : null,
-        ]);
+        return $this->respondWithJson($this->authService->formatUserWithCart($user));
     }
 }

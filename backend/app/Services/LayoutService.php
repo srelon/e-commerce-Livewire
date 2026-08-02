@@ -6,16 +6,15 @@ use App\Http\Resources\MenuResource;
 use App\Models\ContactInfo;
 use App\Models\Menu;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 
 class LayoutService
 {
     public function __construct(protected ProductService $productService) {}
 
     public function getLayout(): array {
-        return Cache::tags([CacheService::TAG_LAYOUT])->remember(
+        return CacheService::remember(
+            'layout',
             'layout.data',
-            CacheService::TTL_LAYOUT,
             fn () => [
                 'categories' => $this->productService->getCategories()->toArray(),
                 'menu' => $this->getMenu()->toArray(),

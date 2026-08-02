@@ -47,15 +47,11 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-
-interface Item {
-    name: string
-    count?: number
-}
+import type { FilterGroupItem } from '@/types/shop'
 
 interface Props {
     title: string
-    items: Item[]
+    items: FilterGroupItem[]
     type?: 'checkbox' | 'radio'
     modelValue?: string[] | string | null
 }

@@ -4,16 +4,15 @@ namespace App\Services;
 
 use App\Http\Resources\PerkResource;
 use App\Models\Perk;
-use Illuminate\Support\Facades\Cache;
 
 class AboutService
 {
     public function __construct(protected TeamService $teamService, protected PageService $pageService) {}
 
     public function getAbout(): array {
-        return Cache::tags([CacheService::TAG_ABOUT])->remember(
+        return CacheService::remember(
+            'about',
             'about.data',
-            CacheService::TTL_ABOUT,
             fn () => [
                 'team' => $this->teamService->getTeamMembers()->toArray(),
                 'perks' => $this->getPerks()->toArray(),

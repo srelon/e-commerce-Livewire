@@ -4,6 +4,8 @@
         <textarea
             v-if="type === 'textarea'"
             :value="display_value"
+            :name="name || undefined"
+            :autocomplete="autocomplete"
             :placeholder="placeholder"
             :rows="rows"
             class="base-input__field"
@@ -15,6 +17,8 @@
             v-else
             :value="display_value"
             :type="type"
+            :name="name || undefined"
+            :autocomplete="autocomplete"
             :placeholder="placeholder"
             class="base-input__field"
             :class="{ 'base-input__field--error': display_error, 'base-input__field--pill': pill }"
@@ -35,6 +39,7 @@ interface Props {
     label?: string
     type?: string
     placeholder?: string
+    autocomplete?: string
     rows?: number
     error?: string
     pill?: boolean

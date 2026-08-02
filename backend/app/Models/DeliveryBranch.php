@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FlushesCacheOnWrite;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,14 +10,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DeliveryBranch extends Model
 {
-    use SoftDeletes;
+    use FlushesCacheOnWrite, SoftDeletes;
+
+    protected static string $cacheFlushTrigger = 'delivery';
 
     protected $fillable = [
         'delivery_id',
         'city',
         'branch',
         'status',
-        'hash',
     ];
 
     public function delivery(): BelongsTo {
