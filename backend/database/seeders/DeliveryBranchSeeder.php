@@ -36,16 +36,13 @@ class DeliveryBranchSeeder extends Seeder
 
         foreach ($branches_by_city as $city => $branches) {
             foreach ($branches as $branch) {
-                $hash = md5("{$city}|{$branch}");
-
                 DeliveryBranch::firstOrCreate(
-                    ['hash' => $hash],
                     [
                         'delivery_id' => $nova_poshta->id,
                         'city' => $city,
                         'branch' => $branch,
-                        'status' => 1,
                     ],
+                    ['status' => 1],
                 );
             }
         }

@@ -46,6 +46,11 @@
                             View Cart
                         </BaseButton>
                     </template>
+                    <template v-else-if="out_of_stock">
+                        <BaseButton variant="outline" class="book-card__cart" disabled>
+                            Out of Stock
+                        </BaseButton>
+                    </template>
                     <template v-else>
                         <BaseButton variant="outline" class="book-card__cart" @click="handle_add_to_cart">
                             Add to cart
@@ -73,6 +78,7 @@ interface Props {
     price?: string
     image?: string
     rating?: number | null
+    quantity?: number
     loading?: boolean
 }
 
@@ -83,6 +89,7 @@ const props = withDefaults(defineProps<Props>(), {
     category: '',
     price: '',
     image: '',
+    quantity: undefined,
     loading: false,
 })
 
@@ -91,6 +98,7 @@ const { go_to_filter } = useShopFilterNav()
 
 const to = computed(() => ({ name: 'product', params: { slug: props.id } }))
 const is_in_cart = computed(() => store.in_cart(props.id))
+const out_of_stock = computed(() => props.quantity !== undefined && props.quantity <= 0)
 
 function handle_add_to_cart() {
     store.add_to_cart({
@@ -100,6 +108,7 @@ function handle_add_to_cart() {
         price: parseFloat(props.price),
         image: props.image,
         href: to.value,
+        available: props.quantity ?? 0,
     })
 }
 </script>

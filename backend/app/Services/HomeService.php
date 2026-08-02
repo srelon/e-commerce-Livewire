@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Cache;
-
 class HomeService
 {
     public function __construct(
@@ -13,9 +11,9 @@ class HomeService
     ) {}
 
     public function getHome(): array {
-        return Cache::tags([CacheService::TAG_HOME])->remember(
+        return CacheService::remember(
+            'home',
             'home.data',
-            CacheService::TTL_HOME,
             fn () => [
                 'bestsellers' => $this->productService->getBestsellers()->toArray(),
                 'best_author' => $this->productService->getBestAuthor(),

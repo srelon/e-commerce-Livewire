@@ -10,7 +10,7 @@ class TeamMember extends Model
 {
     use FlushesCacheOnWrite, SoftDeletes;
 
-    protected static string $cacheFlushMethod = 'flushOnTeamWrite';
+    protected static string $cacheFlushTrigger = 'team';
 
     protected $fillable = [
         'name',

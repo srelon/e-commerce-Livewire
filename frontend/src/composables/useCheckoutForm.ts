@@ -1,23 +1,7 @@
 import { ref, watch } from 'vue'
+import type { ContactData, DeliveryData, PaymentData } from '@/types/shop'
 
 const STORAGE_KEY = 'checkout_form'
-
-export interface ContactData {
-    first_name: string
-    last_name: string
-    phone: string
-    email: string
-}
-
-export interface DeliveryData {
-    method: 'pickup' | 'nova_poshta'
-    city: string
-    warehouse: string
-}
-
-export interface PaymentData {
-    method: 'card' | 'cash'
-}
 
 interface StoredForm {
     contact: ContactData
@@ -51,13 +35,12 @@ export function useCheckoutForm() {
     })
 
     const delivery = ref<DeliveryData>(stored?.delivery ?? {
-        method: 'pickup',
-        city: '',
-        warehouse: '',
+        delivery_id: null,
+        branch_id: null,
     })
 
     const payment = ref<PaymentData>(stored?.payment ?? {
-        method: 'card',
+        method: '',
     })
 
     watch(

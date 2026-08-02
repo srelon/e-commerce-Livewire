@@ -26,14 +26,27 @@
 
                     <div v-else class="cart-popup__items">
                         <div v-for="item in store.cart_items" :key="item.id" class="cart-popup__item">
-                            <img :src="item.image" :alt="item.title" class="cart-popup__img">
+                            <router-link :to="item.href" class="cart-popup__img-link" @click="store.close_popup">
+                                <img :src="item.image" :alt="item.title" class="cart-popup__img">
+                            </router-link>
                             <div class="cart-popup__info">
-                                <p class="cart-popup__title">{{ item.title }}</p>
+                                <p class="cart-popup__title">
+                                    <router-link :to="item.href" @click="store.close_popup">{{ item.title }}</router-link>
+                                </p>
                                 <p class="cart-popup__author">{{ item.author }}</p>
                                 <p class="cart-popup__price">${{ (item.price * item.quantity).toFixed(2) }}</p>
                                 <div class="cart-popup__qty">
                                     <button class="cart-popup__qty-btn" aria-label="Decrease" @click="store.update_qty(item.id, -1)">−</button>
-                                    <span class="cart-popup__qty-val">{{ item.quantity }}</span>
+                                    <input
+                                        type="number"
+                                        class="cart-popup__qty-val"
+                                        step="1"
+                                        :min="1"
+                                        :max="item.available"
+                                        :value="item.quantity"
+                                        @keydown="block_invalid_qty_key"
+                                        @change="on_qty_input(item, $event)"
+                                    >
                                     <button class="cart-popup__qty-btn" aria-label="Increase" @click="store.update_qty(item.id, 1)">+</button>
                                     <button class="cart-popup__delete" aria-label="Remove" @click="store.remove_from_cart(item.id)">
                                         <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -78,9 +91,32 @@
 
 <script setup lang="ts">
 import { useShopStore } from '@/stores/shop'
+import type { CartItem } from '@/types/shop'
 import BaseButton from '@/components/ui/base/BaseButton.vue'
 
 const store = useShopStore()
+
+const invalid_qty_keys = ['.', ',', 'e', 'E', '+', '-']
+
+function block_invalid_qty_key(event: KeyboardEvent) {
+    if (invalid_qty_keys.includes(event.key)) {
+        event.preventDefault()
+    }
+}
+
+function clamp_qty_input(value: number, max: number): number {
+    if (!Number.isFinite(value)) return 1
+
+    return Math.min(Math.max(Math.trunc(value), 1), max)
+}
+
+function on_qty_input(item: CartItem, event: Event) {
+    const target = event.target as HTMLInputElement
+    const clamped = clamp_qty_input(target.valueAsNumber, item.available)
+
+    target.value = String(clamped)
+    store.input_qty(item.id, clamped)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -208,12 +244,16 @@ const store = useShopStore()
         align-items: flex-start;
     }
 
+    &__img-link {
+        display: block;
+        flex-shrink: 0;
+    }
+
     &__img {
         width: 70px;
         height: 96px;
         object-fit: cover;
         border-radius: 6px;
-        flex-shrink: 0;
     }
 
     &__info {
@@ -271,11 +311,27 @@ const store = useShopStore()
     }
 
     &__qty-val {
+        width: 32px;
         min-width: 22px;
         text-align: center;
         font-size: 14px;
         font-weight: 600;
+        font-family: $font-body;
         color: $color-dark;
+        background: none;
+        border: none;
+        appearance: textfield;
+        outline: none;
+
+        &:focus {
+            outline: none;
+        }
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            appearance: none;
+            margin: 0;
+        }
     }
 
     &__delete {

@@ -4,16 +4,15 @@ namespace App\Services;
 
 use App\Http\Resources\FaqResource;
 use App\Models\Faq;
-use Illuminate\Support\Facades\Cache;
 
 class ContactService
 {
     public function __construct(protected PageService $pageService) {}
 
     public function getContact(): array {
-        return Cache::tags([CacheService::TAG_CONTACT])->remember(
+        return CacheService::remember(
+            'contact',
             'contact.data',
-            CacheService::TTL_CONTACT,
             fn () => [
                 'faqs' => $this->getFaqs()->toArray(),
                 'page' => $this->pageService->getPage('contact'),

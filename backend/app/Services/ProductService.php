@@ -43,6 +43,34 @@ class ProductService
             ->map(fn (Product $related) => $this->formatProduct($related));
     }
 
+    public function resolveItems(array $items): array {
+        $conflicts = [];
+        $resolved = [];
+
+        foreach ($items as $item) {
+            $product = Product::where('slug', $item['slug'])->firstOrFail();
+            $stock = $product->activeStock()->lockForUpdate()->first();
+            $available = $stock?->availableQuantity() ?? 0;
+
+            if ($item['quantity'] > $available) {
+                $conflicts[] = [
+                    'slug' => $item['slug'],
+                    'available' => $available,
+                ];
+
+                continue;
+            }
+
+            $resolved[] = [
+                'product' => $product,
+                'stock' => $stock,
+                'quantity' => $item['quantity'],
+            ];
+        }
+
+        return [$conflicts, $resolved];
+    }
+
     public function getFilterGroups(array $filters = []): array {
         return [
             $this->priceFilterGroup(),

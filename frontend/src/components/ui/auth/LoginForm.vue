@@ -40,7 +40,7 @@ async function on_submit(values: Record<string, string>) {
     is_loading.value = true
     try {
         const res = await api.post('auth/login', values)
-        auth_store.set_user(res.data.data.user)
+        auth_store.set_user(res.data.data.user, res.data.data.cart)
         auth_store.close_modal()
         useToast().success('Welcome back!')
     } catch {

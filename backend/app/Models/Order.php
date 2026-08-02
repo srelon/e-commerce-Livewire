@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasNumericPublicId;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,7 @@ use Illuminate\Support\Str;
 
 class Order extends Model
 {
-    use SoftDeletes;
+    use HasNumericPublicId, SoftDeletes;
 
     protected $fillable = [
         'public_id',
@@ -33,7 +34,6 @@ class Order extends Model
 
     protected static function booted(): void {
         static::creating(function (Order $order) {
-            $order->public_id ??= (string) Str::ulid();
             $order->txid ??= (string) Str::uuid();
         });
     }

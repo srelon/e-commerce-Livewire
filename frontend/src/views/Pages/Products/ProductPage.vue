@@ -58,7 +58,7 @@
                         <p class="product__desc">{{ product.short_description }}</p>
 
                         <div class="product__actions">
-                            <div v-if="!is_in_cart" class="product__qty">
+                            <div v-if="!is_in_cart && !out_of_stock" class="product__qty">
                                 <button type="button" :disabled="qty <= 1" @click="decrement_qty">−</button>
                                 <input
                                     type="number"
@@ -70,11 +70,14 @@
                                 >
                                 <button type="button" :disabled="qty >= max_qty" @click="increment_qty">+</button>
                             </div>
-                            <BaseButton v-if="!is_in_cart" class="product__add-to-cart" @click="handle_add_to_cart">
-                                Add to Cart
-                            </BaseButton>
-                            <BaseButton v-else class="product__add-to-cart" @click="store.open_popup()">
+                            <BaseButton v-if="is_in_cart" class="product__add-to-cart" @click="store.open_popup()">
                                 View Cart
+                            </BaseButton>
+                            <BaseButton v-else-if="out_of_stock" class="product__add-to-cart" disabled>
+                                Out of Stock
+                            </BaseButton>
+                            <BaseButton v-else class="product__add-to-cart" @click="handle_add_to_cart">
+                                Add to Cart
                             </BaseButton>
                         </div>
 
@@ -122,6 +125,7 @@
                             :category="p.category ?? ''"
                             :price="p.stock.price ?? ''"
                             :rating="p.rating"
+                            :quantity="p.stock.quantity"
                             :image="to_storage_url(p.image)"
                         />
                     </template>
@@ -176,11 +180,12 @@ const is_in_cart = computed(() => store.in_cart(props.slug))
 const gallery_images = computed(() => (product.value?.images ?? []).map(to_storage_url))
 const page_title = computed(() => product.value?.title ?? (is_loading.value ? '' : 'Product Not Found'))
 const max_qty = computed(() => product.value?.stock.quantity ?? 1)
+const out_of_stock = computed(() => (product.value?.stock.quantity ?? 0) <= 0)
 
 function clamp_qty(value: number): number {
     if (Number.isNaN(value)) return 1
 
-    return Math.min(Math.max(Math.trunc(value), 1), max_qty.value)
+    return Math.min(Math.max(Math.trunc(value), 1), Math.max(max_qty.value, 1))
 }
 
 function increment_qty() {
@@ -207,6 +212,7 @@ function handle_add_to_cart() {
         price: parseFloat(product.value.stock.price ?? '0'),
         image: gallery_images.value[0] ?? '',
         href: to.value,
+        available: max_qty.value,
     }, qty.value)
 }
 

@@ -3,6 +3,7 @@
 namespace Tests\Helpers;
 
 use App\Models\ContactInfo;
+use App\Models\DeliveryBranch;
 use App\Models\DeliveryService;
 use App\Models\Faq;
 use App\Models\Menu;
@@ -96,6 +97,15 @@ trait TestDataHelper
         ], $overrides));
     }
 
+    protected function createOrderContact(array $overrides = []): OrderContact {
+        return OrderContact::create(array_merge([
+            'first_name' => 'Test',
+            'last_name' => 'Customer',
+            'phone' => '555-0100',
+            'email' => 'test-'.uniqid().'@example.com',
+        ], $overrides));
+    }
+
     protected function createOrder(array $overrides = []): Order {
         $contact = OrderContact::create([
             'first_name' => 'Test',
@@ -120,6 +130,31 @@ trait TestDataHelper
             'delivery_id' => $delivery->id,
             'payment_id' => $payment->id,
             'status' => 0,
+        ], $overrides));
+    }
+
+    protected function createDeliveryService(array $overrides = []): DeliveryService {
+        return DeliveryService::create(array_merge([
+            'name' => 'Test Delivery '.uniqid(),
+            'key' => 'test-delivery-'.uniqid(),
+            'status' => 1,
+        ], $overrides));
+    }
+
+    protected function createPayment(array $overrides = []): Payment {
+        return Payment::create(array_merge([
+            'name' => 'Test Payment '.uniqid(),
+            'key' => 'test-payment-'.uniqid(),
+            'status' => 1,
+        ], $overrides));
+    }
+
+    protected function createDeliveryBranch(DeliveryService $delivery, array $overrides = []): DeliveryBranch {
+        return DeliveryBranch::create(array_merge([
+            'delivery_id' => $delivery->id,
+            'city' => 'Test City',
+            'branch' => 'Test Branch',
+            'status' => 1,
         ], $overrides));
     }
 

@@ -12,7 +12,7 @@ class ProductsCategory extends Model
 {
     use FlushesCacheOnWrite, SoftDeletes;
 
-    protected static string $cacheFlushMethod = 'flushOnCategoryWrite';
+    protected static string $cacheFlushTrigger = 'category';
 
     protected $fillable = [
         'name',

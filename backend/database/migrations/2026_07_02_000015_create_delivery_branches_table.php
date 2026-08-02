@@ -12,10 +12,10 @@ return new class extends Migration {
             $table->string('city');
             $table->string('branch');
             $table->tinyInteger('status')->unsigned()->default(0);
-            $table->string('hash')->unique();
             $table->timestamps();
             $table->softDeletes();
 
+            $table->unique(['delivery_id', 'city', 'branch']);
             $table->index('city');
             $table->index('status');
         });

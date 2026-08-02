@@ -15,7 +15,7 @@ class Product extends Model
 {
     use FlushesCacheOnWrite, SoftDeletes;
 
-    protected static string $cacheFlushMethod = 'flushOnProductWrite';
+    protected static string $cacheFlushTrigger = 'product';
 
     protected $fillable = [
         'category_id',

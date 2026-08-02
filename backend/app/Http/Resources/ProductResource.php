@@ -52,12 +52,6 @@ class ProductResource extends JsonResource
     }
 
     protected function availableStockQuantity(?ProductStock $stock): int {
-        if (! $stock) {
-            return 0;
-        }
-
-        $reserved = ($stock->pending_quantity ?? 0) + ($stock->fulfilled_quantity ?? 0);
-
-        return max(0, $stock->quantity - $reserved);
+        return $stock?->availableQuantity() ?? 0;
     }
 }

@@ -10,7 +10,7 @@ class ContactInfo extends Model
 {
     use FlushesCacheOnWrite, SoftDeletes;
 
-    protected static string $cacheFlushMethod = 'flushOnContactWrite';
+    protected static string $cacheFlushTrigger = 'contact';
 
     protected $table = 'contact_info';
 

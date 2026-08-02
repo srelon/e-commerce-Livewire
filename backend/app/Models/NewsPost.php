@@ -13,7 +13,7 @@ class NewsPost extends Model
 {
     use FlushesCacheOnWrite, SoftDeletes;
 
-    protected static string $cacheFlushMethod = 'flushOnNewsWrite';
+    protected static string $cacheFlushTrigger = 'news';
 
     protected $fillable = [
         'title',

@@ -2,31 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import api from '@/plugins/axios'
 import type { ProductSummary } from '@/types/shop'
-
-export interface LayoutCategory {
-    id: number
-    name: string
-    slug: string
-    icon: string | null
-    image: string | null
-    count: number
-}
-
-export interface LayoutMenuItem {
-    id: number
-    name: string
-    type: 'link' | 'route'
-    route: string | null
-    params: Record<string, string> | null
-    children: LayoutMenuItem[]
-}
-
-export interface LayoutContact {
-    key: string
-    name: string
-    content: string
-    icon: string | null
-}
+import type { LayoutCategory, LayoutMenuItem, LayoutContact } from '@/types/global'
 
 export const useLayoutStore = defineStore('layout', () => {
     const loaded = ref(false)

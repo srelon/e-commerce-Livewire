@@ -11,7 +11,7 @@ class Page extends Model
 {
     use FlushesCacheOnWrite, SoftDeletes;
 
-    protected static string $cacheFlushMethod = 'flushOnPageWrite';
+    protected static string $cacheFlushTrigger = 'page';
 
     protected $fillable = [
         'slug',

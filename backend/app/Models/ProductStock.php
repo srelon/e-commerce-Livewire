@@ -12,7 +12,7 @@ class ProductStock extends Model
 {
     use FlushesCacheOnWrite, SoftDeletes;
 
-    protected static string $cacheFlushMethod = 'flushOnProductWrite';
+    protected static string $cacheFlushTrigger = 'product';
 
     protected $fillable = [
         'product_id',
@@ -38,5 +38,12 @@ class ProductStock extends Model
 
     public function orderItems(): HasMany {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function availableQuantity(): int {
+        $pending = $this->pending_quantity ?? $this->orderItems()->where('status', 0)->sum('quantity');
+        $fulfilled = $this->fulfilled_quantity ?? $this->orderItems()->whereIn('status', [1, 2, 3])->sum('fact_quantity');
+
+        return max(0, $this->quantity - $pending - $fulfilled);
     }
 }

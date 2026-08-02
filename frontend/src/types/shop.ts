@@ -1,4 +1,5 @@
 import type { PageSeo } from '@/composables/useSeo'
+import type { RouteLocationRaw } from 'vue-router'
 
 export interface ProductStock {
     price: string | null
@@ -94,10 +95,79 @@ export interface AuthorListItem {
     bestsellers: number
 }
 
+export interface DeliveryBranchOption {
+    id: number
+    city: string
+    branch: string
+}
+
+export interface DeliveryOption {
+    id: number
+    name: string
+    price: string | null
+    requires_branch: boolean
+    branches: DeliveryBranchOption[]
+}
+
+export interface PaymentOption {
+    key: string
+    name: string
+}
+
+export interface SavedContact {
+    first_name: string
+    last_name: string
+    phone: string
+    email: string
+    delivery_id: number | null
+    branch_id: number | null
+}
+
 export interface PageBundle {
     title: string
     content: string | null
     excerpt: string | null
     image: string | null
     seo: PageSeo
+}
+
+export interface CartItem {
+    id: string
+    title: string
+    author: string
+    price: number
+    image: string
+    href: RouteLocationRaw
+    quantity: number
+    available: number
+}
+
+export interface ServerCartItem {
+    slug: string
+    title: string
+    author: string | null
+    image: string | null
+    price: string | null
+    quantity: number
+    available: number
+}
+
+export interface LastOrder {
+    public_id: string
+}
+
+export interface ContactData {
+    first_name: string
+    last_name: string
+    phone: string
+    email: string
+}
+
+export interface DeliveryData {
+    delivery_id: number | null
+    branch_id: number | null
+}
+
+export interface PaymentData {
+    method: string
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cart;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -25,7 +26,8 @@ class AuthTest extends TestCase
         ])
             ->assertSuccessful()
             ->assertJsonPath('data.user.name', 'Jane Doe')
-            ->assertJsonPath('data.user.email', 'jane@example.com');
+            ->assertJsonPath('data.user.email', 'jane@example.com')
+            ->assertJsonPath('data.cart', []);
 
         $this->assertAuthenticated('web');
         $this->assertDatabaseHas('users', ['email' => 'jane@example.com']);
@@ -66,9 +68,29 @@ class AuthTest extends TestCase
             'password' => 'password123',
         ])
             ->assertSuccessful()
-            ->assertJsonPath('data.user.email', 'jane@example.com');
+            ->assertJsonPath('data.user.email', 'jane@example.com')
+            ->assertJsonPath('data.cart', []);
 
         $this->assertAuthenticated('web');
+    }
+
+    public function test_login_response_includes_the_users_saved_cart_items(): void {
+        $user = $this->createUser([
+            'email' => 'jane@example.com',
+            'password' => 'password123',
+        ]);
+        $product = $this->createProduct();
+        $this->createProductStock($product);
+        $cart = Cart::create(['user_id' => $user->id, 'status' => 0]);
+        $cart->items()->create(['product_id' => $product->id, 'quantity' => 2, 'status' => 0]);
+
+        $this->postJson('/api/auth/login', [
+            'email' => 'jane@example.com',
+            'password' => 'password123',
+        ])
+            ->assertSuccessful()
+            ->assertJsonPath('data.cart.0.slug', $product->slug)
+            ->assertJsonPath('data.cart.0.quantity', 2);
     }
 
     public function test_login_fails_with_wrong_password(): void {
@@ -136,6 +158,37 @@ class AuthTest extends TestCase
         $this->getJson('/api/auth/profile')
             ->assertSuccessful()
             ->assertJsonPath('data.user', null);
+    }
+
+    public function test_profile_returns_null_cart_when_guest(): void {
+        $this->getJson('/api/auth/profile')
+            ->assertSuccessful()
+            ->assertJsonPath('data.cart', null);
+    }
+
+    public function test_profile_returns_an_empty_cart_when_the_user_has_no_saved_items(): void {
+        $user = $this->createUser();
+
+        $this->actingAs($user, 'web')
+            ->getJson('/api/auth/profile')
+            ->assertSuccessful()
+            ->assertJsonPath('data.cart', []);
+    }
+
+    public function test_profile_returns_the_users_saved_cart_items(): void {
+        $user = $this->createUser();
+        $product = $this->createProduct(null, ['title' => 'Saved Book']);
+        $this->createProductStock($product, ['price' => '12.50']);
+        $cart = Cart::create(['user_id' => $user->id, 'status' => 0]);
+        $cart->items()->create(['product_id' => $product->id, 'quantity' => 3, 'status' => 0]);
+
+        $this->actingAs($user, 'web')
+            ->getJson('/api/auth/profile')
+            ->assertSuccessful()
+            ->assertJsonPath('data.cart.0.slug', $product->slug)
+            ->assertJsonPath('data.cart.0.title', 'Saved Book')
+            ->assertJsonPath('data.cart.0.quantity', 3)
+            ->assertJsonPath('data.cart.0.price', '12.50');
     }
 
     public function test_forgot_password_sends_a_reset_link_notification(): void {
