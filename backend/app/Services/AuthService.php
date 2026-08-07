@@ -54,4 +54,16 @@ class AuthService
             'cart' => $user ? $this->cartService->getItems($user) : null,
         ];
     }
+
+    public function issueBroadcastTicket(User $user): string {
+        $payload = base64_encode(json_encode([
+            'public_id' => $user->public_id,
+            'issued_at' => time(),
+            'expires_at' => time() + config('websocket.ticket_ttl'),
+        ]));
+
+        $signature = hash_hmac('sha256', $payload, config('websocket.ticket_secret'));
+
+        return "{$payload}.{$signature}";
+    }
 }

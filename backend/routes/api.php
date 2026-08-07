@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\BroadcastAuthController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\AuthorController;
@@ -20,6 +21,7 @@ Route::get('layout', [LayoutController::class, 'index']);
 Route::post('newsletter', [NewsletterController::class, 'store']);
 
 Route::get('csrf-cookie', [CsrfCookieController::class, 'show']);
+Route::post('broadcasting/auth', [BroadcastAuthController::class, 'auth'])->middleware('auth:sanctum');
 
 Route::prefix('auth')->group(function () {
     Route::controller(AuthController::class)->group(function () {
