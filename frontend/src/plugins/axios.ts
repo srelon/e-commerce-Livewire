@@ -2,6 +2,12 @@ import axios from 'axios'
 import { useToast } from 'vue-toastification'
 import { useSeo } from '@/composables/useSeo'
 
+declare module 'axios' {
+    export interface AxiosRequestConfig {
+        silent?: boolean
+    }
+}
+
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL ?? '/api',
     headers: {
@@ -63,7 +69,9 @@ api.interceptors.response.use(
         return response
     },
     (error) => {
-        useToast().error(extract_error_message(error))
+        if (!error.config?.silent) {
+            useToast().error(extract_error_message(error))
+        }
 
         return Promise.reject(error)
     },

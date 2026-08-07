@@ -2,8 +2,21 @@ const redis = require('../redis')
 const logger = require('../logger')
 
 const subscribers = new Map()
+const PRIVATE_CHANNEL_PATTERN = /^[a-z_]+\.users\.(.+)$/
+
+function isAuthorized(channel, ws) {
+    const match = channel.match(PRIVATE_CHANNEL_PATTERN)
+    if (!match) return true
+
+    return ws.public_id !== null && ws.public_id === match[1]
+}
 
 function subscribe(channel, ws) {
+    if (!isAuthorized(channel, ws)) {
+        logger.warn({ channel, public_id: ws.public_id }, 'Rejected unauthorized channel subscription')
+        return
+    }
+
     let sockets = subscribers.get(channel)
 
     if (!sockets) {

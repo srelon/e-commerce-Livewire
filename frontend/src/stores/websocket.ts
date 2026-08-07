@@ -1,20 +1,31 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import api from '@/plugins/axios'
 
 export const useWebsocketStore = defineStore('websocket', () => {
     const socket = ref<WebSocket | null>(null)
     const channels = ref(new Set<string>())
+    let connecting = false
 
-    function connect() {
-        if (socket.value && socket.value.readyState !== WebSocket.CLOSED) {
+    async function connect() {
+        if (connecting || (socket.value && socket.value.readyState !== WebSocket.CLOSED)) {
             return
         }
 
-        const url = import.meta.env.VITE_WS_URL ?? 'ws://127.0.0.1:6001'
-        const ws = new WebSocket(url)
+        connecting = true
+
+        const url = new URL(import.meta.env.VITE_WS_URL ?? 'ws://127.0.0.1:6001')
+
+        try {
+            const { data } = await api.post('broadcasting/auth', {}, { silent: true })
+            url.searchParams.set('ticket', data.data.ticket)
+        } catch {}
+
+        const ws = new WebSocket(url.toString())
         socket.value = ws
 
         ws.onopen = () => {
+            connecting = false
             channels.value.forEach((channel) => {
                 ws.send(JSON.stringify({ type: 'subscribe', channel }))
             })
@@ -30,6 +41,7 @@ export const useWebsocketStore = defineStore('websocket', () => {
         }
 
         ws.onclose = () => {
+            connecting = false
             socket.value = null
             setTimeout(connect, 3000)
         }

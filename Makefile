@@ -58,3 +58,13 @@ test:
 
 format:
 	docker exec -it filament_app bash -c "cd /var/www/backend && ./vendor/bin/pint"
+
+ws-secret:
+	@NEW_SECRET=$$(openssl rand -hex 32); \
+	sed -i.bak "s#^WS_TICKET_SECRET=.*#WS_TICKET_SECRET=$$NEW_SECRET#" .env; \
+	sed -i.bak "s#^WS_TICKET_SECRET=.*#WS_TICKET_SECRET=$$NEW_SECRET#" backend/.env; \
+	rm -f .env.bak backend/.env.bak; \
+	export WS_TICKET_SECRET=$$NEW_SECRET; \
+	$(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.override.yml up -d websocket; \
+	docker exec filament_app bash -c "cd /var/www/backend && php artisan config:clear" > /dev/null 2>&1 || true; \
+	echo "WS_TICKET_SECRET rotated in .env and backend/.env, websocket container restarted."

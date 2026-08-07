@@ -1,10 +1,16 @@
+const { URL } = require('url')
 const logger = require('./logger')
 const channels = require('./channels')
+const { verifyTicket } = require('./ticket')
 
 function handleConnection(ws, req) {
-    logger.info({ ip: req.socket.remoteAddress }, 'Client connected')
+    const { searchParams } = new URL(req.url, 'http://localhost')
+    const ticket = verifyTicket(searchParams.get('ticket'))
 
     ws._channels = new Set()
+    ws.public_id = ticket?.public_id ?? null
+
+    logger.info({ ip: req.socket.remoteAddress, public_id: ws.public_id }, 'Client connected')
 
     ws.on('message', (data) => handleMessage(ws, data))
     ws.on('close', () => handleClose(ws))
