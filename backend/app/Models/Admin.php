@@ -2,9 +2,6 @@
 
 namespace App\Models;
 
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Models\Contracts\HasAvatar;
-use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,9 +9,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
-class Admin extends Authenticatable implements FilamentUser, HasAvatar
+class Admin extends Authenticatable
 {
     use HasFactory, Notifiable;
 
@@ -75,13 +71,5 @@ class Admin extends Authenticatable implements FilamentUser, HasAvatar
             ->get()
             ->map(fn ($row) => $row->key.':'.$row->type)
         );
-    }
-
-    public function canAccessPanel(Panel $panel): bool {
-        return true;
-    }
-
-    public function getFilamentAvatarUrl(): ?string {
-        return $this->avatar ? Storage::disk('public')->url($this->avatar) : null;
     }
 }

@@ -45,7 +45,6 @@ async function on_submit(values: Record<string, string>) {
         useToast().success('Welcome back!')
     } catch {
         // error toast is already shown by the axios response interceptor
-    } finally {
         is_loading.value = false
     }
 }

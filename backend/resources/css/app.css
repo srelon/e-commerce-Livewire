@@ -1,9 +1,120 @@
 @import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@plugin "daisyui" {
+    themes: false;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/power-components/livewire-powergrid/resources/views/**/*.blade.php';
+@source '../../vendor/power-components/livewire-powergrid/src/Themes/DaisyUI.php';
+@source '../../vendor/power-components/livewire-powergrid/resources/js/**/*.js';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Segoe UI', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* daisyUI reads these as CSS variables — no built-in daisyUI theme is loaded (see the
+       @plugin block above), we hand-supply the values instead so daisyUI's own utility
+       classes (bg-base-*, table-zebra, btn, input, select, checkbox, ...) render in this
+       app's palette instead of a hand-rolled copy of them. */
+    --color-base-100: var(--color-white);
+    --color-base-200: var(--color-zinc-50);
+    --color-base-300: var(--color-zinc-200);
+    --color-base-content: var(--color-zinc-800);
+
+    --color-primary: oklch(45% .24 277.023);
+    --color-primary-content: oklch(93% .034 272.788);
+    --color-secondary: var(--color-amber-600);
+    --color-secondary-content: var(--color-white);
+    --color-accent: oklch(62.7% .194 149.214);
+    --color-accent-content: var(--color-accent);
+    --color-accent-foreground: var(--color-white);
+    --color-neutral: var(--color-zinc-800);
+    --color-neutral-content: var(--color-white);
+
+    --radius-selector: 0.5rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 1;
+    --noise: 0;
+}
+
+@layer theme {
+    .dark {
+        --color-base-100: #20262e;
+        --color-base-200: #191e24;
+        --color-base-300: #2a323d;
+        --color-base-content: var(--color-zinc-100);
+
+        --color-primary: oklch(58% .233 277.117);
+        --color-primary-content: oklch(96% .018 272.314);
+        --color-secondary: var(--color-amber-500);
+        --color-accent: oklch(62.7% .194 149.214);
+        --color-accent-foreground: var(--color-white);
+        --color-neutral: #20262e;
+    }
+}
+
+@layer base {
+    input[type='checkbox'],
+    input[type='radio'] {
+        accent-color: var(--color-amber-600);
+    }
+
+    [data-flux-button]:not(:disabled),
+    [data-flux-checkbox]:not([disabled]) {
+        cursor: pointer;
+    }
+
+    [x-cloak] {
+        display: none;
+    }
+}
+
+/* PowerGrid's own layout-only component classes (from its resources/css/tailwind4.css
+   source, which we don't import directly to avoid double-importing Tailwind) — shared
+   by every PowerGrid theme (including DaisyUI), so still needed even though the
+   Tailwind-theme-specific pg-primary/pg-secondary tokens are gone. */
+@layer components {
+    .pg-filter-container {
+        @apply py-3;
+    }
+
+    .pg-enabled-filters-base {
+        @apply flex items-center gap-2 my-3 md:mt-0 flex-wrap;
+    }
+}
+
+/* @alpinejs/sort (menu tree drag-and-drop) drop-target placeholder — shows where the
+   dragged item will land, styled after Filament's own drag-highlight convention.
+   Deliberately NOT inside @layer components: the drop-target <div> already carries
+   utility classes (bg-base-200/border-base-300/shadow-sm), and Tailwind's utilities
+   layer always beats components regardless of selector specificity — a components-layer
+   override here would silently lose to those utilities and never actually apply. */
+.sortable-ghost {
+    opacity: 0.6;
+}
+
+.sortable-ghost > div {
+    border-width: 2px !important;
+    border-style: dashed !important;
+    border-color: var(--color-accent) !important;
+    background-color: color-mix(in oklab, var(--color-accent) 15%, transparent) !important;
+    box-shadow: none !important;
+}
+
+.sortable-ghost > div > * {
+    visibility: hidden;
+}
+
+[data-flux-modal] > dialog::backdrop {
+    background-color: rgb(0 0 0 / 0.6);
+    cursor: pointer;
 }
