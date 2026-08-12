@@ -45,7 +45,6 @@ async function on_submit(values: Record<string, string>) {
         useToast().success('Account created!')
     } catch {
         // error toast is already shown by the axios response interceptor
-    } finally {
         is_loading.value = false
     }
 }

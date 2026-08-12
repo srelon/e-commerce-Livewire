@@ -41,7 +41,6 @@ async function on_submit(values: Record<string, string>) {
         auth_store.open_modal('login')
     } catch {
         // error toast is already shown by the axios response interceptor
-    } finally {
         is_loading.value = false
     }
 }

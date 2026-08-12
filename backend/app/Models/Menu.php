@@ -4,11 +4,11 @@ namespace App\Models;
 
 use App\Models\Concerns\FlushesCacheOnWrite;
 use Illuminate\Database\Eloquent\Model;
-use SolutionForest\FilamentTree\Concern\ModelTree;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Menu extends Model
 {
-    use FlushesCacheOnWrite, ModelTree;
+    use FlushesCacheOnWrite;
 
     protected static string $cacheFlushTrigger = 'menu';
 
@@ -27,5 +27,9 @@ class Menu extends Model
             'parent_id' => 'integer',
             'params' => 'array',
         ];
+    }
+
+    public function children(): HasMany {
+        return $this->hasMany(self::class, 'parent_id')->orderBy('sort_order');
     }
 }
