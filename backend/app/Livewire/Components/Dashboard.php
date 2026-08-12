@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin;
+namespace App\Livewire\Components;
 
 use Livewire\Attributes\Layout;
 use Livewire\Component;

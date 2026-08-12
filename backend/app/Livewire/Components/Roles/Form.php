@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\Roles;
+namespace App\Livewire\Components\Roles;
 
 use App\Livewire\Traits\HasAccessControl;
 use App\Models\AdminAccess;
@@ -56,6 +56,23 @@ class Form extends Component
     public function accesses(): Collection
     {
         return AdminAccess::orderBy('title')->get();
+    }
+
+    #[Computed]
+    public function schema(): array
+    {
+        return [
+            [
+                'name' => 'name',
+                'label' => 'Name',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'label',
+                'label' => 'Label',
+                'type' => 'text',
+            ],
+        ];
     }
 
     public function createAccess(): void
@@ -124,6 +141,13 @@ class Form extends Component
 
     public function render()
     {
-        return view('livewire.admin.roles.form');
+        return view('livewire.admin.partials.resource-form', [
+            'title' => $this->role ? 'Edit role' : 'New role',
+            'fields' => $this->schema(),
+            'disabled' => ! $this->hasAccess('edit'),
+            'cancel_route' => 'admin.roles.index',
+            'extra' => 'livewire.admin.roles.partials.permission-matrix',
+            'extra_data' => ['accesses' => $this->accesses],
+        ]);
     }
 }

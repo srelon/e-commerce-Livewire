@@ -1,11 +1,11 @@
 <?php
 
-use App\Livewire\Admin\Admins;
-use App\Livewire\Admin\Dashboard;
-use App\Livewire\Admin\Menu;
-use App\Livewire\Admin\Roles;
-use App\Livewire\Admin\Users;
-use App\Livewire\Auth\Login;
+use App\Livewire\Components\Admins;
+use App\Livewire\Components\Auth\Login;
+use App\Livewire\Components\Dashboard;
+use App\Livewire\Components\Menu;
+use App\Livewire\Components\Roles;
+use App\Livewire\Components\Users;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {

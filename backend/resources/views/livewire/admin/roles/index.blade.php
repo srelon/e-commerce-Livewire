@@ -10,7 +10,7 @@
     </div>
 
     <div class="mt-6">
-        <livewire:admin.roles.table />
+        <livewire:components.roles.table />
     </div>
 
     @include('livewire.admin.partials.confirm-modal')

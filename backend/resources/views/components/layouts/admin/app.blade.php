@@ -17,37 +17,21 @@
             </a>
 
             <flux:navlist variant="outline" class="mt-4">
-                <flux:navlist.item :href="route('admin.dashboard')" :current="request()->routeIs('admin.dashboard')" wire:navigate>
-                    Dashboard
-                </flux:navlist.item>
-
-                @if (Route::has('admin.users.index') && auth('admins')->user()?->hasAccess('users.view'))
-                    <flux:navlist.item :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
-                        Users
-                    </flux:navlist.item>
-                @endif
-
-                @if (Route::has('admin.menus.index') && auth('admins')->user()?->hasAccess('menus.view'))
-                    <flux:navlist.item :href="route('admin.menus.index')" :current="request()->routeIs('admin.menus.*')" wire:navigate>
-                        Menus
-                    </flux:navlist.item>
-                @endif
-
-                @if ((Route::has('admin.admins.index') && auth('admins')->user()?->hasAccess('admins.view')) || (Route::has('admin.roles.index') && auth('admins')->user()?->hasAccess('roles.view')))
-                    <flux:navlist.group heading="Settings" class="mt-4">
-                        @if (Route::has('admin.admins.index') && auth('admins')->user()?->hasAccess('admins.view'))
-                            <flux:navlist.item :href="route('admin.admins.index')" :current="request()->routeIs('admin.admins.*')" wire:navigate>
-                                Admins
-                            </flux:navlist.item>
-                        @endif
-
-                        @if (Route::has('admin.roles.index') && auth('admins')->user()?->hasAccess('roles.view'))
-                            <flux:navlist.item :href="route('admin.roles.index')" :current="request()->routeIs('admin.roles.*')" wire:navigate>
-                                Roles
-                            </flux:navlist.item>
-                        @endif
-                    </flux:navlist.group>
-                @endif
+                @foreach (\App\Livewire\Navigation\Navigation::visible(auth('admins')->user()) as $entry)
+                    @if (isset($entry['group']))
+                        <flux:navlist.group heading="{{ $entry['group'] }}" class="mt-4">
+                            @foreach ($entry['items'] as $item)
+                                <flux:navlist.item :href="route($item['route'])" :current="request()->routeIs($item['route_pattern'])" wire:navigate>
+                                    {{ $item['label'] }}
+                                </flux:navlist.item>
+                            @endforeach
+                        </flux:navlist.group>
+                    @else
+                        <flux:navlist.item :href="route($entry['route'])" :current="request()->routeIs($entry['route_pattern'])" wire:navigate>
+                            {{ $entry['label'] }}
+                        </flux:navlist.item>
+                    @endif
+                @endforeach
             </flux:navlist>
 
             <flux:spacer />

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Auth;
+namespace App\Livewire\Components\Auth;
 
 use App\Traits\ThrottlesLogins;
 use Livewire\Attributes\Layout;

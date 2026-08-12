@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Admin\Menu\Tree;
+use App\Livewire\Components\Menu\Tree;
 use App\Models\Admin;
 use App\Models\AdminAccess;
 use App\Models\AdminRole;

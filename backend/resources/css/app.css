@@ -31,7 +31,7 @@
     --color-secondary: var(--color-amber-600);
     --color-secondary-content: var(--color-white);
     --color-accent: oklch(62.7% .194 149.214);
-    --color-accent-content: var(--color-white);
+    --color-accent-content: var(--color-accent);
     --color-accent-foreground: var(--color-white);
     --color-neutral: var(--color-zinc-800);
     --color-neutral-content: var(--color-white);

@@ -67,7 +67,7 @@
     </div>
 
     <div class="mt-6">
-        <livewire:admin.users.table />
+        <livewire:components.users.table />
     </div>
 
     @include('livewire.admin.partials.confirm-modal')

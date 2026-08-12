@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Livewire\Admin\Admins;
+namespace App\Livewire\Components\Admins;
 
 use App\Livewire\Traits\HasAccessControl;
 use App\Models\Admin;
 use App\Models\AdminRole;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -53,6 +54,48 @@ class Form extends Component
         return AdminRole::orderBy('label')->get();
     }
 
+    #[Computed]
+    public function schema(): array
+    {
+        return [
+            [
+                'name' => 'avatar',
+                'label' => 'Avatar',
+                'type' => 'file',
+                'preview' => $this->admin?->avatar ? Storage::disk('public')->url($this->admin->avatar) : null,
+                'preview_class' => 'h-16 w-16 rounded-full object-cover',
+            ],
+            [
+                'name' => 'name',
+                'label' => 'Name',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'email',
+                'label' => 'Email',
+                'type' => 'text',
+                'input_type' => 'email',
+                ...($this->admin ? ['disabled' => true] : []),
+            ],
+            [
+                'name' => 'password',
+                'label' => 'Password',
+                'type' => 'text',
+                'input_type' => 'password',
+                'placeholder' => $this->admin ? 'Leave blank to keep current password' : null,
+            ],
+            [
+                'name' => 'role_id',
+                'label' => 'Role',
+                'type' => 'select',
+                'options' => $this->roles->map(fn (AdminRole $role) => [
+                    'value' => $role->id,
+                    'label' => $role->label,
+                ])->all(),
+            ],
+        ];
+    }
+
     public function save(): void
     {
         if (! $this->guardSave()) {
@@ -94,6 +137,11 @@ class Form extends Component
 
     public function render()
     {
-        return view('livewire.admin.admins.form');
+        return view('livewire.admin.partials.resource-form', [
+            'title' => $this->admin ? 'Edit admin' : 'New admin',
+            'fields' => $this->schema(),
+            'disabled' => ! $this->hasAccess('edit'),
+            'cancel_route' => 'admin.admins.index',
+        ]);
     }
 }

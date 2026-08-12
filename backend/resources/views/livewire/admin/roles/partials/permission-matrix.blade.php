@@ -44,7 +44,8 @@
             <tr class="border-b border-base-300 text-left">
                 <th class="w-20 px-4 py-2 text-center font-medium">View</th>
                 <th class="w-20 px-4 py-2 text-center font-medium">Edit</th>
-                <th class="px-4 py-2 font-medium">Resource</th>
+                <th class="w-64 px-4 py-2 font-medium">Resource</th>
+                <th class="px-4 py-2 font-medium">Key</th>
             </tr>
         </thead>
         <tbody>
@@ -68,11 +69,12 @@
                             class="size-4 rounded border-zinc-300"
                         />
                     </td>
-                    <td class="px-4 py-2">{{ $access->title }}</td>
+                    <td class="w-64 px-4 py-2">{{ $access->title }}</td>
+                    <td class="px-4 py-2 text-zinc-500">{{ $access->key }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="3" class="px-4 py-3 text-center text-zinc-500">No accesses defined yet.</td>
+                    <td colspan="4" class="px-4 py-3 text-center text-zinc-500">No accesses defined yet.</td>
                 </tr>
             @endforelse
         </tbody>

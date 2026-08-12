@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\Menu;
+namespace App\Livewire\Components\Menu;
 
 use App\Livewire\Traits\HasAccessControl;
 use App\Models\Menu;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\Users;
+namespace App\Livewire\Components\Users;
 
 use App\Livewire\Traits\ConfirmsAction;
 use App\Livewire\Traits\HasAccessControl;

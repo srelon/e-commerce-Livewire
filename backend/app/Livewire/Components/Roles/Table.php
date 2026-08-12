@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\Roles;
+namespace App\Livewire\Components\Roles;
 
 use App\Livewire\Traits\HasAccessControl;
 use App\Livewire\Traits\HasPowerGridBehavior;
