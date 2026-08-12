@@ -1,18 +1,18 @@
-# E-commerce FilamentPHP
+# E-commerce Livewire
 
-Book store. Laravel + FilamentPHP admin, Vue 3 public site, Node.js WebSocket server for real-time stock/notification updates.
+Book store. Laravel + Livewire admin, Vue 3 public site, Node.js WebSocket server for real-time stock/notification updates.
 
 ## Stack
 
-| Layer          | Technology                                          |
-|----------------|-----------------------------------------------------|
-| Backend        | Laravel 13, PHP 8.3                                 |
-| Admin panel    | FilamentPHP (Livewire + Alpine.js + Tailwind CSS)   |
-| Site frontend  | Vue 3 + TypeScript, Vite                            |
-| Database       | MySQL 8.0                                           |
-| Cache/Pub-Sub  | Redis 7                                             |
-| WebSocket      | Node.js 20 (ws + ioredis)                           |
-| Infrastructure | Docker Compose, Nginx, PHP-FPM                      |
+| Layer          | Technology                                    |
+|----------------|------------------------------------------------|
+| Backend        | Laravel 13, PHP 8.3                             |
+| Admin panel    | Livewire (Alpine.js + Flux UI + Tailwind CSS)   |
+| Site frontend  | Vue 3 + TypeScript, Vite                        |
+| Database       | MySQL 8.0                                       |
+| Cache/Pub-Sub  | Redis 7                                         |
+| WebSocket      | Node.js 20 (ws + ioredis)                       |
+| Infrastructure | Docker Compose, Nginx, PHP-FPM                  |
 
 ## Requirements
 
@@ -25,7 +25,7 @@ Book store. Laravel + FilamentPHP admin, Vue 3 public site, Node.js WebSocket se
 ```bash
 cp .env.example .env && cp backend/.env.example backend/.env
 docker compose up -d --build
-docker exec -it filament_app sh -c 'cd /var/www/backend && php artisan db:seed'
+docker exec -it bookstore_app sh -c 'cd /var/www/backend && php artisan db:seed'
 ```
 
 ## Commands
@@ -42,7 +42,7 @@ make bash  # Enter the backend container shell
 | Service         | URL                          |
 |-----------------|-------------------------------|
 | API             | http://127.0.0.1:8880/api    |
-| Filament Admin  | http://127.0.0.1:8880/admin  |
+| Admin           | http://127.0.0.1:8880/admin  |
 | Site            | http://127.0.0.1:8880        |
 | phpMyAdmin      | http://127.0.0.1:8080        |
 | WebSocket       | ws://127.0.0.1:6001          |

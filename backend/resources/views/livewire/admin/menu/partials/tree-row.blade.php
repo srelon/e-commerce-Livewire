@@ -2,7 +2,6 @@
     <div class="flex items-center gap-2 cursor-move">
         <span class="text-zinc-400">⠿</span>
         <span x-text="{{ $var }}.name" @if ($root) class="font-medium" @endif></span>
-        <flux:badge size="sm" x-text="{{ $var }}.location"></flux:badge>
     </div>
 
     <div class="flex gap-1" x-sort:ignore>
@@ -12,7 +11,19 @@
             @if ($root)
                 <flux:button size="sm" variant="ghost" x-on:click="$wire.openCreate({{ $var }}.id)">+ Child</flux:button>
             @endif
-            <flux:button size="sm" variant="ghost" class="text-red-600" x-on:click="confirm('Delete this menu item?') && $wire.delete({{ $var }}.id)">Delete</flux:button>
+            <flux:button
+                size="sm"
+                variant="ghost"
+                class="text-red-600"
+                x-on:click="$wire.dispatch('confirm-action', {
+                    event: 'deleteMenuItem',
+                    params: { id: {{ $var }}.id },
+                    message: 'Delete this menu item?',
+                    heading: 'Confirm deletion',
+                    label: 'Delete',
+                    variant: 'danger',
+                })"
+            >Delete</flux:button>
         @endif
     </div>
 </div>

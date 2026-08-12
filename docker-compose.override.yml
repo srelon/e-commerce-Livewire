@@ -1,7 +1,7 @@
 services:
   frontend-site:
     image: node:20-alpine
-    container_name: filament_frontend_site
+    container_name: bookstore_frontend_site
     working_dir: /var/www/frontend
     command: sh -c "npm install && npm run dev"
     ports:
@@ -13,7 +13,7 @@ services:
 
   phpmyadmin:
     image: phpmyadmin:latest
-    container_name: filament_phpmyadmin
+    container_name: bookstore_phpmyadmin
     restart: unless-stopped
     ports:
       - "8080:80"

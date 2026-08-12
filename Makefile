@@ -18,7 +18,7 @@ down:
 	$(DOCKER_COMPOSE) $(PROFILES) down --remove-orphans
 
 bash:
-	docker exec -it filament_app bash
+	docker exec -it bookstore_app bash
 
 logs:
 	$(DOCKER_COMPOSE) logs -f
@@ -36,7 +36,7 @@ logs-websocket:
 	$(DOCKER_COMPOSE) logs -f websocket
 
 scheduler-logs:
-	docker logs -f filament_scheduler
+	docker logs -f bookstore_scheduler
 
 scheduler-restart:
 	$(DOCKER_COMPOSE) restart scheduler
@@ -54,10 +54,10 @@ site:
 	@echo ""
 
 test:
-	docker exec -it filament_app bash -c "cd /var/www/backend && php artisan test"
+	docker exec -it bookstore_app bash -c "cd /var/www/backend && php artisan test"
 
 format:
-	docker exec -it filament_app bash -c "cd /var/www/backend && ./vendor/bin/pint"
+	docker exec -it bookstore_app bash -c "cd /var/www/backend && ./vendor/bin/pint"
 
 ws-secret:
 	@NEW_SECRET=$$(openssl rand -hex 32); \
@@ -66,5 +66,5 @@ ws-secret:
 	rm -f .env.bak backend/.env.bak; \
 	export WS_TICKET_SECRET=$$NEW_SECRET; \
 	$(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.override.yml up -d websocket; \
-	docker exec filament_app bash -c "cd /var/www/backend && php artisan config:clear" > /dev/null 2>&1 || true; \
+	docker exec bookstore_app bash -c "cd /var/www/backend && php artisan config:clear" > /dev/null 2>&1 || true; \
 	echo "WS_TICKET_SECRET rotated in .env and backend/.env, websocket container restarted."

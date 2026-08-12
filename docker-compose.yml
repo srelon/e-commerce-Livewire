@@ -1,7 +1,7 @@
 services:
   nginx:
     image: nginx:alpine
-    container_name: filament_nginx
+    container_name: bookstore_nginx
     ports:
       - "${SITE_PORT}:${SITE_PORT}"
     environment:
@@ -16,7 +16,7 @@ services:
     build:
       context: .
       dockerfile: ./_docker/app/Dockerfile
-    container_name: filament_app
+    container_name: bookstore_app
     user: "1000:1000"
     entrypoint: ["sh", "/var/www/_docker/app/entrypoint.sh"]
     volumes:
@@ -29,7 +29,7 @@ services:
     build:
       context: .
       dockerfile: ./_docker/app/Dockerfile
-    container_name: filament_scheduler
+    container_name: bookstore_scheduler
     user: "1000:1000"
     entrypoint: ["sh", "/var/www/_docker/app/scheduler-entrypoint.sh"]
     restart: unless-stopped
@@ -43,7 +43,7 @@ services:
 
   websocket:
     image: node:20-alpine
-    container_name: filament_websocket
+    container_name: bookstore_websocket
     working_dir: /var/www/websocket
     command: sh -c "npm install && npm start"
     environment:
@@ -62,13 +62,13 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: filament_redis
+    container_name: bookstore_redis
     ports:
       - "6379:6379"
 
   db:
     image: mysql:8.0
-    container_name: filament_db
+    container_name: bookstore_db
     ports:
       - "8101:3306"
     environment:
