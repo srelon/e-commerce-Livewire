@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Components\Menu;
 
+use App\Livewire\Traits\ConfirmsAction;
 use App\Livewire\Traits\HasAccessControl;
 use App\Models\Menu;
 use App\Models\NewsPost;
@@ -9,12 +10,13 @@ use App\Models\Product;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 #[Layout('components.layouts.admin.app')]
 class Tree extends Component
 {
-    use HasAccessControl;
+    use ConfirmsAction, HasAccessControl;
 
     protected string $accessKey = 'menus';
 
@@ -50,7 +52,7 @@ class Tree extends Component
 
     public ?string $params_slug = null;
 
-    public string $location = 'header';
+    public string $active_location = 'header';
 
     public string $slug_search = '';
 
@@ -69,7 +71,7 @@ class Tree extends Component
     #[Computed]
     public function tree(): array
     {
-        $all = Menu::orderBy('sort_order')->get();
+        $all = Menu::where('location', $this->active_location)->orderBy('sort_order')->get();
         $byParent = $all->groupBy('parent_id');
 
         $map = function (int $parentId) use (&$map, $byParent): array {
@@ -80,7 +82,6 @@ class Tree extends Component
                     'type' => $node->type,
                     'route' => $node->route,
                     'route_label' => $node->type === 'route' ? (self::ROUTE_OPTIONS[$node->route] ?? $node->route) : null,
-                    'location' => $node->location,
                     'children' => $map($node->id),
                 ])
                 ->values()
@@ -88,6 +89,12 @@ class Tree extends Component
         };
 
         return $map(-1);
+    }
+
+    public function updatedActiveLocation(): void
+    {
+        unset($this->tree);
+        $this->dispatch('menu-tree-updated', tree: $this->tree);
     }
 
     public function openCreate(?int $parentId = null): void
@@ -112,7 +119,6 @@ class Tree extends Component
         $this->type = $node->type;
         $this->route = (string) $node->route;
         $this->params_slug = $node->params['slug'] ?? null;
-        $this->location = $node->location;
 
         if ($this->params_slug && array_key_exists($this->route, self::ROUTE_SLUG_MODELS)) {
             $model = self::ROUTE_SLUG_MODELS[$this->route];
@@ -130,7 +136,6 @@ class Tree extends Component
         $this->type = 'route';
         $this->route = '';
         $this->params_slug = null;
-        $this->location = 'header';
         $this->slug_search = '';
         $this->slug_results = [];
         $this->resetErrorBag();
@@ -191,7 +196,6 @@ class Tree extends Component
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'in:link,route'],
             'route' => ['required', 'string', 'max:255'],
-            'location' => ['required', 'in:header,footer'],
             'params_slug' => [
                 Rule::requiredIf($this->type === 'route' && array_key_exists($this->route, self::ROUTE_SLUG_MODELS)),
             ],
@@ -203,7 +207,6 @@ class Tree extends Component
         $node->name = $this->name;
         $node->type = $this->type;
         $node->route = $this->route;
-        $node->location = $this->location;
 
         $params = [];
 
@@ -215,6 +218,7 @@ class Tree extends Component
 
         if (! $this->editing_id) {
             $node->parent_id = $this->parent_id ?? -1;
+            $node->location = $this->parent_id ? Menu::findOrFail($this->parent_id)->location : $this->active_location;
             $node->sort_order = (int) Menu::where('parent_id', $node->parent_id)->max('sort_order') + 1;
         }
 
@@ -228,6 +232,7 @@ class Tree extends Component
         $this->dispatch('notify', type: 'success', message: $isCreating ? 'Menu item created.' : 'Menu item updated.');
     }
 
+    #[On('deleteMenuItem')]
     public function delete(int $id): void
     {
         if (! $this->guardSave()) {
@@ -250,6 +255,8 @@ class Tree extends Component
 
         $this->persistOrder($tree, -1);
 
+        unset($this->tree);
+        $this->dispatch('menu-tree-updated', tree: $this->tree);
         $this->dispatch('notify', type: 'success', message: 'Menu order saved.');
     }
 

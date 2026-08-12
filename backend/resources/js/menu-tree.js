@@ -2,10 +2,7 @@ export default function menuTree(seed) {
     return {
         tree: JSON.parse(JSON.stringify(seed)),
         original: JSON.parse(JSON.stringify(seed)),
-
-        get isDirty() {
-            return JSON.stringify(this.tree) !== JSON.stringify(this.original)
-        },
+        is_dirty: false,
 
         findNode(id, nodes = this.tree) {
             for (const node of nodes) {
@@ -46,6 +43,7 @@ export default function menuTree(seed) {
                 }
             }
 
+            this.is_dirty = true
             this.resumeObserving()
         },
 
@@ -75,11 +73,13 @@ export default function menuTree(seed) {
 
         cancelOrder() {
             this.tree = JSON.parse(JSON.stringify(this.original))
+            this.is_dirty = false
         },
 
         commitOrder() {
             this.$wire.saveOrder(this.tree).then(() => {
                 this.original = JSON.parse(JSON.stringify(this.tree))
+                this.is_dirty = false
             })
         },
     }

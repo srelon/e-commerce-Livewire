@@ -4,17 +4,26 @@
 
 <div
     x-data="menuTree(@js($this->tree))"
-    x-on:menu-tree-updated.window="tree = $event.detail.tree; original = JSON.parse(JSON.stringify($event.detail.tree))"
+    x-on:menu-tree-updated.window="tree = $event.detail.tree; original = JSON.parse(JSON.stringify($event.detail.tree)); is_dirty = false"
+    wire:ignore.self
 >
-    <div class="flex items-center justify-between">
-        <flux:heading size="xl">Menus</flux:heading>
-
-        @if ($can_edit)
-            <flux:button variant="primary" wire:click="openCreate">New menu item</flux:button>
-        @endif
-    </div>
+    <flux:heading size="xl">Menus</flux:heading>
 
     <flux:text class="mt-1 text-zinc-500">Drag items to reorder or nest them under a parent (max one level deep).</flux:text>
+
+    <div class="mt-4 flex items-end justify-between">
+        <flux:field class="max-w-xs">
+            <flux:label>Location</flux:label>
+            <flux:select wire:model.live="active_location">
+                <flux:select.option value="header">Header</flux:select.option>
+                <flux:select.option value="footer">Footer</flux:select.option>
+            </flux:select>
+        </flux:field>
+
+        @if ($can_edit)
+            <flux:button class="self-end" variant="primary" wire:click="openCreate">New menu item</flux:button>
+        @endif
+    </div>
 
     <div class="mt-6">
         <ul x-sort.ghost="onDrop($item, $position, -1)" x-sort:group="menu-tree" x-sort:config="{ onMove: checkMove, forceFallback: true, onChoose: pauseObserving, onUnchoose: resumeObserving }" data-drop-zone="root" class="space-y-1">
@@ -46,7 +55,7 @@
     </div>
 
     @if ($can_edit)
-        <div class="mt-6 flex gap-3 border-t border-base-300 pt-4" x-show="isDirty">
+        <div class="mt-6 flex gap-3 border-t border-base-300 pt-4" x-show="is_dirty">
             <flux:button variant="primary" x-on:click="commitOrder">Save changes</flux:button>
             <flux:button variant="ghost" x-on:click="cancelOrder">Cancel</flux:button>
         </div>
@@ -111,14 +120,6 @@
                 @endif
             @endif
 
-            <flux:field>
-                <flux:label>Location</flux:label>
-                <flux:select wire:model="location" :disabled="! $can_edit">
-                    <flux:select.option value="header">Header</flux:select.option>
-                    <flux:select.option value="footer">Footer</flux:select.option>
-                </flux:select>
-            </flux:field>
-
             <div class="flex justify-end gap-3 pt-2">
                 <flux:button variant="ghost" wire:click="closeModal">Cancel</flux:button>
 
@@ -128,4 +129,6 @@
             </div>
         </div>
     </flux:modal>
+
+    @include('livewire.admin.partials.confirm-modal')
 </div>

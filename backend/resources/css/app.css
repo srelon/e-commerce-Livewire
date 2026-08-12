@@ -93,7 +93,7 @@
 }
 
 /* @alpinejs/sort (menu tree drag-and-drop) drop-target placeholder — shows where the
-   dragged item will land, styled after Filament's own drag-highlight convention.
+   dragged item will land.
    Deliberately NOT inside @layer components: the drop-target <div> already carries
    utility classes (bg-base-200/border-base-300/shadow-sm), and Tailwind's utilities
    layer always beats components regardless of selector specificity — a components-layer
