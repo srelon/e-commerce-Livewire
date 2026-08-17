@@ -205,10 +205,10 @@ class ReviewService
     }
 
     public function sanitizeBody(string $body): string {
-        $allowed_tags = '<b><i><u><s><strong><em><br>';
+        $allowed_tags = '<p><b><i><u><s><strong><em><br>';
         $stripped = strip_tags($body, $allowed_tags);
 
-        return preg_replace('/<(b|i|u|s|strong|em|br)\b[^>]*>/i', '<$1>', $stripped);
+        return preg_replace('/<(p|b|i|u|s|strong|em|br)\b[^>]*>/i', '<$1>', $stripped);
     }
 
     protected function recalculateRating(Product $product): void {

@@ -40,7 +40,13 @@ class ReviewsPanel extends Component
         $this->product = $product;
 
         $sessionId = (int) session('moderator_user_id');
-        $this->selected_moderator_id = $this->moderators->contains('id', $sessionId) ? $sessionId : null;
+        $this->selected_moderator_id = $this->moderators->contains('id', $sessionId)
+            ? $sessionId
+            : $this->moderators->first()?->id;
+
+        if ($this->selected_moderator_id) {
+            session(['moderator_user_id' => $this->selected_moderator_id]);
+        }
     }
 
     #[Computed]
@@ -164,6 +170,10 @@ class ReviewsPanel extends Component
 
         unset($this->reviews);
         $this->dispatch('notify', type: 'success', message: 'Review deleted.');
+    }
+
+    public function handleWsReviewEvent(): void {
+        unset($this->reviews);
     }
 
     protected function guardModerator(): bool {
