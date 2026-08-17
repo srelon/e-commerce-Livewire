@@ -172,6 +172,7 @@ class Form extends Component
                 'type' => 'richtext',
                 'full_width' => true,
                 'value' => $this->content,
+                'emoji' => true,
             ],
             [
                 'name' => 'seo_title',

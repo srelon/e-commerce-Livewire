@@ -3,7 +3,14 @@ import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
 
-export default function richTextEditor(field_name, initial_value, disabled) {
+const EMOJIS = [
+    '📚', '📖', '📕', '⭐', '❤️', '🔖',
+    '👍', '👎', '🙌', '👏', '🤝', '💬',
+    '😊', '😍', '🥰', '🤔', '😮', '😢',
+    '🔥', '💯', '✨', '💡', '🎉', '☕',
+]
+
+export default function richTextEditor(field_name, initial_value, disabled, placeholder = 'Start writing...') {
     // Kept outside the returned object on purpose: Alpine wraps everything returned
     // from an x-data factory in a reactive Proxy, and ProseMirror's transaction
     // handling does strict identity checks internally (`RangeError: Applying a
@@ -15,6 +22,9 @@ export default function richTextEditor(field_name, initial_value, disabled) {
     return {
         field_name,
         active: {},
+        emojis: EMOJIS,
+        show_emoji: false,
+        emoji_picker_style: '',
 
         init() {
             editor = new Editor({
@@ -39,7 +49,7 @@ export default function richTextEditor(field_name, initial_value, disabled) {
                         allowBase64: false,
                     }),
                     Placeholder.configure({
-                        placeholder: 'Start writing...',
+                        placeholder,
                     }),
                 ],
                 onUpdate: () => this.sync(),
@@ -55,6 +65,7 @@ export default function richTextEditor(field_name, initial_value, disabled) {
                 bold: editor.isActive('bold'),
                 italic: editor.isActive('italic'),
                 underline: editor.isActive('underline'),
+                strike: editor.isActive('strike'),
                 heading2: editor.isActive('heading', { level: 2 }),
                 heading3: editor.isActive('heading', { level: 3 }),
                 bulletList: editor.isActive('bulletList'),
@@ -78,6 +89,26 @@ export default function richTextEditor(field_name, initial_value, disabled) {
 
         toggleUnderline() {
             editor.chain().focus().toggleUnderline().run()
+        },
+
+        toggleStrike() {
+            editor.chain().focus().toggleStrike().run()
+        },
+
+        toggleEmojiPicker(button_el) {
+            this.show_emoji = ! this.show_emoji
+
+            if (this.show_emoji) {
+                const rect = button_el.getBoundingClientRect()
+                const top = rect.bottom + window.scrollY + 4
+                const left = rect.left + window.scrollX
+                this.emoji_picker_style = `top:${top}px; left:${left}px;`
+            }
+        },
+
+        insertEmoji(emoji) {
+            editor.chain().focus().insertContent(emoji).run()
+            this.show_emoji = false
         },
 
         toggleHeading(level) {

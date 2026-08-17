@@ -36,14 +36,24 @@
 
             @if ($editing_id === $review['id'])
                 <div class="mt-2 space-y-2">
-                    <flux:textarea wire:model="editing_body" rows="3" />
+                    @include('livewire.admin.partials.fields.richtext', [
+                        'field' => [
+                            'name' => 'editing_body',
+                            'value' => $editing_body,
+                            'placeholder' => 'Edit review...',
+                            'buttons' => ['undo', 'redo', 'bold', 'italic', 'underline', 'strike'],
+                            'emoji' => true,
+                            'min_height' => 'min-h-16',
+                        ],
+                        'disabled' => false,
+                    ])
                     <div class="flex gap-2">
                         <flux:button size="sm" variant="primary" wire:click="submitEdit">Save</flux:button>
                         <flux:button size="sm" variant="ghost" wire:click="cancelEdit">Cancel</flux:button>
                     </div>
                 </div>
             @else
-                <p class="mt-1 text-sm">{{ $review['body'] }}</p>
+                <div class="mt-1 text-sm">{!! $review['body'] !!}</div>
             @endif
         </div>
 
@@ -98,7 +108,17 @@
 
     @if ($is_replying_here)
         <div class="mt-3 space-y-2">
-            <flux:textarea wire:model="reply_body" rows="2" placeholder="Write a reply as {{ $this->selectedModerator?->name }}..." />
+            @include('livewire.admin.partials.fields.richtext', [
+                'field' => [
+                    'name' => 'reply_body',
+                    'value' => $reply_body,
+                    'placeholder' => 'Write a reply as '.$this->selectedModerator?->name.'...',
+                    'buttons' => ['undo', 'redo', 'bold', 'italic', 'underline', 'strike'],
+                    'emoji' => true,
+                    'min_height' => 'min-h-16',
+                ],
+                'disabled' => false,
+            ])
             <div class="flex gap-2">
                 <flux:button size="sm" variant="primary" wire:click="submitReply">Post reply</flux:button>
                 <flux:button size="sm" variant="ghost" wire:click="cancelReply">Cancel</flux:button>
