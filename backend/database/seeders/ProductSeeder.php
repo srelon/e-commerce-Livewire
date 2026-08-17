@@ -7,11 +7,14 @@ use App\Models\ProductImage;
 use App\Models\ProductsAuthor;
 use App\Models\ProductsCategory;
 use App\Models\ProductStock;
+use Database\Seeders\Concerns\CopiesSeedImages;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
 {
+    use CopiesSeedImages;
+
     private const PLACEHOLDER_QUANTITY = 50;
 
     public function run(): void {
@@ -492,7 +495,7 @@ class ProductSeeder extends Seeder
             $category = ProductsCategory::where('name', $data['category'])->firstOrFail();
             $author = ProductsAuthor::where('name', $data['author'])->firstOrFail();
 
-            $product = Product::firstOrCreate(
+            $product = Product::withTrashed()->firstOrCreate(
                 ['slug' => Str::slug($data['title'])],
                 [
                     'category_id' => $category->id,
@@ -507,17 +510,27 @@ class ProductSeeder extends Seeder
                 ],
             );
 
+            if ($product->trashed()) {
+                $product->restore();
+            }
+
             foreach ($data['images'] as $sort => $image) {
-                ProductImage::firstOrCreate(
+                $this->copySeedImage($image, 'products');
+
+                $product_image = ProductImage::withTrashed()->firstOrCreate(
                     [
                         'product_id' => $product->id,
                         'sort_order' => $sort + 1,
                     ],
                     ['image' => ['original' => "products/{$image}"]],
                 );
+
+                if ($product_image->trashed()) {
+                    $product_image->restore();
+                }
             }
 
-            ProductStock::firstOrCreate(
+            $stock = ProductStock::withTrashed()->firstOrCreate(
                 [
                     'product_id' => $product->id,
                     'status' => 1,
@@ -528,6 +541,10 @@ class ProductSeeder extends Seeder
                     'sort_order' => 1,
                 ],
             );
+
+            if ($stock->trashed()) {
+                $stock->restore();
+            }
         }
     }
 }

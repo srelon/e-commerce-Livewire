@@ -5,12 +5,15 @@ namespace Database\Seeders;
 use App\Models\NewsAuthor;
 use App\Models\NewsCategory;
 use App\Models\NewsPost;
+use Database\Seeders\Concerns\CopiesSeedImages;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class NewsPostSeeder extends Seeder
 {
+    use CopiesSeedImages;
+
     public function run(): void {
         $posts = [
             [
@@ -177,7 +180,9 @@ class NewsPostSeeder extends Seeder
         foreach ($posts as $index => $data) {
             $category = NewsCategory::where('name', $data['category'])->firstOrFail();
 
-            NewsPost::firstOrCreate(
+            $this->copySeedImage($data['image'], 'news');
+
+            $post = NewsPost::withTrashed()->firstOrCreate(
                 ['slug' => Str::slug($data['title'])],
                 [
                     'category_id' => $category->id,
@@ -190,6 +195,10 @@ class NewsPostSeeder extends Seeder
                     'status' => 1,
                 ],
             );
+
+            if ($post->trashed()) {
+                $post->restore();
+            }
         }
     }
 }

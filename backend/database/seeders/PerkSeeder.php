@@ -32,7 +32,7 @@ class PerkSeeder extends Seeder
         ];
 
         foreach ($perks as $index => $data) {
-            Perk::firstOrCreate(
+            $record = Perk::withTrashed()->firstOrCreate(
                 ['title' => $data['title']],
                 [
                     'description' => $data['description'],
@@ -41,6 +41,10 @@ class PerkSeeder extends Seeder
                     'sort_order' => $index + 1,
                 ],
             );
+
+            if ($record->trashed()) {
+                $record->restore();
+            }
         }
     }
 }

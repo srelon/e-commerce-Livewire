@@ -36,7 +36,7 @@ class DeliveryBranchSeeder extends Seeder
 
         foreach ($branches_by_city as $city => $branches) {
             foreach ($branches as $branch) {
-                DeliveryBranch::firstOrCreate(
+                $record = DeliveryBranch::withTrashed()->firstOrCreate(
                     [
                         'delivery_id' => $nova_poshta->id,
                         'city' => $city,
@@ -44,6 +44,10 @@ class DeliveryBranchSeeder extends Seeder
                     ],
                     ['status' => 1],
                 );
+
+                if ($record->trashed()) {
+                    $record->restore();
+                }
             }
         }
     }

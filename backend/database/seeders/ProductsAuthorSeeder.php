@@ -82,7 +82,12 @@ class ProductsAuthorSeeder extends Seeder
         ];
 
         foreach ($authors as $index => $author) {
-            $record = ProductsAuthor::firstOrCreate(['name' => $author['name']], $author);
+            $record = ProductsAuthor::withTrashed()->firstOrCreate(['name' => $author['name']], $author);
+
+            if ($record->trashed()) {
+                $record->restore();
+            }
+
             $record->forceFill(['created_at' => now()->subDays(count($authors) - $index)])->save();
         }
     }

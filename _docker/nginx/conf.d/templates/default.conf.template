@@ -23,6 +23,7 @@ server {
         fastcgi_param SCRIPT_FILENAME /var/www/backend/public/index.php;
         fastcgi_param HTTP_X_FORWARDED_FOR $proxy_add_x_forwarded_for;
         fastcgi_param HTTP_X_REAL_IP $remote_addr;
+        fastcgi_param HTTP_X_FORWARDED_PROTO $http_x_forwarded_proto;
     }
 
     location ^~ /livewire- {
@@ -31,6 +32,7 @@ server {
         fastcgi_param SCRIPT_FILENAME /var/www/backend/public/index.php;
         fastcgi_param HTTP_X_FORWARDED_FOR $proxy_add_x_forwarded_for;
         fastcgi_param HTTP_X_REAL_IP $remote_addr;
+        fastcgi_param HTTP_X_FORWARDED_PROTO $http_x_forwarded_proto;
     }
 
     location ^~ /flux/ {
@@ -39,6 +41,7 @@ server {
         fastcgi_param SCRIPT_FILENAME /var/www/backend/public/index.php;
         fastcgi_param HTTP_X_FORWARDED_FOR $proxy_add_x_forwarded_for;
         fastcgi_param HTTP_X_REAL_IP $remote_addr;
+        fastcgi_param HTTP_X_FORWARDED_PROTO $http_x_forwarded_proto;
     }
 
     location ^~ /api/ {
@@ -51,6 +54,7 @@ server {
         fastcgi_param SCRIPT_FILENAME /var/www/backend/public/index.php;
         fastcgi_param HTTP_X_FORWARDED_FOR $proxy_add_x_forwarded_for;
         fastcgi_param HTTP_X_REAL_IP $remote_addr;
+        fastcgi_param HTTP_X_FORWARDED_PROTO $http_x_forwarded_proto;
     }
 
     location ^~ /admin {
@@ -64,6 +68,7 @@ server {
         fastcgi_param SCRIPT_FILENAME /var/www/backend/public/index.php;
         fastcgi_param HTTP_X_FORWARDED_FOR $proxy_add_x_forwarded_for;
         fastcgi_param HTTP_X_REAL_IP $remote_addr;
+        fastcgi_param HTTP_X_FORWARDED_PROTO $http_x_forwarded_proto;
     }
 
     location / {

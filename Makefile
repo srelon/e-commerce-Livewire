@@ -65,6 +65,9 @@ test:
 format:
 	docker exec -it bookstore_app bash -c "cd /var/www/backend && ./vendor/bin/pint"
 
+fresh:
+	docker exec -it bookstore_app bash -c "cd /var/www/backend && php artisan migrate:fresh --seed"
+
 ws-secret:
 	@NEW_SECRET=$$(openssl rand -hex 32); \
 	sed -i.bak "s#^WS_TICKET_SECRET=.*#WS_TICKET_SECRET=$$NEW_SECRET#" .env; \
