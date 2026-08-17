@@ -12,13 +12,17 @@ class NewsCategorySeeder extends Seeder
         $categories = ['Literature', 'Cultural', 'Reading', 'Authors'];
 
         foreach ($categories as $name) {
-            NewsCategory::firstOrCreate(
+            $category = NewsCategory::withTrashed()->firstOrCreate(
                 ['slug' => Str::slug($name)],
                 [
                     'name' => $name,
                     'status' => 1,
                 ],
             );
+
+            if ($category->trashed()) {
+                $category->restore();
+            }
         }
     }
 }

@@ -3,10 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\ProductsCategory;
+use Database\Seeders\Concerns\CopiesSeedImages;
 use Illuminate\Database\Seeder;
 
 class ProductsCategorySeeder extends Seeder
 {
+    use CopiesSeedImages;
+
     public function run(): void {
         $categories = [
             [
@@ -62,7 +65,10 @@ class ProductsCategorySeeder extends Seeder
         ];
 
         foreach ($categories as $sort => $category) {
-            ProductsCategory::firstOrCreate(
+            $this->copySeedImage($category['icon'], 'products_categories');
+            $this->copySeedImage($category['promo'], 'products_categories');
+
+            $record = ProductsCategory::withTrashed()->firstOrCreate(
                 ['name' => $category['name']],
                 [
                     'name' => $category['name'],
@@ -76,6 +82,10 @@ class ProductsCategorySeeder extends Seeder
                     'status' => 1,
                 ],
             );
+
+            if ($record->trashed()) {
+                $record->restore();
+            }
         }
     }
 }

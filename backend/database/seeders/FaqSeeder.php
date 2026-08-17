@@ -36,7 +36,7 @@ class FaqSeeder extends Seeder
         ];
 
         foreach ($items as $sort => $item) {
-            Faq::firstOrCreate(
+            $record = Faq::withTrashed()->firstOrCreate(
                 [
                     'title' => $item['title'],
                     'type' => 'contact',
@@ -47,6 +47,10 @@ class FaqSeeder extends Seeder
                     'sort_order' => $sort + 1,
                 ],
             );
+
+            if ($record->trashed()) {
+                $record->restore();
+            }
         }
     }
 }

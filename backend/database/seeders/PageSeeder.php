@@ -70,7 +70,7 @@ class PageSeeder extends Seeder
         ];
 
         foreach ($pages as $index => $data) {
-            $page = Page::firstOrCreate(
+            $page = Page::withTrashed()->firstOrCreate(
                 ['slug' => $data['slug']],
                 [
                     'title' => $data['title'],
@@ -81,7 +81,11 @@ class PageSeeder extends Seeder
                 ],
             );
 
-            SeoMeta::firstOrCreate(
+            if ($page->trashed()) {
+                $page->restore();
+            }
+
+            $seo = SeoMeta::withTrashed()->firstOrCreate(
                 ['type' => 'pages', 'record_id' => $page->id],
                 [
                     'seo_title' => $data['seo_title'],
@@ -89,6 +93,10 @@ class PageSeeder extends Seeder
                     'seo_keywords' => $data['seo_keywords'],
                 ],
             );
+
+            if ($seo->trashed()) {
+                $seo->restore();
+            }
         }
     }
 }

@@ -68,7 +68,7 @@ class TeamMemberSeeder extends Seeder
         ];
 
         foreach ($members as $index => $data) {
-            TeamMember::firstOrCreate(
+            $record = TeamMember::withTrashed()->firstOrCreate(
                 ['name' => $data['name']],
                 [
                     'role' => $data['role'],
@@ -79,6 +79,10 @@ class TeamMemberSeeder extends Seeder
                     'sort_order' => $index + 1,
                 ],
             );
+
+            if ($record->trashed()) {
+                $record->restore();
+            }
         }
     }
 }

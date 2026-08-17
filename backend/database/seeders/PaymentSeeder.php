@@ -20,13 +20,17 @@ class PaymentSeeder extends Seeder
         ];
 
         foreach ($payments as $payment) {
-            Payment::firstOrCreate(
+            $record = Payment::withTrashed()->firstOrCreate(
                 ['key' => $payment['key']],
                 [
                     'name' => $payment['name'],
                     'status' => 1,
                 ],
             );
+
+            if ($record->trashed()) {
+                $record->restore();
+            }
         }
     }
 }

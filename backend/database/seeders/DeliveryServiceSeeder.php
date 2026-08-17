@@ -20,13 +20,17 @@ class DeliveryServiceSeeder extends Seeder
         ];
 
         foreach ($services as $service) {
-            DeliveryService::firstOrCreate(
+            $record = DeliveryService::withTrashed()->firstOrCreate(
                 ['key' => $service['key']],
                 [
                     'name' => $service['name'],
                     'status' => 1,
                 ],
             );
+
+            if ($record->trashed()) {
+                $record->restore();
+            }
         }
     }
 }

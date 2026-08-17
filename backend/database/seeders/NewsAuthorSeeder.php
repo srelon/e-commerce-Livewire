@@ -15,7 +15,7 @@ class NewsAuthorSeeder extends Seeder
         ];
 
         foreach ($authors as $author) {
-            NewsAuthor::firstOrCreate(
+            $record = NewsAuthor::withTrashed()->firstOrCreate(
                 ['name' => $author['name']],
                 [
                     'public_id' => (string) random_int(10000000, 99999999),
@@ -23,6 +23,10 @@ class NewsAuthorSeeder extends Seeder
                     'status' => 1,
                 ],
             );
+
+            if ($record->trashed()) {
+                $record->restore();
+            }
         }
     }
 }

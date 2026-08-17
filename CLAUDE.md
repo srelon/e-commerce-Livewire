@@ -32,6 +32,9 @@ make down
 # Start Vue dev server (port 5173)
 make site
 
+# Drop and recreate the database, then reseed the demo catalog
+make fresh
+
 # Production: HTTPS via Caddy in front of nginx (needs SSL_DOMAIN set in .env)
 make prod
 ```

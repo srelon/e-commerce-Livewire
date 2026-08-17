@@ -36,7 +36,7 @@ class ContactInfoSeeder extends Seeder
         ];
 
         foreach ($items as $sort => $item) {
-            ContactInfo::firstOrCreate(
+            $record = ContactInfo::withTrashed()->firstOrCreate(
                 ['key' => $item['key']],
                 [
                     'name' => $item['name'],
@@ -46,6 +46,10 @@ class ContactInfoSeeder extends Seeder
                     'sort_order' => $sort + 1,
                 ],
             );
+
+            if ($record->trashed()) {
+                $record->restore();
+            }
         }
     }
 }
