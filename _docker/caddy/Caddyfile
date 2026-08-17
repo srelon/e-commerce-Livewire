@@ -1,0 +1,3 @@
+{$SSL_DOMAIN} {
+    reverse_proxy nginx:{$SITE_PORT}
+}

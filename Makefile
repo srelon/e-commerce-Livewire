@@ -14,6 +14,12 @@ up:
 	@echo ""
 	@echo "Waiting for app to start..."
 
+prod:
+	$(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.prod.yml up -d
+	@echo ""
+	@echo "  Site: https://$(SSL_DOMAIN)"
+	@echo ""
+
 down:
 	$(DOCKER_COMPOSE) $(PROFILES) down --remove-orphans
 
