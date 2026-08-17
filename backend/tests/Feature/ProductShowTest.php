@@ -63,6 +63,24 @@ class ProductShowTest extends TestCase
             ->assertJsonPath('data.seo.title', 'Astral Journey');
     }
 
+    public function test_product_show_returns_images_ordered_by_sort_order(): void {
+        $product = $this->createProduct();
+
+        $this->createProductImage($product, [
+            'image' => ['original' => 'products/test-cover-second.webp'],
+            'sort_order' => 2,
+        ]);
+        $this->createProductImage($product, [
+            'image' => ['original' => 'products/test-cover-first.webp'],
+            'sort_order' => 1,
+        ]);
+
+        $this->getJson("/api/products/{$product->slug}")
+            ->assertSuccessful()
+            ->assertJsonPath('data.images.0', fn (string $url) => str_ends_with($url, 'test-cover-first.webp'))
+            ->assertJsonPath('data.images.1', fn (string $url) => str_ends_with($url, 'test-cover-second.webp'));
+    }
+
     public function test_product_show_returns_null_rating_when_product_has_no_reviews(): void {
         $product = $this->createProduct();
 

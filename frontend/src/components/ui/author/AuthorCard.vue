@@ -7,9 +7,10 @@
             v-else
             :to="{ name: 'products', query: { author: name } }"
             class="author-card__avatar"
-            :style="{ background: color }"
+            :style="photo ? undefined : { background: color }"
         >
-            {{ initials }}
+            <img v-if="photo" :src="to_storage_url(photo)" :alt="name" class="author-card__photo">
+            <template v-else>{{ initials }}</template>
         </router-link>
         <div class="author-card__body">
             <template v-if="loading">
@@ -37,11 +38,13 @@
 
 <script setup lang="ts">
 import BaseSkeleton from '@/components/ui/base/BaseSkeleton.vue'
+import { to_storage_url } from '@/stores/layout'
 
 interface Props {
     name?: string
     initials?: string
     color?: string
+    photo?: string | null
     bio?: string
     books?: number
     bestsellers?: number
@@ -52,6 +55,7 @@ withDefaults(defineProps<Props>(), {
     name: '',
     initials: '',
     color: '',
+    photo: null,
     bio: '',
     books: 0,
     bestsellers: 0,
@@ -77,6 +81,7 @@ withDefaults(defineProps<Props>(), {
         width: 80px;
         height: 80px;
         border-radius: 50%;
+        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -85,6 +90,12 @@ withDefaults(defineProps<Props>(), {
         color: $color-white;
         flex-shrink: 0;
         font-family: $font-heading;
+    }
+
+    &__photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     &__body {

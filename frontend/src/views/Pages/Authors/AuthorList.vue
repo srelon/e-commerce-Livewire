@@ -18,7 +18,7 @@
                         <template v-else>
                             <AuthorCard
                                 v-for="author in authors"
-                                :key="author.slug"
+                                :key="author.name"
                                 v-bind="author"
                             />
                         </template>

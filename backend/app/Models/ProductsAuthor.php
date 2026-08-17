@@ -15,7 +15,6 @@ class ProductsAuthor extends Model
 
     protected $fillable = [
         'name',
-        'slug',
         'avatar_color',
         'photo',
         'content',

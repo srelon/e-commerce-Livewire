@@ -6,7 +6,10 @@
                 <span v-else>{{ (review.user.name ?? '?').charAt(0).toUpperCase() }}</span>
             </div>
             <div class="review-item__meta">
-                <p class="review-item__author">{{ review.user.name }}</p>
+                <p class="review-item__author">
+                    {{ review.user.name }}
+                    <span v-if="review.user.is_moderator" class="review-item__moderator-badge">Moderator</span>
+                </p>
                 <StarRating v-if="!is_reply && review.rating !== null" :rating="review.rating" />
             </div>
             <span class="review-item__date">{{ format_date(review.created_at) }}</span>
@@ -431,6 +434,18 @@ onUnmounted(() => {
         font-weight: 600;
         color: $color-dark;
         margin-bottom: 2px;
+    }
+
+    &__moderator-badge {
+        display: inline-block;
+        margin-left: 6px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(#16a34a, 0.12);
+        color: #16a34a;
+        font-size: 11px;
+        font-weight: 600;
+        vertical-align: middle;
     }
 
     &__date {

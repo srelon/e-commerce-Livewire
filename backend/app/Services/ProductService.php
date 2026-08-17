@@ -266,7 +266,6 @@ class ProductService
             ->map(fn (ProductsCategory $category) => [
                 'id' => $category->id,
                 'name' => $category->name,
-                'slug' => $category->slug,
                 'icon' => $category->icon['original'] ?? null,
                 'image' => $category->image['original'] ?? null,
                 'count' => $category->products_count,

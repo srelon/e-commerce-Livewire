@@ -25,10 +25,10 @@ class ReviewService
         return $product->reviews()->findOrFail($reviewId);
     }
 
-    public function getPaginated(Product $product, ?User $viewer, int $perPage = 10, ?int $pinId = null): LengthAwarePaginator {
+    public function getPaginated(Product $product, ?User $viewer, int $perPage = 10, ?int $pinId = null, bool $excludeViewerOwn = true): LengthAwarePaginator {
         $query = $product->reviews()
             ->whereNull('parent_id')
-            ->when($viewer, fn ($query) => $query->where('user_id', '!=', $viewer->id))
+            ->when($viewer && $excludeViewerOwn, fn ($query) => $query->where('user_id', '!=', $viewer->id))
             ->with([
                 'user',
                 'likes',
@@ -133,10 +133,15 @@ class ReviewService
         return $review;
     }
 
-    public function delete(Review $review): void {
+    public function delete(Review $review, ?int $deletedBy = null): void {
         $product = $review->reviewable;
         $review_id = $review->id;
         $parent_id = $review->parent_id;
+
+        if ($deletedBy) {
+            $review->deleted_by = $deletedBy;
+            $review->save();
+        }
 
         $review->delete();
 
