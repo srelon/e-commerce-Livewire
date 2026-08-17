@@ -25,6 +25,26 @@ class AccessesSeeder extends Seeder
                 'key' => 'menus',
                 'title' => 'Menus',
             ],
+            [
+                'key' => 'products',
+                'title' => 'Products',
+            ],
+            [
+                'key' => 'categories',
+                'title' => 'Categories',
+            ],
+            [
+                'key' => 'authors',
+                'title' => 'Authors',
+            ],
+            [
+                'key' => 'news',
+                'title' => 'News',
+            ],
+            [
+                'key' => 'reviews',
+                'title' => 'Reviews',
+            ],
         ];
 
         foreach ($accesses as $access) {

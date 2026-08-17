@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->string('excerpt')->nullable();
             $table->longText('content')->nullable();
             $table->json('image')->nullable();
-            $table->foreignId('author_id')->nullable()->constrained('admins')->nullOnDelete();
+            $table->foreignId('author_id')->nullable()->constrained('news_authors')->nullOnDelete();
             $table->timestamp('published_at')->nullable();
             $table->tinyInteger('status')->unsigned()->default(0);
             $table->timestamps();

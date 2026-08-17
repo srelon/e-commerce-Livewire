@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\ProductsCategory;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class ProductsCategorySeeder extends Seeder
 {
@@ -64,7 +63,7 @@ class ProductsCategorySeeder extends Seeder
 
         foreach ($categories as $sort => $category) {
             ProductsCategory::firstOrCreate(
-                ['slug' => Str::slug($category['name'])],
+                ['name' => $category['name']],
                 [
                     'name' => $category['name'],
                     'icon' => [
