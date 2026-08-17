@@ -12,11 +12,21 @@ mkdir -p storage/framework/sessions
 mkdir -p storage/logs
 chmod -R 775 storage
 
+echo "=== Ensuring app key is set ==="
+if ! grep -q "^APP_KEY=.\+" .env; then
+  php artisan key:generate --force
+fi
+
 echo "=== Running migrations ==="
 php artisan migrate --force --no-interaction
 
 echo "=== Linking storage ==="
 php artisan storage:link --force
+
+echo "=== Building backend admin assets ==="
+cd /var/www/backend
+npm install
+npm run build
 
 echo "=== Building frontend site ==="
 cd /var/www/frontend
