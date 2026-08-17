@@ -31,11 +31,16 @@ make down
 
 # Start Vue dev server (port 5173)
 make site
+
+# Production: HTTPS via Caddy in front of nginx (needs SSL_DOMAIN set in .env)
+make prod
 ```
 
-**Container names:** `bookstore_app`, `bookstore_nginx`, `bookstore_db`, `bookstore_redis`, `bookstore_scheduler`, `bookstore_websocket`
+**Container names:** `bookstore_app`, `bookstore_nginx`, `bookstore_db`, `bookstore_redis`, `bookstore_scheduler`, `bookstore_websocket`; `bookstore_caddy` in production only.
 
 **Ports:** все на одном порту `8880` (`SITE_PORT` в `.env`) — API `/api`, Admin `/admin`, сайт `/`; Vue dev-сервер (`make site`) — `5173`, phpMyAdmin `8080`, WebSocket `6001`, MySQL `8101`
+
+**Production HTTPS** is `docker-compose.prod.yml`, applied on top of the base file (`make prod`), not a change to `docker-compose.yml` itself — that file stays the plain-HTTP local-dev setup. It adds one `caddy` container (`_docker/caddy/Caddyfile`) that reverse-proxies `443`/`80` to the existing `nginx` service on `SITE_PORT`, obtaining and renewing its own Let's Encrypt certificate automatically — no certbot commands, no nginx template changes needed. Requires `SSL_DOMAIN` set in the root `.env` (a real resolvable domain, e.g. a DuckDNS one — Let's Encrypt's HTTP-01 challenge needs port 80 reachable from the internet) and ports 80/443 open in the host firewall / cloud security group. After first `make prod`, update `backend/.env`'s `APP_URL`/`FRONTEND_URL`/`SANCTUM_STATEFUL_DOMAINS`/`SESSION_DOMAIN` to the `https://` domain (see `backend/CLAUDE.md`'s `SESSION_DOMAIN` gotcha — it must match exactly what's typed in the browser, port included only if non-default).
 
 ## Shell scripts and permissions
 

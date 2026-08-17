@@ -1,5 +1,7 @@
 # E-commerce Livewire
 
+**Live demo:** https://livewire-demo.duckdns.org
+
 Book store. Laravel + Livewire admin, Vue 3 public site, Node.js WebSocket server for real-time stock/notification updates.
 
 ## Stack
