@@ -1,14 +1,15 @@
-export default function menuTree(seed) {
+export default function sortableTree(seed) {
     return {
         tree: JSON.parse(JSON.stringify(seed)),
         original: JSON.parse(JSON.stringify(seed)),
         is_dirty: false,
+        resume_timeout: null,
 
         findNode(id, nodes = this.tree) {
             for (const node of nodes) {
                 if (node.id === id) return node
 
-                const found = this.findNode(id, node.children)
+                const found = this.findNode(id, node.children ?? [])
                 if (found) return found
             }
 
@@ -23,14 +24,14 @@ export default function menuTree(seed) {
             }
 
             for (const node of nodes) {
-                const removed = this.removeNode(id, node.children)
+                const removed = this.removeNode(id, node.children ?? [])
                 if (removed) return removed
             }
 
             return null
         },
 
-        onDrop(itemId, position, targetParentId) {
+        onDrop(itemId, position, targetParentId = -1) {
             const item = this.removeNode(itemId)
 
             if (item) {
@@ -48,19 +49,13 @@ export default function menuTree(seed) {
         },
 
         pauseObserving() {
+            clearTimeout(this.resume_timeout)
             window.Alpine.stopObservingMutations()
         },
 
-        // SortableJS moves real DOM nodes directly while dragging (ghost/fallback
-        // previews, cross-list moves) — Alpine's own MutationObserver would try to
-        // re-init those raw moves and crash on stale node/child scope references.
-        // pauseObserving() (wired to onChoose below) keeps it disconnected for the
-        // whole gesture; this only reconnects it on the next macrotask, which always
-        // runs after both Alpine's own microtask-queued reactive x-for repaint (from
-        // the `tree` mutation in onDrop) and SortableJS's own onEnd/onUnchoose have
-        // settled, whichever of those ends up calling this last.
         resumeObserving() {
-            setTimeout(() => window.Alpine.startObservingMutations(), 0)
+            clearTimeout(this.resume_timeout)
+            this.resume_timeout = setTimeout(() => window.Alpine.startObservingMutations(), 0)
         },
 
         checkMove(evt) {

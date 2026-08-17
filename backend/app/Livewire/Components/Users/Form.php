@@ -2,39 +2,39 @@
 
 namespace App\Livewire\Components\Users;
 
+use App\Livewire\Traits\HandlesFullPageSave;
 use App\Livewire\Traits\HasAccessControl;
+use App\Livewire\Traits\HasAccountFields;
 use App\Models\User;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-#[Layout('components.layouts.admin.app')]
+#[Layout('livewire.components.layouts.admin.app')]
 class Form extends Component
 {
-    use HasAccessControl, WithFileUploads;
+    use HandlesFullPageSave, HasAccessControl, HasAccountFields, WithFileUploads;
 
     protected string $accessKey = 'users';
 
-    public ?User $user = null;
+    protected string $routePrefix = 'users';
 
-    public string $name = '';
+    protected string $routeParamKey = 'user';
+
+    protected string $saveMessageName = 'User';
+
+    public ?User $user = null;
 
     public string $email = '';
 
-    public string $password = '';
-
-    public $avatar = null;
-
-    public function mount(?User $user = null): void
-    {
+    public function mount(?User $user = null): void {
         if ($user) {
             $this->guardView();
 
             $this->user = $user;
-            $this->name = $user->name;
+            $this->fillAccountFields($user);
             $this->email = $user->email;
         } else {
             abort_unless($this->hasAccess('edit'), 403);
@@ -42,16 +42,9 @@ class Form extends Component
     }
 
     #[Computed]
-    public function schema(): array
-    {
+    public function schema(): array {
         return [
-            [
-                'name' => 'avatar',
-                'label' => 'Avatar',
-                'type' => 'file',
-                'preview' => $this->user?->avatar ? Storage::disk('public')->url($this->user->avatar) : null,
-                'preview_class' => 'h-16 w-16 rounded-full object-cover',
-            ],
+            $this->accountAvatarField($this->user?->avatar),
             [
                 'name' => 'name',
                 'label' => 'Name',
@@ -63,56 +56,39 @@ class Form extends Component
                 'type' => 'text',
                 'input_type' => 'email',
             ],
-            [
-                'name' => 'password',
-                'label' => 'Password',
-                'type' => 'text',
-                'input_type' => 'password',
-                'placeholder' => $this->user ? 'Leave blank to keep current password' : null,
-            ],
+            $this->accountPasswordField((bool) $this->user),
         ];
     }
 
-    public function save(): void
-    {
+    private function persist(): ?User {
         if (! $this->guardSave()) {
-            return;
+            return null;
         }
 
         $this->validate([
-            'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($this->user?->id)],
-            'password' => [$this->user ? 'nullable' : 'required', 'string', 'min:8'],
-            'avatar' => ['nullable', 'image', 'max:2048'],
+            ...$this->accountValidationRules((bool) $this->user),
         ]);
 
-        $isCreating = ! $this->user;
-        $user = $this->user ?? new User();
+        $user = $this->user ?? new User;
         $user->name = $this->name;
         $user->email = $this->email;
 
-        if (filled($this->password)) {
-            $user->password = $this->password;
-        }
-
-        if ($this->avatar) {
-            $user->avatar = $this->avatar->store('avatars', 'public');
-        }
+        $this->applyPasswordUpdate($user);
+        $this->applyAvatarUpload($user);
 
         $user->save();
 
-        session()->flash('notify', ['type' => 'success', 'message' => $isCreating ? 'User created.' : 'User updated.']);
+        $this->user = $user;
 
-        $this->redirectRoute('admin.users.index', navigate: true);
+        return $user;
     }
 
-    public function render()
-    {
-        return view('livewire.admin.partials.resource-form', [
-            'title' => $this->user ? 'Edit user' : 'New user',
-            'fields' => $this->schema(),
-            'disabled' => ! $this->hasAccess('edit'),
-            'cancel_route' => 'admin.users.index',
-        ]);
+    public function render() {
+        return $this->renderResourceForm(
+            pageTitle: $this->user ? 'Edit user' : 'New user',
+            disabled: ! $this->hasAccess('edit'),
+            cancelRoute: 'admin.users.index',
+        );
     }
 }

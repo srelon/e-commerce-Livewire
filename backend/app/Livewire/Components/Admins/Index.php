@@ -4,23 +4,23 @@ namespace App\Livewire\Components\Admins;
 
 use App\Livewire\Traits\ConfirmsAction;
 use App\Livewire\Traits\HasAccessControl;
+use App\Livewire\Traits\RendersResourceTable;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('components.layouts.admin.app')]
+#[Layout('livewire.components.layouts.admin.app')]
 class Index extends Component
 {
-    use ConfirmsAction, HasAccessControl;
+    use ConfirmsAction, HasAccessControl, RendersResourceTable;
 
     protected string $accessKey = 'admins';
 
-    public function mount(): void
-    {
-        $this->guardView();
-    }
-
-    public function render()
-    {
-        return view('livewire.admin.admins.index');
+    public function render() {
+        return $this->renderResourceTable(
+            pageTitle: 'Admins',
+            tableComponent: 'components.admins.table',
+            createRoute: 'admin.admins.create',
+            createLabel: 'New admin',
+        );
     }
 }

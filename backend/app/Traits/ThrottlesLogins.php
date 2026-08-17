@@ -10,8 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 trait ThrottlesLogins
 {
-    protected function attemptLogin(string $guard, string $email, string $password, bool $remember = false): void
-    {
+    protected function attemptLogin(string $guard, string $email, string $password, bool $remember = false): void {
         $throttleKey = $this->throttleKey($email);
 
         $this->ensureIsNotRateLimited($throttleKey);
@@ -27,8 +26,7 @@ trait ThrottlesLogins
         RateLimiter::clear($throttleKey);
     }
 
-    protected function ensureIsNotRateLimited(string $throttleKey): void
-    {
+    protected function ensureIsNotRateLimited(string $throttleKey): void {
         if (! RateLimiter::tooManyAttempts($throttleKey, 5)) {
             return;
         }
@@ -45,8 +43,7 @@ trait ThrottlesLogins
         ]);
     }
 
-    protected function throttleKey(string $email): string
-    {
+    protected function throttleKey(string $email): string {
         return Str::lower($email).'|'.request()->ip();
     }
 }

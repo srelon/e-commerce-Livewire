@@ -48,7 +48,6 @@ trait TestDataHelper
     protected function createCategory(array $overrides = []): ProductsCategory {
         return ProductsCategory::create(array_merge([
             'name' => 'Test Category '.uniqid(),
-            'slug' => 'test-category-'.uniqid(),
             'icon' => [
                 'original' => 'products_categories/test-icon.svg',
             ],
@@ -63,7 +62,6 @@ trait TestDataHelper
     protected function createAuthor(array $overrides = []): ProductsAuthor {
         return ProductsAuthor::create(array_merge([
             'name' => 'Test Author '.uniqid(),
-            'slug' => 'test-author-'.uniqid(),
         ], $overrides));
     }
 

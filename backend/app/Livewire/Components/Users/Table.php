@@ -6,7 +6,6 @@ use App\Livewire\Traits\HasAccessControl;
 use App\Livewire\Traits\HasPowerGridBehavior;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Livewire\Attributes\On;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
@@ -19,52 +18,37 @@ final class Table extends PowerGridComponent
 
     protected string $accessKey = 'users';
 
+    protected string $modelClass = User::class;
+
+    protected string $itemNoun = 'User';
+
+    public string $deleteEvent = 'deleteUser';
+
     public string $tableName = 'users-table';
 
     public string $sortField = 'id';
 
     public string $sortDirection = 'desc';
 
-    public function setUp(): array
-    {
-        return [
-            PowerGrid::header()
-                ->showSearchInput(),
-            PowerGrid::footer()
-                ->showPerPage()
-                ->showRecordCount(),
-        ];
-    }
-
-    public function datasource(): Builder
-    {
+    public function datasource(): Builder {
         return User::query();
     }
 
-    public function fields(): PowerGridFields
-    {
+    public function fields(): PowerGridFields {
         return PowerGrid::fields()
             ->add('id')
-            ->add('avatar_cell', fn (User $model) => view('livewire.admin.partials.avatar-cell', [
-                'avatar' => $model->avatar,
-                'name' => $model->name,
-            ])->render())
+            ->add('avatar_cell', $this->avatarCellField())
             ->add('name')
             ->add('email')
-            ->add('email_verified', fn (User $model) => view('livewire.admin.partials.boolean-icon', [
-                'value' => ! is_null($model->email_verified_at),
-            ])->render())
+            ->add('email_verified', $this->booleanIconField(fn (User $model) => ! is_null($model->email_verified_at)))
             ->add('registered_at', fn (User $model) => $model->created_at->format('d.m.Y H:i'));
     }
 
-    public function columns(): array
-    {
+    public function columns(): array {
         return [
-            Column::make('ID', 'id')
-                ->sortable(),
+            $this->idColumn(),
 
-            Column::make('Avatar', 'avatar_cell')
-                ->template(),
+            $this->photoColumn('Avatar', 'avatar_cell'),
 
             Column::make('Name', 'name')
                 ->searchable()
@@ -85,8 +69,7 @@ final class Table extends PowerGridComponent
         ];
     }
 
-    public function filters(): array
-    {
+    public function filters(): array {
         return [
             Filter::boolean('email_verified')
                 ->label('Verified', 'Not verified')
@@ -106,28 +89,15 @@ final class Table extends PowerGridComponent
         ];
     }
 
-    public function actions(User $row): array
-    {
+    public function actions(User $row): array {
         $actions = [
             $this->editIconButton('admin.users.edit', ['user' => $row->id]),
         ];
 
         if ($this->hasAccess('edit')) {
-            $actions[] = $this->deleteIconButton('deleteUser', ['userId' => $row->id], "Delete user \"{$row->name}\"?");
+            $actions[] = $this->deleteIconButton($this->deleteEvent, ['id' => $row->id], "Delete user \"{$row->name}\"?");
         }
 
         return $actions;
-    }
-
-    #[On('deleteUser')]
-    public function deleteUser(int $userId): void
-    {
-        if (! $this->guardSave()) {
-            return;
-        }
-
-        User::whereKey($userId)->delete();
-
-        $this->dispatch('notify', type: 'success', message: 'User deleted.');
     }
 }

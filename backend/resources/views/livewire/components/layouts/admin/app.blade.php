@@ -16,42 +16,16 @@
                 <span class="text-base font-bold text-base-content">{{ config('app.name') }}</span>
             </a>
 
-            <flux:navlist variant="outline" class="mt-4">
-                @foreach (\App\Livewire\Navigation\Navigation::visible(auth('admins')->user()) as $entry)
-                    @if (isset($entry['group']))
-                        <flux:navlist.group heading="{{ $entry['group'] }}" class="mt-4">
-                            @foreach ($entry['items'] as $item)
-                                <flux:navlist.item :href="route($item['route'])" :current="request()->routeIs($item['route_pattern'])" wire:navigate>
-                                    {{ $item['label'] }}
-                                </flux:navlist.item>
-                            @endforeach
-                        </flux:navlist.group>
-                    @else
-                        <flux:navlist.item :href="route($entry['route'])" :current="request()->routeIs($entry['route_pattern'])" wire:navigate>
-                            {{ $entry['label'] }}
-                        </flux:navlist.item>
-                    @endif
-                @endforeach
-            </flux:navlist>
+            <livewire:components.sidebar-nav />
 
             <flux:spacer />
-
-            <flux:dropdown position="top" align="start">
-                <flux:profile
-                    :name="auth('admins')->user()?->name"
-                    :avatar="auth('admins')->user()?->avatar ? \Illuminate\Support\Facades\Storage::disk('public')->url(auth('admins')->user()->avatar) : null"
-                    :initials="\Illuminate\Support\Str::of(auth('admins')->user()?->name)->explode(' ')->map(fn ($part) => \Illuminate\Support\Str::substr($part, 0, 1))->join('')"
-                    circle
-                />
-
-                <flux:menu>
-                    <form method="POST" action="{{ route('admin.logout') }}">
-                        @csrf
-                        <flux:menu.item as="button" type="submit">Log out</flux:menu.item>
-                    </form>
-                </flux:menu>
-            </flux:dropdown>
         </flux:sidebar>
+
+        <flux:header sticky class="border-b border-base-300 bg-base-200 shadow-sm">
+            <flux:spacer />
+
+            <livewire:components.header-profile />
+        </flux:header>
 
         <flux:main>
             {{ $slot }}

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Components\Roles;
 
+use App\Livewire\Traits\HandlesFullPageSave;
 use App\Livewire\Traits\HasAccessControl;
 use App\Models\AdminAccess;
 use App\Models\AdminRole;
@@ -12,12 +13,18 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('components.layouts.admin.app')]
+#[Layout('livewire.components.layouts.admin.app')]
 class Form extends Component
 {
-    use HasAccessControl;
+    use HandlesFullPageSave, HasAccessControl;
 
     protected string $accessKey = 'roles';
+
+    protected string $routePrefix = 'roles';
+
+    protected string $routeParamKey = 'role';
+
+    protected string $saveMessageName = 'Role';
 
     public ?AdminRole $role = null;
 
@@ -34,8 +41,7 @@ class Form extends Component
 
     public string $new_access_title = '';
 
-    public function mount(?AdminRole $role = null): void
-    {
+    public function mount(?AdminRole $role = null): void {
         if ($role) {
             $this->guardView();
 
@@ -53,14 +59,12 @@ class Form extends Component
     }
 
     #[Computed]
-    public function accesses(): Collection
-    {
+    public function accesses(): Collection {
         return AdminAccess::orderBy('title')->get();
     }
 
     #[Computed]
-    public function schema(): array
-    {
+    public function schema(): array {
         return [
             [
                 'name' => 'name',
@@ -75,8 +79,7 @@ class Form extends Component
         ];
     }
 
-    public function createAccess(): void
-    {
+    public function createAccess(): void {
         if (! $this->guardSave()) {
             return;
         }
@@ -99,10 +102,9 @@ class Form extends Component
         $this->dispatch('notify', type: 'success', message: 'Access created.');
     }
 
-    public function save(): void
-    {
+    private function persist(): ?AdminRole {
         if (! $this->guardSave()) {
-            return;
+            return null;
         }
 
         $this->validate([
@@ -110,8 +112,7 @@ class Form extends Component
             'label' => ['required', 'string', 'max:255'],
         ]);
 
-        $isCreating = ! $this->role;
-        $role = $this->role ?? new AdminRole();
+        $role = $this->role ?? new AdminRole;
         $role->name = $this->name;
         $role->label = $this->label;
         $role->save();
@@ -134,20 +135,20 @@ class Form extends Component
             DB::table('admin_role_access')->insert($rows);
         }
 
-        session()->flash('notify', ['type' => 'success', 'message' => $isCreating ? 'Role created.' : 'Role updated.']);
+        $this->role = $role;
 
-        $this->redirectRoute('admin.roles.index', navigate: true);
+        $this->dispatch('admin-access-updated');
+
+        return $role;
     }
 
-    public function render()
-    {
-        return view('livewire.admin.partials.resource-form', [
-            'title' => $this->role ? 'Edit role' : 'New role',
-            'fields' => $this->schema(),
-            'disabled' => ! $this->hasAccess('edit'),
-            'cancel_route' => 'admin.roles.index',
-            'extra' => 'livewire.admin.roles.partials.permission-matrix',
-            'extra_data' => ['accesses' => $this->accesses],
-        ]);
+    public function render() {
+        return $this->renderResourceForm(
+            pageTitle: $this->role ? 'Edit role' : 'New role',
+            disabled: ! $this->hasAccess('edit'),
+            cancelRoute: 'admin.roles.index',
+            extra: 'livewire.admin.roles.partials.permission-matrix',
+            extraData: ['accesses' => $this->accesses],
+        );
     }
 }

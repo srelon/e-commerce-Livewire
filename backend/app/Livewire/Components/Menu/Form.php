@@ -3,6 +3,7 @@
 namespace App\Livewire\Components\Menu;
 
 use App\Livewire\Traits\ConfirmsAction;
+use App\Livewire\Traits\HandlesModalForm;
 use App\Livewire\Traits\HasAccessControl;
 use App\Models\Menu;
 use App\Models\NewsPost;
@@ -13,10 +14,10 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-#[Layout('components.layouts.admin.app')]
-class Tree extends Component
+#[Layout('livewire.components.layouts.admin.app')]
+class Form extends Component
 {
-    use ConfirmsAction, HasAccessControl;
+    use ConfirmsAction, HandlesModalForm, HasAccessControl;
 
     protected string $accessKey = 'menus';
 
@@ -58,19 +59,56 @@ class Tree extends Component
 
     public array $slug_results = [];
 
-    public function mount(): void
-    {
-        $this->guardView();
-    }
+    #[Computed]
+    public function schema(): array {
+        $fields = [
+            [
+                'name' => 'name',
+                'label' => 'Name',
+                'type' => 'text',
+            ],
+            [
+                'name' => 'type',
+                'label' => 'Type',
+                'type' => 'select',
+                'live' => true,
+                'options' => [
+                    ['value' => 'route', 'label' => 'Internal route'],
+                    ['value' => 'link', 'label' => 'External link'],
+                ],
+            ],
+        ];
 
-    public function getRouteOptions(): array
-    {
-        return self::ROUTE_OPTIONS;
+        if ($this->type === 'link') {
+            $fields[] = [
+                'name' => 'route',
+                'label' => 'URL',
+                'type' => 'text',
+                'placeholder' => 'https://...',
+                'full_width' => true,
+            ];
+        } else {
+            $fields[] = [
+                'name' => 'route',
+                'label' => 'Route',
+                'type' => 'select',
+                'live' => true,
+                'full_width' => true,
+                'options' => [
+                    ['value' => '', 'label' => '— Select a route —'],
+                    ...collect(self::ROUTE_OPTIONS)
+                        ->map(fn (string $label, string $key) => ['value' => $key, 'label' => $label])
+                        ->values()
+                        ->all(),
+                ],
+            ];
+        }
+
+        return $fields;
     }
 
     #[Computed]
-    public function tree(): array
-    {
+    public function tree(): array {
         $all = Menu::where('location', $this->active_location)->orderBy('sort_order')->get();
         $byParent = $all->groupBy('parent_id');
 
@@ -91,14 +129,11 @@ class Tree extends Component
         return $map(-1);
     }
 
-    public function updatedActiveLocation(): void
-    {
-        unset($this->tree);
-        $this->dispatch('menu-tree-updated', tree: $this->tree);
+    public function updatedActiveLocation(): void {
+        $this->dispatchTreeUpdated();
     }
 
-    public function openCreate(?int $parentId = null): void
-    {
+    public function openCreate(?int $parentId = null): void {
         if (! $this->hasAccess('edit')) {
             return;
         }
@@ -108,8 +143,7 @@ class Tree extends Component
         $this->show_modal = true;
     }
 
-    public function openEdit(int $id): void
-    {
+    public function openEdit(int $id): void {
         $node = Menu::findOrFail($id);
 
         $this->resetForm();
@@ -128,40 +162,23 @@ class Tree extends Component
         $this->show_modal = true;
     }
 
-    protected function resetForm(): void
-    {
-        $this->editing_id = null;
-        $this->parent_id = null;
-        $this->name = '';
-        $this->type = 'route';
-        $this->route = '';
-        $this->params_slug = null;
-        $this->slug_search = '';
-        $this->slug_results = [];
-        $this->resetErrorBag();
+    protected function resetForm(): void {
+        $this->resetFormFields(['editing_id', 'parent_id', 'name', 'type', 'route', 'params_slug', 'slug_search', 'slug_results']);
     }
 
-    public function closeModal(): void
-    {
-        $this->show_modal = false;
-    }
-
-    public function updatedType(): void
-    {
+    public function updatedType(): void {
         $this->route = '';
         $this->params_slug = null;
         $this->slug_search = '';
         $this->slug_results = [];
     }
 
-    public function updatedRoute(): void
-    {
+    public function updatedRoute(): void {
         $this->params_slug = null;
         $this->slug_results = [];
     }
 
-    public function updatedSlugSearch(string $value): void
-    {
+    public function updatedSlugSearch(string $value): void {
         $model = self::ROUTE_SLUG_MODELS[$this->route] ?? null;
 
         if (! $model) {
@@ -179,15 +196,13 @@ class Tree extends Component
             ->all();
     }
 
-    public function selectSlug(string $slug, string $title): void
-    {
+    public function selectSlug(string $slug, string $title): void {
         $this->params_slug = $slug;
         $this->slug_search = $title;
         $this->slug_results = [];
     }
 
-    public function save(): void
-    {
+    public function save(): void {
         if (! $this->guardSave()) {
             return;
         }
@@ -203,7 +218,7 @@ class Tree extends Component
             'params_slug.required' => 'Select a target for this route.',
         ]);
 
-        $node = $this->editing_id ? Menu::findOrFail($this->editing_id) : new Menu();
+        $node = $this->editing_id ? Menu::findOrFail($this->editing_id) : new Menu;
         $node->name = $this->name;
         $node->type = $this->type;
         $node->route = $this->route;
@@ -227,14 +242,12 @@ class Tree extends Component
         $isCreating = ! $this->editing_id;
         $this->show_modal = false;
 
-        unset($this->tree);
-        $this->dispatch('menu-tree-updated', tree: $this->tree);
+        $this->dispatchTreeUpdated();
         $this->dispatch('notify', type: 'success', message: $isCreating ? 'Menu item created.' : 'Menu item updated.');
     }
 
     #[On('deleteMenuItem')]
-    public function delete(int $id): void
-    {
+    public function delete(int $id): void {
         if (! $this->guardSave()) {
             return;
         }
@@ -242,26 +255,27 @@ class Tree extends Component
         Menu::where('parent_id', $id)->update(['parent_id' => -1]);
         Menu::find($id)?->delete();
 
-        unset($this->tree);
-        $this->dispatch('menu-tree-updated', tree: $this->tree);
+        $this->dispatchTreeUpdated();
         $this->dispatch('notify', type: 'success', message: 'Menu item deleted.');
     }
 
-    public function saveOrder(array $tree): void
-    {
+    public function saveOrder(array $tree): void {
         if (! $this->guardSave()) {
             return;
         }
 
         $this->persistOrder($tree, -1);
 
-        unset($this->tree);
-        $this->dispatch('menu-tree-updated', tree: $this->tree);
+        $this->dispatchTreeUpdated();
         $this->dispatch('notify', type: 'success', message: 'Menu order saved.');
     }
 
-    protected function persistOrder(array $nodes, int $parentId): void
-    {
+    private function dispatchTreeUpdated(): void {
+        unset($this->tree);
+        $this->dispatch('menu-tree-updated', tree: $this->tree);
+    }
+
+    protected function persistOrder(array $nodes, int $parentId): void {
         foreach ($nodes as $index => $node) {
             $model = Menu::find((int) $node['id']);
             $model?->update([
@@ -281,8 +295,7 @@ class Tree extends Component
         }
     }
 
-    public function render()
-    {
-        return view('livewire.admin.menu.tree');
+    public function render() {
+        return view('livewire.admin.menu.index');
     }
 }

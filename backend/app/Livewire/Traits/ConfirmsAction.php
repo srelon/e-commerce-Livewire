@@ -38,14 +38,12 @@ trait ConfirmsAction
         $this->confirming_action = true;
     }
 
-    public function confirmAction(): void
-    {
+    public function confirmAction(): void {
         $this->dispatch($this->confirm_action_event, ...$this->confirm_action_params);
         $this->confirming_action = false;
     }
 
-    public function cancelAction(): void
-    {
+    public function cancelAction(): void {
         $this->confirming_action = false;
     }
 }

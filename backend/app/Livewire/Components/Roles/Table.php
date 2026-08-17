@@ -6,7 +6,6 @@ use App\Livewire\Traits\HasAccessControl;
 use App\Livewire\Traits\HasPowerGridBehavior;
 use App\Models\AdminRole;
 use Illuminate\Database\Eloquent\Builder;
-use Livewire\Attributes\On;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
@@ -18,30 +17,23 @@ final class Table extends PowerGridComponent
 
     protected string $accessKey = 'roles';
 
+    protected string $modelClass = AdminRole::class;
+
+    protected string $itemNoun = 'Role';
+
+    public string $deleteEvent = 'deleteRole';
+
     public string $tableName = 'roles-table';
 
     public string $sortField = 'id';
 
     public string $sortDirection = 'asc';
 
-    public function setUp(): array
-    {
-        return [
-            PowerGrid::header()
-                ->showSearchInput(),
-            PowerGrid::footer()
-                ->showPerPage()
-                ->showRecordCount(),
-        ];
-    }
-
-    public function datasource(): Builder
-    {
+    public function datasource(): Builder {
         return AdminRole::query()->withCount(['accesses', 'admins']);
     }
 
-    public function fields(): PowerGridFields
-    {
+    public function fields(): PowerGridFields {
         return PowerGrid::fields()
             ->add('id')
             ->add('label')
@@ -50,11 +42,9 @@ final class Table extends PowerGridComponent
             ->add('admins_count');
     }
 
-    public function columns(): array
-    {
+    public function columns(): array {
         return [
-            Column::make('ID', 'id')
-                ->sortable(),
+            $this->idColumn(),
 
             Column::make('Label', 'label')
                 ->searchable()
@@ -74,28 +64,19 @@ final class Table extends PowerGridComponent
         ];
     }
 
-    public function actions(AdminRole $row): array
-    {
+    public function actions(AdminRole $row): array {
         $actions = [
             $this->editIconButton('admin.roles.edit', ['role' => $row->id]),
         ];
 
         if ($this->hasAccess('edit')) {
-            $actions[] = $this->deleteIconButton('deleteRole', ['roleId' => $row->id], "Delete role \"{$row->label}\"?");
+            $actions[] = $this->deleteIconButton($this->deleteEvent, ['id' => $row->id], "Delete role \"{$row->label}\"?");
         }
 
         return $actions;
     }
 
-    #[On('deleteRole')]
-    public function deleteRole(int $roleId): void
-    {
-        if (! $this->guardSave()) {
-            return;
-        }
-
-        AdminRole::whereKey($roleId)->delete();
-
-        $this->dispatch('notify', type: 'success', message: 'Role deleted.');
+    protected function afterDelete(): void {
+        $this->dispatch('admin-access-updated');
     }
 }
