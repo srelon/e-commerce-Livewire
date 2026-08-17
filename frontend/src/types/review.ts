@@ -11,6 +11,7 @@ export interface Review {
     user: {
         name: string | null
         avatar: string | null
+        is_moderator: boolean
     }
     rating: number | null
     body: string

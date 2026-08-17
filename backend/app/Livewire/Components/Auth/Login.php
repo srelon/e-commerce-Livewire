@@ -6,7 +6,7 @@ use App\Traits\ThrottlesLogins;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('components.layouts.admin.guest')]
+#[Layout('livewire.components.layouts.admin.guest')]
 class Login extends Component
 {
     use ThrottlesLogins;
@@ -17,8 +17,7 @@ class Login extends Component
 
     public bool $remember = false;
 
-    public function login(): void
-    {
+    public function login(): void {
         $this->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -31,8 +30,7 @@ class Login extends Component
         $this->redirectRoute('admin.dashboard', navigate: true);
     }
 
-    public function render()
-    {
+    public function render() {
         return view('livewire.auth.login');
     }
 }

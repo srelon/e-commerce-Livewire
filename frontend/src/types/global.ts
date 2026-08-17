@@ -20,7 +20,6 @@ export interface FaqItem {
 export interface LayoutCategory {
     id: number
     name: string
-    slug: string
     icon: string | null
     image: string | null
     count: number

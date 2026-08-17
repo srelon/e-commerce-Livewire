@@ -34,7 +34,6 @@ export interface ProductDetail {
 
 export interface AuthorSummary {
     name: string
-    slug: string
     content: string | null
     photo: string | null
 }
@@ -86,10 +85,10 @@ export interface Paginated<T> {
 }
 
 export interface AuthorListItem {
-    slug: string
     name: string
     initials: string
     color: string
+    photo: string | null
     bio: string
     books: number
     bestsellers: number

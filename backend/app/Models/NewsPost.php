@@ -39,7 +39,7 @@ class NewsPost extends Model
     }
 
     public function author(): BelongsTo {
-        return $this->belongsTo(Admin::class, 'author_id');
+        return $this->belongsTo(NewsAuthor::class, 'author_id');
     }
 
     public function seo(): MorphOne {

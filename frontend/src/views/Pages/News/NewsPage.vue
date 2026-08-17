@@ -33,9 +33,7 @@
                             <span class="post__date">{{ post.date }}</span>
                         </div>
 
-                        <div class="post__content">
-                            <p v-for="(para, i) in content_paragraphs" :key="i">{{ para }}</p>
-                        </div>
+                        <div class="post__content" v-html="post.content"></div>
 
                         <div class="post__footer">
                             <router-link :to="{ name: 'news' }" class="post__back">← Back to News</router-link>
@@ -71,7 +69,6 @@ const is_loading = ref(true)
 const post = ref<BlogPostDetail | null>(null)
 
 const page_title = computed(() => post.value?.title ?? (is_loading.value ? '' : 'Post Not Found'))
-const content_paragraphs = computed(() => (post.value?.content ?? '').split('\n\n').filter(Boolean))
 
 function fetch_post() {
     if (!props.slug) return
@@ -144,15 +141,83 @@ watch(() => props.slug, fetch_post, { immediate: true })
     }
 
     &__content {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
         margin-bottom: 40px;
+        font-size: 16px;
+        color: $color-dark;
+        line-height: 1.8;
 
-        p {
-            font-size: 16px;
+        :deep(p) {
+            margin-bottom: 20px;
+        }
+
+        :deep(h2) {
+            margin: 32px 0 16px;
+            font-size: 24px;
+            font-weight: 700;
             color: $color-dark;
-            line-height: 1.8;
+        }
+
+        :deep(h3) {
+            margin: 28px 0 14px;
+            font-size: 20px;
+            font-weight: 700;
+            color: $color-dark;
+        }
+
+        :deep(ul),
+        :deep(ol) {
+            margin: 0 0 20px;
+            padding-left: 24px;
+
+            li {
+                margin-bottom: 8px;
+            }
+        }
+
+        :deep(ul) {
+            list-style: disc;
+        }
+
+        :deep(ol) {
+            list-style: decimal;
+        }
+
+        :deep(blockquote) {
+            margin: 0 0 20px;
+            padding: 4px 20px;
+            border-left: 3px solid $color-primary;
+            color: $color-gray;
+            font-style: italic;
+        }
+
+        :deep(a) {
+            color: $color-primary;
+            text-decoration: underline;
+
+            &:hover {
+                color: $color-primary-light;
+            }
+        }
+
+        :deep(img) {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 8px 0 20px;
+        }
+
+        :deep(strong),
+        :deep(b) {
+            font-weight: 700;
+        }
+
+        :deep(em),
+        :deep(i) {
+            font-style: italic;
+        }
+
+        :deep(u) {
+            text-decoration: underline;
         }
     }
 

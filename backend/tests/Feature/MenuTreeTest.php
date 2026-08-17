@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Components\Menu\Tree;
+use App\Livewire\Components\Menu\Form;
 use App\Models\Admin;
 use App\Models\AdminAccess;
 use App\Models\AdminRole;
@@ -15,8 +15,7 @@ class MenuTreeTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function actingAsAdminWithMenuAccess(): Admin
-    {
+    protected function actingAsAdminWithMenuAccess(): Admin {
         $role = AdminRole::create(['name' => 'editor', 'label' => 'Editor']);
         $access = AdminAccess::create(['key' => 'menus', 'title' => 'Menus']);
 
@@ -35,8 +34,7 @@ class MenuTreeTest extends TestCase
         return $admin;
     }
 
-    public function test_nesting_a_node_that_already_has_children_does_not_create_a_hidden_third_level(): void
-    {
+    public function test_nesting_a_node_that_already_has_children_does_not_create_a_hidden_third_level(): void {
         $this->actingAsAdminWithMenuAccess();
 
         $root_a = Menu::create(['name' => 'A', 'route' => 'home', 'type' => 'route', 'parent_id' => -1, 'sort_order' => 0, 'location' => 'header']);
@@ -59,7 +57,7 @@ class MenuTreeTest extends TestCase
             ],
         ];
 
-        Livewire::test(Tree::class)->call('saveOrder', $payload);
+        Livewire::test(Form::class)->call('saveOrder', $payload);
 
         $root_a->refresh();
         $child_b->refresh();
@@ -68,8 +66,7 @@ class MenuTreeTest extends TestCase
         $this->assertSame(-1, $child_b->parent_id, 'B should be promoted back to root, not left nested three levels deep.');
     }
 
-    public function test_normal_one_level_nesting_still_works(): void
-    {
+    public function test_normal_one_level_nesting_still_works(): void {
         $this->actingAsAdminWithMenuAccess();
 
         $root_a = Menu::create(['name' => 'A', 'route' => 'home', 'type' => 'route', 'parent_id' => -1, 'sort_order' => 0, 'location' => 'header']);
@@ -84,7 +81,7 @@ class MenuTreeTest extends TestCase
             ],
         ];
 
-        Livewire::test(Tree::class)->call('saveOrder', $payload);
+        Livewire::test(Form::class)->call('saveOrder', $payload);
 
         $root_a->refresh();
 

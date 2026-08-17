@@ -17,11 +17,9 @@ class ProductFilterTest extends TestCase
     public function test_products_are_filtered_by_category(): void {
         $fantasy = $this->createCategory([
             'name' => 'Fantasy',
-            'slug' => 'fantasy',
         ]);
         $cooking = $this->createCategory([
             'name' => 'Cooking',
-            'slug' => 'cooking',
         ]);
         $this->createProduct($fantasy, [
             'title' => 'Fantasy Book',
@@ -39,7 +37,6 @@ class ProductFilterTest extends TestCase
     public function test_products_accept_a_single_category_string_not_just_an_array(): void {
         $fantasy = $this->createCategory([
             'name' => 'Fantasy',
-            'slug' => 'fantasy',
         ]);
         $this->createProduct($fantasy, [
             'title' => 'Fantasy Book',
@@ -54,15 +51,12 @@ class ProductFilterTest extends TestCase
     public function test_products_accept_a_comma_separated_category_list(): void {
         $fantasy = $this->createCategory([
             'name' => 'Fantasy',
-            'slug' => 'fantasy',
         ]);
         $cooking = $this->createCategory([
             'name' => 'Cooking',
-            'slug' => 'cooking',
         ]);
         $history = $this->createCategory([
             'name' => 'History',
-            'slug' => 'history',
         ]);
         $this->createProduct($fantasy, [
             'title' => 'Fantasy Book',
@@ -231,7 +225,6 @@ class ProductFilterTest extends TestCase
     public function test_products_response_includes_filter_groups_with_counts(): void {
         $category = $this->createCategory([
             'name' => 'Fantasy',
-            'slug' => 'fantasy',
         ]);
         $this->createProduct($category);
 
@@ -249,11 +242,9 @@ class ProductFilterTest extends TestCase
     public function test_filter_groups_exclude_categories_and_authors_with_no_products(): void {
         $with_products = $this->createCategory([
             'name' => 'Fantasy',
-            'slug' => 'fantasy',
         ]);
         $this->createCategory([
             'name' => 'Empty Category',
-            'slug' => 'empty-category',
         ]);
         $author = $this->createAuthor([
             'name' => 'Has Books',
@@ -280,11 +271,9 @@ class ProductFilterTest extends TestCase
     public function test_filter_groups_narrow_down_when_a_category_is_selected(): void {
         $fantasy = $this->createCategory([
             'name' => 'Fantasy',
-            'slug' => 'fantasy',
         ]);
         $cooking = $this->createCategory([
             'name' => 'Cooking',
-            'slug' => 'cooking',
         ]);
         $fantasy_author = $this->createAuthor([
             'name' => 'Fantasy Writer',
@@ -321,11 +310,9 @@ class ProductFilterTest extends TestCase
     public function test_filter_groups_keep_a_selected_item_visible_even_at_zero_count(): void {
         $fantasy = $this->createCategory([
             'name' => 'Fantasy',
-            'slug' => 'fantasy',
         ]);
         $cooking = $this->createCategory([
             'name' => 'Cooking',
-            'slug' => 'cooking',
         ]);
         $fantasy_author = $this->createAuthor([
             'name' => 'Fantasy Writer',

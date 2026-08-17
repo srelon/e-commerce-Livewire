@@ -266,6 +266,12 @@ function on_review_deleted(e: Event) {
         return
     }
 
+    if (viewer_review.value?.id === data.id) {
+        viewer_review.value = null
+        is_editing.value = false
+        return
+    }
+
     reviews.value = reviews.value.filter((r) => r.id !== data.id)
     pagination.value.total = Math.max(0, pagination.value.total - 1)
 }

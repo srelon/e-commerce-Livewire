@@ -16,7 +16,6 @@ class ProductsCategory extends Model
 
     protected $fillable = [
         'name',
-        'slug',
         'icon',
         'image',
         'sort_order',

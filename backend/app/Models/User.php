@@ -8,12 +8,13 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['public_id', 'name', 'email', 'password', 'avatar'])]
+#[Fillable(['public_id', 'name', 'email', 'password', 'avatar', 'is_moderator'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -29,7 +30,12 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_moderator' => 'boolean',
         ];
+    }
+
+    public function moderatingAdmins(): BelongsToMany {
+        return $this->belongsToMany(Admin::class, 'admin_moderators')->withTimestamps();
     }
 
     public function cart(): HasOne {

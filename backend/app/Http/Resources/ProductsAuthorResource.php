@@ -8,10 +8,10 @@ class ProductsAuthorResource extends JsonResource
 {
     public function toArray($request): array {
         return [
-            'slug' => $this->slug,
             'name' => $this->name,
             'initials' => $this->initials(),
             'color' => $this->avatar_color ?? '#999999',
+            'photo' => $this->photo['original'] ?? null,
             'bio' => $this->content ?? '',
             'books' => $this->products_count,
             'bestsellers' => (int) $this->bestseller_sum,

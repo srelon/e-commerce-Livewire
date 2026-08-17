@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\NewsAuthor;
 use App\Models\NewsCategory;
 use App\Models\NewsPost;
 use Illuminate\Database\Seeder;
@@ -171,13 +172,16 @@ class NewsPostSeeder extends Seeder
             ],
         ];
 
-        foreach ($posts as $data) {
+        $authors = NewsAuthor::orderBy('id')->get();
+
+        foreach ($posts as $index => $data) {
             $category = NewsCategory::where('name', $data['category'])->firstOrFail();
 
             NewsPost::firstOrCreate(
                 ['slug' => Str::slug($data['title'])],
                 [
                     'category_id' => $category->id,
+                    'author_id' => $authors->isNotEmpty() ? $authors[$index % $authors->count()]->id : null,
                     'title' => $data['title'],
                     'excerpt' => $data['excerpt'],
                     'content' => isset($data['content']) ? implode("\n\n", $data['content']) : null,

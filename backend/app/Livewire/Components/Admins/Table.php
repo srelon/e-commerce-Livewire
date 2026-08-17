@@ -6,7 +6,6 @@ use App\Livewire\Traits\HasAccessControl;
 use App\Livewire\Traits\HasPowerGridBehavior;
 use App\Models\Admin;
 use Illuminate\Database\Eloquent\Builder;
-use Livewire\Attributes\On;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
@@ -18,36 +17,26 @@ final class Table extends PowerGridComponent
 
     protected string $accessKey = 'admins';
 
+    protected string $modelClass = Admin::class;
+
+    protected string $itemNoun = 'Admin';
+
+    public string $deleteEvent = 'deleteAdmin';
+
     public string $tableName = 'admins-table';
 
     public string $sortField = 'id';
 
     public string $sortDirection = 'desc';
 
-    public function setUp(): array
-    {
-        return [
-            PowerGrid::header()
-                ->showSearchInput(),
-            PowerGrid::footer()
-                ->showPerPage()
-                ->showRecordCount(),
-        ];
-    }
-
-    public function datasource(): Builder
-    {
+    public function datasource(): Builder {
         return Admin::query()->with('role');
     }
 
-    public function fields(): PowerGridFields
-    {
+    public function fields(): PowerGridFields {
         return PowerGrid::fields()
             ->add('id')
-            ->add('avatar_cell', fn (Admin $model) => view('livewire.admin.partials.avatar-cell', [
-                'avatar' => $model->avatar,
-                'name' => $model->name,
-            ])->render())
+            ->add('avatar_cell', $this->avatarCellField())
             ->add('name')
             ->add('email')
             ->add('role_badge', fn (Admin $model) => view('livewire.admin.partials.role-badge', [
@@ -56,14 +45,11 @@ final class Table extends PowerGridComponent
             ->add('registered_at', fn (Admin $model) => $model->created_at->format('d.m.Y H:i'));
     }
 
-    public function columns(): array
-    {
+    public function columns(): array {
         return [
-            Column::make('ID', 'id')
-                ->sortable(),
+            $this->idColumn(),
 
-            Column::make('Avatar', 'avatar_cell')
-                ->template(),
+            $this->photoColumn('Avatar', 'avatar_cell'),
 
             Column::make('Name', 'name')
                 ->searchable()
@@ -83,32 +69,19 @@ final class Table extends PowerGridComponent
         ];
     }
 
-    public function actions(Admin $row): array
-    {
+    public function actions(Admin $row): array {
         $actions = [
             $this->editIconButton('admin.admins.edit', ['admin' => $row->id]),
         ];
 
         if ($this->hasAccess('edit') && $row->id !== auth('admins')->id()) {
-            $actions[] = $this->deleteIconButton('deleteAdmin', ['adminId' => $row->id], "Delete admin \"{$row->name}\"?");
+            $actions[] = $this->deleteIconButton($this->deleteEvent, ['id' => $row->id], "Delete admin \"{$row->name}\"?");
         }
 
         return $actions;
     }
 
-    #[On('deleteAdmin')]
-    public function deleteAdmin(int $adminId): void
-    {
-        if (! $this->guardSave()) {
-            return;
-        }
-
-        if ($adminId === auth('admins')->id()) {
-            return;
-        }
-
-        Admin::whereKey($adminId)->delete();
-
-        $this->dispatch('notify', type: 'success', message: 'Admin deleted.');
+    protected function beforeDelete(int $id): bool {
+        return $id !== auth('admins')->id();
     }
 }

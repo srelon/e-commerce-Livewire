@@ -9,7 +9,6 @@ return new class extends Migration {
         Schema::create('products_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug')->unique();
             $table->json('icon')->nullable();
             $table->json('image')->nullable();
             $table->unsignedInteger('sort_order')->default(999);

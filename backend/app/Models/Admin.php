@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -20,6 +21,7 @@ class Admin extends Authenticatable
         'password',
         'avatar',
         'role_id',
+        'allowed_ip',
     ];
 
     protected $hidden = [
@@ -42,6 +44,10 @@ class Admin extends Authenticatable
 
     public function newsPosts(): HasMany {
         return $this->hasMany(NewsPost::class, 'author_id');
+    }
+
+    public function moderators(): BelongsToMany {
+        return $this->belongsToMany(User::class, 'admin_moderators')->withTimestamps();
     }
 
     public function hasAccess(string $slug): bool {

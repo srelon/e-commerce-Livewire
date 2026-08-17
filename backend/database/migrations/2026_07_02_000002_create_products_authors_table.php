@@ -9,7 +9,6 @@ return new class extends Migration {
         Schema::create('products_authors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug')->unique();
             $table->string('avatar_color')->nullable();
             $table->json('photo')->nullable();
             $table->text('content')->nullable();

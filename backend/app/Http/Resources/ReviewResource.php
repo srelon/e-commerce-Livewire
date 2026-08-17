@@ -30,6 +30,7 @@ class ReviewResource extends JsonResource
             'user' => [
                 'name' => $this->resource->user?->name,
                 'avatar' => $this->resource->user?->avatar,
+                'is_moderator' => (bool) $this->resource->user?->is_moderator,
             ],
             'rating' => $this->rating,
             'body' => $this->body,

@@ -17,13 +17,12 @@ class LayoutTest extends TestCase
     public function test_layout_includes_active_categories_with_product_count(): void {
         $category = $this->createCategory([
             'name' => 'Fantasy',
-            'slug' => 'fantasy',
         ]);
         $this->createProduct($category);
 
         $this->getJson('/api/layout')
             ->assertSuccessful()
-            ->assertJsonPath('data.categories.0.slug', 'fantasy')
+            ->assertJsonPath('data.categories.0.name', 'Fantasy')
             ->assertJsonPath('data.categories.0.image', 'products_categories/test-promo.webp')
             ->assertJsonPath('data.categories.0.count', 1);
     }

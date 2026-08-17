@@ -82,7 +82,7 @@
 </div>
 
 <flux:modal wire:model.self="show_create_access" name="create-access" class="max-w-sm">
-    <div class="space-y-4">
+    <div class="space-y-4" x-on:keydown.enter="if ($event.target.tagName !== 'TEXTAREA') { $event.preventDefault(); $wire.createAccess() }">
         <flux:heading size="lg">Add Access</flux:heading>
 
         <flux:field>
